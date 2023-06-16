@@ -50,6 +50,8 @@
       Route::get('/userdata', 'UserController@getUserData');
       Route::patch('/userdata', 'UserController@changeUserData')->middleware('csrf');
 
+      Route::post('/review', 'ReviewController@store')->middleware('csrf');
+
       Route::get('/search-tmdb', 'TMDBController@search');
 
       Route::post('/fetch-files', 'FileParserController@call');

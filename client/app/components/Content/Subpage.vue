@@ -116,6 +116,11 @@
               v-for="(item, index) in creditCrew"
             />
           </ol>
+          <form v-if="auth" @submit.prevent="sendReview()">
+            <textarea v-model="review" cols="30" rows="10"></textarea>
+            <span class="userdata-changed"><span v-if="success">{{ lang('success message') }}</span></span>
+            <button type="submit">{{ lang('save button') }}</button>
+          </form>
         </div>
       </div>
     </div>
@@ -132,6 +137,9 @@
   import Person from './Person.vue';
 
   import http from 'axios';
+  import debounce from 'debounce';
+
+  const debounceMilliseconds = 2000;
 
   export default {
     mixins: [MiscHelper, ItemHelper],
@@ -143,6 +151,7 @@
       window.scrollTo(0, 0);
       this.fetchSettings();
       this.fetchData();
+      this.clearSuccessMessage = debounce(this.clearSuccessMessage, debounceMilliseconds);
     },
 
     destroyed() {
@@ -160,7 +169,9 @@
         loadingImdb: false,
         auth: config.auth,
         rated: false,
-        displayRatings: null
+        displayRatings: null,
+        review: '',
+        success: false
       }
     },
 
@@ -312,6 +323,21 @@
           alert(error);
           this.SET_LOADING(false);
         })
+      },
+
+      sendReview() {
+        const review = this.review;
+
+        if(review !== '') {
+          http.post(`${config.api}/review`, {review}).then(() => {
+            this.success = true;
+            this.clearSuccessMessage();
+          });
+        }
+      },
+
+      clearSuccessMessage() {
+        this.success = false;
       }
     },
 
