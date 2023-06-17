@@ -116,8 +116,19 @@
               v-for="(item, index) in creditCrew"
             />
           </ol>
+          <ol
+            v-if="reviews.length"
+            class="reviews"
+          >
+            <ReviewItem
+              :item="item"
+              :key="'review-' + index"
+              v-for="(item, index) in reviews"
+            />
+          </ol>
           <form v-if="auth" @submit.prevent="sendReview()">
-            <textarea v-model="review" cols="30" rows="10"></textarea>
+            <label for="review-add" class="review-add-label">{{ lang('Votre avis') }}</label>
+            <textarea id="review-add" v-model="review" class="review-add" required></textarea>
             <span class="userdata-changed"><span v-if="success">{{ lang('success message') }}</span></span>
             <button type="submit">{{ lang('save button') }}</button>
           </form>
@@ -135,6 +146,7 @@
   import MiscHelper from '../../helpers/misc';
   import ItemHelper from '../../helpers/item';
   import Person from './Person.vue';
+  import ReviewItem from './ReviewItem.vue';
 
   import http from 'axios';
   import debounce from 'debounce';
@@ -166,6 +178,7 @@
         latestEpisode: null,
         creditCast: [],
         creditCrew: [],
+        reviews: [],
         loadingImdb: false,
         auth: config.auth,
         rated: false,
@@ -264,6 +277,7 @@
           this.item = response.data;
           this.creditCast = response.data.credit_cast;
           this.creditCrew = response.data.credit_crew;
+          this.reviews = response.data.review;
           this.item.tmdb_rating = this.intToFloat(response.data.tmdb_rating);
           this.latestEpisode = this.item.latest_episode;
 
@@ -343,7 +357,8 @@
 
     components: {
       Person,
-      Rating
+      Rating,
+      ReviewItem
     }
   }
 </script>
