@@ -329,7 +329,7 @@
         const review = this.review;
 
         if(review !== '') {
-          http.post(`${config.api}/review`, {review}).then(() => {
+          http.post(`${config.api}/review`, {review, itemId: this.item.id}).then(() => {
             this.success = true;
             this.clearSuccessMessage();
           });

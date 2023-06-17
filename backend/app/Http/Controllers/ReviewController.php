@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Review;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -21,8 +22,20 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
-      $review = Request::input('review');
-      return response('Success', Response::HTTP_OK);
+      $itemId = Request::input('itemId');
+      $content = Request::input('content');
+
+      if(!$content || !$itemId) {
+        return response('Bad request.', Response::HTTP_BAD_REQUEST);
+      }
+
+      if(Auth::check() || $request->validate(['content' => 'required|unique:content|max:255'])) {
+        $reviewModel = new Review();
+        $reviewModel->store(Auth::user()->id, $itemId, $content);
+        return response('Success', Response::HTTP_OK);
+      }
+
+      return response('Invalid credentials.', Response::HTTP_UNAUTHORIZED, ['WWW-Authenticate' => 'Basic']);
     }
 
     /**
