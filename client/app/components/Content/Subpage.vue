@@ -116,22 +116,22 @@
               v-for="(item, index) in creditCrew"
             />
           </ol>
+          <form v-if="auth" @submit.prevent="sendReview()">
+            <label for="review-add" class="review-add-label">{{ lang('Votre avis') }}</label>
+            <textarea id="review-add" v-model="userReview" class="review-add" required></textarea>
+            <span class="userdata-changed"><span v-if="success">{{ lang('success message') }}</span></span>
+            <button type="submit">{{ lang('save button') }}</button>
+          </form>
           <ol
-            v-if="reviews.length"
+            v-if="filteredReviews.length"
             class="reviews"
           >
             <ReviewItem
               :item="item"
               :key="'review-' + index"
-              v-for="(item, index) in reviews"
+              v-for="(item, index) in filteredReviews"
             />
           </ol>
-          <form v-if="auth" @submit.prevent="sendReview()">
-            <label for="review-add" class="review-add-label">{{ lang('Votre avis') }}</label>
-            <textarea id="review-add" v-model="review" class="review-add" required></textarea>
-            <span class="userdata-changed"><span v-if="success">{{ lang('success message') }}</span></span>
-            <button type="submit">{{ lang('save button') }}</button>
-          </form>
         </div>
       </div>
     </div>
@@ -183,8 +183,8 @@
         auth: config.auth,
         rated: false,
         displayRatings: null,
-        review: '',
-        success: false
+        success: false,
+        userReview: ''
       }
     },
 
@@ -208,6 +208,11 @@
         return {
           backgroundImage: `url(${backdropUrl}${this.item.backdrop})`
         }
+      },
+
+      filteredReviews() {
+        return this.auth ?
+            this.reviews.filter(review => review.user_id !== this.auth) : this.reviews;
       },
 
       posterImage() {
@@ -277,7 +282,7 @@
           this.item = response.data;
           this.creditCast = response.data.credit_cast;
           this.creditCrew = response.data.credit_crew;
-          this.reviews = response.data.review;
+          this.reviews = this.setReviews(response.data.review);
           this.item.tmdb_rating = this.intToFloat(response.data.tmdb_rating);
           this.latestEpisode = this.item.latest_episode;
 
@@ -306,12 +311,27 @@
         }, 50);
       },
 
+      setInitialUserReview(reviews) {
+        const userReviews = reviews.filter(review => review.user_id === this.auth);
+        if(userReviews.length === 1) {
+            this.setUserReview(userReviews[0].content);
+        }
+        if(userReviews.length > 1) {
+          console.warn('More than 1 user review detected.');
+        }
+      },
+
       setItem(item) {
         this.item = item;
       },
 
       setRated(rated) {
         this.rated = rated;
+      },
+
+      setReviews(reviews) {
+        this.setInitialUserReview(reviews);
+        return reviews;
       },
 
       removeItem() {
@@ -340,7 +360,7 @@
       },
 
       sendReview() {
-        const review = this.review;
+        const review = this.userReview;
 
         if(review !== '') {
           http.post(`${config.api}/review`, {review, itemId: this.item.id}).then(() => {
@@ -352,6 +372,10 @@
 
       clearSuccessMessage() {
         this.success = false;
+      },
+
+      setUserReview(review) {
+        this.userReview = review;
       }
     },
 
