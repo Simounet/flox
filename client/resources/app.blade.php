@@ -18,7 +18,7 @@
   data-poster-tmdb="{{ config('services.tmdb.poster') }}"
   data-poster-subpage-tmdb="{{ config('services.tmdb.poster_subpage') }}"
   data-backdrop-tmdb="{{ config('services.tmdb.backdrop') }}"
-  data-auth="{{ Auth::check() }}"
+  data-auth="{{ Auth::id() }}"
   data-language="{{ $lang }}"
   class="{{ Auth::check() ? 'logged' : 'guest' }}"
 >
