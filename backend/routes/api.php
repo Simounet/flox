@@ -12,3 +12,8 @@
   });
 
   Route::get('.well-known/webfinger', 'WebFingerController@handle')->name('well-known.webfinger');
+  Route::get('/users/{username}/followers', 'ActorController@followers')->name('federation.user.followers');
+  Route::get('/users/{username}/following', 'ActorController@following')->name('federation.user.following');
+  Route::get('/users/{username}/inbox', 'ActorController@inbox')->name('federation.user.inbox');
+  Route::get('/users/{username}/outbox', 'ActorController@outbox')->name('federation.user.outbox');
+  Route::get('/users/{username}', 'ActorController@actor')->name('federation.user');
