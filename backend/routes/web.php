@@ -61,4 +61,6 @@
     });
   });
 
+  Route::get('/review/{id}.json', 'ReviewController@showObject');
+
   Route::fallback('HomeController@app');

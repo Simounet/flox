@@ -10,3 +10,5 @@
     Route::get('/last-fetched', 'FileParserController@lastFetched');
     Route::get('/review/{id}', 'ReviewController@show');
   });
+
+  Route::get('.well-known/webfinger', 'WebFingerController@handle')->name('well-known.webfinger');
