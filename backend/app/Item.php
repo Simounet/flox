@@ -2,6 +2,7 @@
 
   namespace App;
 
+  use App\Services\Storage;
   use Carbon\Carbon;
   use Illuminate\Database\Eloquent\Model;
 
@@ -293,5 +294,13 @@
             $query->where('title', $title);
           });
         });
+    }
+
+    public function getPoster(): array
+    {
+      return [
+        'url' => (new Storage)->getPosterUrl($this->poster),
+        'title' => $this->title
+      ];
     }
   }

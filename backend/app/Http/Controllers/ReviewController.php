@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ReviewResource;
 use App\Review;
+use App\Services\Fediverse\Activity\ReviewActivity;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -75,4 +76,13 @@ class ReviewController extends Controller
 
         return response('Success', Response::HTTP_OK);
     }
+
+    public function showObject(Request $request, string $username, string $id)
+    {
+        $review = Review::findOrFail($id);
+        $note =  (new ReviewActivity)->reviewObject($request, $review);
+
+        return response()->json($note->toArray(), 200, ['Content-Type' => 'application/activity+json'], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+    }
+
 }
