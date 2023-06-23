@@ -8,14 +8,14 @@
   "dependencies": {
     "axios": "^0.18.1",
     "babel-runtime": "^6.26.0",
-    "dayjs": "^1.7.5",
-    "debounce": "^1.1.0",
-    "element-ui": "^2.0.10",
+    "dayjs": "^1.11.8",
+    "debounce": "^1.2.1",
+    "element-ui": "^2.15.13",
     "v-hotkey": "^0.2.3",
     "vue": "^2.7.14",
-    "vue-router": "^3.0.1",
+    "vue-router": "^3.6.5",
     "vue-simple-calendar": "^5.0.1",
-    "vuex": "^3.0.0"
+    "vuex": "^3.6.2"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.6",
@@ -25,21 +25,21 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
-    "cross-env": "^5.1.1",
+    "cross-env": "^5.2.1",
     "css-loader": "^0.28.7",
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.5",
-    "lost": "^8.2.0",
-    "mjml": "^4.2.0",
-    "node-sass": "^4.13",
+    "lost": "^8.3.1",
+    "mjml": "^4.14.1",
+    "node-sass": "^4.14.1",
     "postcss-loader": "^2.0.8",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.19.0",
     "url-loader": "^0.6.2",
     "vue-html-loader": "^1.2.4",
-    "vue-loader": "^15.10.0",
-    "vue-template-compiler": "^2.5.2",
+    "vue-loader": "^15.10.1",
+    "vue-template-compiler": "^2.7.14",
     "webpack": "^3.8.1",
-    "webpack-cli": "^3.1.0"
+    "webpack-cli": "^3.3.12"
   }
 }
