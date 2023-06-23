@@ -1,7 +1,10 @@
 const webpack = require("webpack");
 const path = require("path");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 const { VueLoaderPlugin } = require("vue-loader");
+
+const isProduction = process.env.NODE_ENV === "production";
 
 module.exports = {
   entry: {
@@ -13,7 +16,8 @@ module.exports = {
   },
   output: {
     path: path.resolve("../public/assets"),
-    filename: "app.js",
+    filename: "[name].js",
+    assetModuleFilename: "img/[name][ext][query]",
   },
   resolve: {
     alias: {
@@ -33,40 +37,35 @@ module.exports = {
       },
       {
         test: /\.(png|jpg|svg|woff|woff2|eot|ttf)$/,
-        use: {
-          loader: "url-loader",
-          options: {
-            limit: 10000,
-            name: "img/[name].[ext]",
-            emitFile: false,
-          },
-        },
+        type: "asset/resource",
       },
       {
         test: /\.(scss|css)$/,
-        use: ExtractTextPlugin.extract({
-          fallback: "style-loader",
-          use: ["css-loader", "postcss-loader", "sass-loader"],
-        }),
+        use: [
+          isProduction ? MiniCssExtractPlugin.loader : "style-loader",
+          "css-loader",
+          "postcss-loader",
+          "sass-loader",
+        ],
       },
     ],
   },
-  plugins: [
-    new VueLoaderPlugin(),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: "vendor",
-      filename: "vendor.js",
-    }),
-    new ExtractTextPlugin("app.css"),
-  ],
+  plugins: [new VueLoaderPlugin(), new MiniCssExtractPlugin()],
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        extractComments: false,
+        terserOptions: {
+          format: {
+            comments: false,
+          },
+        },
+      }),
+    ],
+  },
 };
 
-if (process.env.NODE_ENV === "production") {
-  module.exports.plugins = (module.exports.plugins || []).concat([
-    new webpack.DefinePlugin({
-      "process.env": {
-        NODE_ENV: '"production"',
-      },
-    }),
-  ]);
+if (isProduction) {
+  module.exports.mode = "production";
 }
