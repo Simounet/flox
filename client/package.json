@@ -1,4 +1,5 @@
 {
+  "name": "Flox",
   "private": true,
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --progress",
@@ -41,5 +42,9 @@
     "vue-template-compiler": "^2.7.14",
     "webpack": "^5.88.0",
     "webpack-cli": "^5.1.4"
+  },
+  "engines": {
+    "node": "^18.0.0",
+    "npm": "^9.0.0"
   }
 }
