@@ -28,4 +28,4 @@ jobs:
       env:
         DB_CONNECTION: sqlite
         DB_DATABASE: ':memory:'
-      run: cd backend && vendor/bin/phpunit
+      run: cd backend && php artisan test --parallel
