@@ -11,7 +11,7 @@
     "dayjs": "^1.11.8",
     "debounce": "^1.2.1",
     "element-ui": "^2.15.13",
-    "v-hotkey": "^0.2.3",
+    "v-hotkey": "^0.9.0",
     "vue": "^2.7.14",
     "vue-router": "^3.6.5",
     "vue-simple-calendar": "^5.0.1",
