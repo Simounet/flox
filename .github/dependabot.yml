@@ -1,0 +1,41 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: "08:00"
+    timezone: Europe/Paris
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: vue
+    versions:
+    - "> 2.7.14"
+  - dependency-name: vue-loader
+    versions:
+    - "> 15.10.1"
+  - dependency-name: vue-router
+    versions:
+    - "> 3.6.5"
+  - dependency-name: vue-simple-calendar
+    versions:
+    - "> 5.0.1"
+  - dependency-name: vuex
+    versions:
+    - "> 3.6.2"
+- package-ecosystem: composer
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "08:00"
+    timezone: Europe/Paris
+  open-pull-requests-limit: 10
+  reviewers:
+  - simounet
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: "08:00"
+    timezone: Europe/Paris
+  open-pull-requests-limit: 10
