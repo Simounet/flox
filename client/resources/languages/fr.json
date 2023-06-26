@@ -81,5 +81,8 @@
   "show own ratings": "Show own ratings",
   "always": "Always",
   "on hover": "On hover",
-  "never": "Never"
+  "never": "Never",
+
+  "go_to_review_page": "Voir la note",
+  "error message": "Une erreur est survenue. Veuillez réessayer plus tard."
 }

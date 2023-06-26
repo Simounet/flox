@@ -81,5 +81,8 @@
   "show own ratings": "Show own ratings",
   "always": "Always",
   "on hover": "On hover",
-  "never": "Never"
+  "never": "Never",
+
+  "go_to_review_page": "Review page",
+  "error message": "Something went wrong. Please try again later."
 }

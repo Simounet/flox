@@ -1,17 +1,34 @@
 <template>
-  <transition mode="out-in" name="fade">
-    <li class="review-item" v-html="content"></li>
-  </transition>
+  <ol
+    class="reviews"
+  >
+    <li
+      :key="'review-' + index"
+      v-for="(review, index) in reviews"
+      class="review-item">
+      <p v-html="contentFilter(review.content)"></p>
+      <ReviewLink
+        :review="review"
+        class="review-item__link"
+      />
+    </li>
+  </ol>
 </template>
 
 <script>
-  export default {
-    props: ['item'],
+  import ReviewLink from '../Review/ReviewLink.vue';
 
-    computed: {
-      content() {
-        return this.item.content.replace(/\n/g, '<br />');
+  export default {
+    props: ['reviews'],
+
+    methods: {
+      contentFilter(content) {
+        return content.replace(/\n/g, '<br />');
       }
+    },
+
+    components: {
+      ReviewLink
     }
   }
 </script>

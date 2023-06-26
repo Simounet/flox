@@ -116,22 +116,10 @@
               v-for="(item, index) in creditCrew"
             />
           </ol>
-          <form v-if="auth" @submit.prevent="sendReview()">
-            <label for="review-add" class="review-add-label">{{ lang('Votre avis') }}</label>
-            <textarea id="review-add" v-model="userReview" class="review-add" required></textarea>
-            <span class="userdata-changed"><span v-if="success">{{ lang('success message') }}</span></span>
-            <button type="submit">{{ lang('save button') }}</button>
-          </form>
-          <ol
-            v-if="filteredReviews.length"
-            class="reviews"
-          >
-            <ReviewItem
-              :item="item"
-              :key="'review-' + index"
-              v-for="(item, index) in filteredReviews"
-            />
-          </ol>
+          <ReviewItems
+            :itemId="item.id"
+            :reviews="reviews"
+          />
         </div>
       </div>
     </div>
@@ -146,12 +134,9 @@
   import MiscHelper from '../../helpers/misc';
   import ItemHelper from '../../helpers/item';
   import Person from './Person.vue';
-  import ReviewItem from './ReviewItem.vue';
+  import ReviewItems from '../Review/ReviewItems.vue';
 
   import http from 'axios';
-  import debounce from 'debounce';
-
-  const debounceMilliseconds = 2000;
 
   export default {
     mixins: [MiscHelper, ItemHelper],
@@ -163,7 +148,6 @@
       window.scrollTo(0, 0);
       this.fetchSettings();
       this.fetchData();
-      this.clearSuccessMessage = debounce(this.clearSuccessMessage, debounceMilliseconds);
     },
 
     destroyed() {
@@ -183,9 +167,7 @@
         loadingImdb: false,
         auth: config.auth,
         rated: false,
-        displayRatings: null,
-        success: false,
-        userReview: ''
+        displayRatings: null
       }
     },
 
@@ -210,11 +192,6 @@
         return {
           backgroundImage: `url(${backdropBaseUrl}${this.item.backdrop})`
         }
-      },
-
-      filteredReviews() {
-        return this.auth ?
-            this.reviews.filter(review => review.user_id !== this.auth) : this.reviews;
       },
 
       posterImage() {
@@ -284,7 +261,7 @@
           this.isLocalContent = !!response.data.rating;
           this.creditCast = response.data.credit_cast;
           this.creditCrew = response.data.credit_crew;
-          this.reviews = this.setReviews(response.data.review);
+          this.reviews = response.data.review;
           this.item.tmdb_rating = this.intToFloat(response.data.tmdb_rating);
           this.latestEpisode = this.item.latest_episode;
 
@@ -313,27 +290,12 @@
         }, 50);
       },
 
-      setInitialUserReview(reviews) {
-        const userReviews = reviews.filter(review => review.user_id === this.auth);
-        if(userReviews.length === 1) {
-            this.setUserReview(userReviews[0].content);
-        }
-        if(userReviews.length > 1) {
-          console.warn('More than 1 user review detected.');
-        }
-      },
-
       setItem(item) {
         this.item = item;
       },
 
       setRated(rated) {
         this.rated = rated;
-      },
-
-      setReviews(reviews) {
-        this.setInitialUserReview(reviews);
-        return reviews;
       },
 
       removeItem() {
@@ -359,32 +321,13 @@
           alert(error);
           this.SET_LOADING(false);
         })
-      },
-
-      sendReview() {
-        const review = this.userReview;
-
-        if(review !== '') {
-          http.post(`${config.api}/review`, {review, itemId: this.item.id}).then(() => {
-            this.success = true;
-            this.clearSuccessMessage();
-          });
-        }
-      },
-
-      clearSuccessMessage() {
-        this.success = false;
-      },
-
-      setUserReview(review) {
-        this.userReview = review;
       }
     },
 
     components: {
       Person,
       Rating,
-      ReviewItem
+      ReviewItems
     }
   }
 </script>
