@@ -16,7 +16,7 @@
 </template>
 
 <script>
-  import ReviewLink from '../Review/ReviewLink.vue';
+  import ReviewLink from './ReviewLink.vue';
 
   export default {
     props: ['reviews'],

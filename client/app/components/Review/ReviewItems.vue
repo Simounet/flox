@@ -4,7 +4,7 @@
       :review="userReview"
       :itemId="itemId"
     />
-    <ReviewItem
+    <ReviewList
       v-if="filteredReviews.length > 0"
       :reviews="filteredReviews"
     />
@@ -13,7 +13,7 @@
 
 <script>
   import MiscHelper from '../../helpers/misc';
-  import ReviewItem from '../Content/ReviewItem.vue';
+  import ReviewList from './ReviewList.vue';
   import UserReview from './UserReview.vue';
 
   export default {
@@ -46,7 +46,7 @@
     },
 
     components: {
-      ReviewItem,
+      ReviewList,
       UserReview
     }
   }
