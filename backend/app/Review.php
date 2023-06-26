@@ -17,6 +17,18 @@ class Review extends Model
         'content',
     ];
 
+    protected $with = ['user'];
+
+    public function item()
+    {
+        return $this->belongsTo(Item::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     /**
      * Create the new person.
      *
