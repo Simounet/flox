@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ReviewResource;
 use App\Review;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
@@ -14,7 +15,6 @@ class ReviewController extends Controller
      */
     public function index()
     {
-        //
     }
 
     /**
@@ -41,9 +41,12 @@ class ReviewController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Review $review)
+    public function show(string $id)
     {
-        //
+        $review = Review::with('item')->findOrFail($id);
+        $data = new ReviewResource($review);
+
+        return $data;
     }
 
     /**

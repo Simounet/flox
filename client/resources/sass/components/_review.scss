@@ -1,5 +1,23 @@
+.wrap-review {
+    margin: 0 auto;
+    max-width: 900px;
+    color: white;
+}
+
+.review-back-link {
+    display: inline-block;
+    margin-top: 30px;
+}
+
 .review-add-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+@media(max-width: 1000px) {
+    .wrap-review {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
 }

@@ -8,4 +8,5 @@
     });
 
     Route::get('/last-fetched', 'FileParserController@lastFetched');
+    Route::get('/review/{id}', 'ReviewController@show');
   });

@@ -84,5 +84,7 @@
   "never": "Never",
 
   "go_to_review_page": "Review page",
+  "return_item": "Return to the card",
+  "reviewed_by": "review by",
   "error message": "Something went wrong. Please try again later."
 }

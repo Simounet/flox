@@ -9,6 +9,7 @@ import Settings from './components/Content/Settings/Index.vue';
 import TMDBContent from './components/Content/TMDBContent.vue';
 import Subpage from './components/Content/Subpage.vue';
 import Calendar from './components/Content/Calendar.vue';
+import ReviewPage from "./components/Content/ReviewPage.vue";
 
 Vue.use(Router);
 
@@ -22,6 +23,8 @@ export default new Router({
     { path: '/movies', component: Content, name: 'movie' },
     { path: '/tv', component: Content, name: 'tv' },
     { path: '/watchlist/:type?', component: Content, name: 'watchlist' },
+
+    { path: '/users/:username/review/:reviewId', component: ReviewPage, name: 'user-review' },
     
     { path: '/movies/:tmdbId/:slug?', component: Subpage, name: 'subpage-movie', props: {mediaType: 'movie'} },
     { path: '/tv/:tmdbId/:slug?', component: Subpage, name: 'subpage-tv', props: {mediaType: 'tv'} },
