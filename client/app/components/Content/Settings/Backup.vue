@@ -5,7 +5,7 @@
 
     <a :href="exportLink" class="setting-btn">{{ lang('export button') }}</a>
 
-    <form class="login-form" @submit.prevent="importMovies()">
+    <form class="settings-form" @submit.prevent="importMovies()">
       <span class="import-info">{{ lang('or divider') }}</span>
       <input type="file" @change="upload" class="file-btn" required>
       <div v-if="uploadSuccess" class="userdata-changed">{{ lang('success import') }}</div>

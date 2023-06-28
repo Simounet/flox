@@ -3,7 +3,7 @@
   <div class="settings-box element-ui-checkbox no-select" v-if=" ! loading">
     <div class="login-error" v-if="config.env === 'demo'"><span>Data cannot be changed in the demo</span></div>
 
-    <form class="login-form" @submit.prevent="editSetting()">
+    <form class="settings-form" @submit.prevent="editSetting()">
       <span class="update-check">{{ lang('reminders send to') }}</span>
 
       <input type="email" placeholder="E-Mail" v-model="reminders_send_to">
