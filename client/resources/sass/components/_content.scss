@@ -959,15 +959,13 @@ main {
 }
 
 .userdata-changed {
-  float: left;
-  width: 100%;
+  color: $rating1;
+  margin: 10px 0;
+  font-size: 14px;
+}
 
-  span {
-    float: left;
-    color: $rating1;
-    margin: 10px 0;
-    font-size: 14px;
-  }
+.userdata-changed--error {
+  color: $rating3;
 }
 
 .userdata-info,

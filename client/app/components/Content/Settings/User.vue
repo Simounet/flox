@@ -6,7 +6,7 @@
       <input type="text" :placeholder="lang('username')" v-model="username">
       <input type="password" :placeholder="lang('password')" v-model="password" autocomplete="off">
       <span class="userdata-info">{{ lang('password message') }}</span>
-      <span class="userdata-changed"><span v-if="success">{{ lang('success message') }}</span></span>
+      <div v-if="success" class="userdata-changed">{{ lang('success message') }}</div>
       <input type="submit" :value="lang('save button')">
     </form>
   </div>

@@ -2,11 +2,11 @@
   <form v-if="auth" @submit.prevent="sendReview()">
     <label for="review-add" class="review-add-label">{{ lang('Votre avis') }}</label>
     <textarea id="review-add" v-model="review.content" class="review-add" required></textarea>
-    <span class="userdata-changed" v-if="log.length > 0"><span>{{ lang(log) }}</span></span>
     <div class="review-add-actions">
         <button type="submit">{{ lang('save button') }}</button>
         <ReviewLink v-if="review.id" :review="review" class="review-add-link" />
     </div>
+    <div v-if="logMsg.length > 0" :class="['userdata-changed', hasError ? 'userdata-changed--error' : '']">{{ lang(logMsg) }}</div>
   </form>
 </template>
 
@@ -31,7 +31,8 @@
     data() {
       return {
         auth: config.auth,
-        log: ''
+        logMsg: '',
+        hasError: false
       }
     },
 
@@ -44,19 +45,20 @@
             this.displayLogMessage('success message');
           })
           .catch(err => {
-            console.log(err.response);
+            this.hasError = true;
             this.displayLogMessage('error message');
           });
         }
       },
 
       displayLogMessage(message) {
-        this.log = message;
+        this.logMsg = message;
         this.clearLogMessage();
       },
 
       clearLogMessage() {
-        this.log = '';
+        this.logMsg = '';
+        this.hasError = false;
       }
     },
 

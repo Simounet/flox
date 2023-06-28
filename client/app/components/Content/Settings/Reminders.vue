@@ -7,7 +7,7 @@
       <span class="update-check">{{ lang('reminders send to') }}</span>
 
       <input type="email" placeholder="E-Mail" v-model="reminders_send_to">
-      <span class="userdata-changed"><span v-if="success">{{ lang('success message') }}</span></span>
+      <div v-if="success" class="userdata-changed">{{ lang('success message') }}</div>
       <input type="submit" :value="lang('save button')">
     </form>
 
