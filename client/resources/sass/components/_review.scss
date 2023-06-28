@@ -1,0 +1,37 @@
+.wrap-review {
+    margin: 0 auto;
+    max-width: 900px;
+    color: white;
+}
+
+.review-content {
+    min-height: 100px;
+}
+
+.review-actions {
+    display: flex;
+    margin-top: 50px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.review-back-link {
+    display: inline-block;
+}
+
+.review-add-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@media(max-width: 1000px) {
+    .wrap-review {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    .review-content {
+        min-height: 50px;
+    }
+}

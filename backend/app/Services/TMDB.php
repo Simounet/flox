@@ -287,6 +287,7 @@
         'genre_ids' => $data->genre_ids,
         'credit_cast' => $data->credit_cast ?? [],
         'credit_crew' => $data->credit_crew ?? [],
+        'review' => $data->review ?? [],
         'genre' => Genre::whereIn('id', $data->genre_ids)->get(),
         'episodes' => [],
         'overview' => $data->overview,

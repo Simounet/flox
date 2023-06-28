@@ -5,8 +5,9 @@
   $factory->define(App\User::class, function(Faker\Generator $faker) {
     static $password;
 
+    $username = strtolower(str_replace(' ', '', $faker->name));
     return [
-      'username' => $faker->name,
+      'username' => $username,
       'password' => $password ?: $password = bcrypt('secret'),
       'remember_token' => Illuminate\Support\Str::random(10),
       'api_key' => null,

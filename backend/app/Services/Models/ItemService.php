@@ -401,7 +401,7 @@
         case 'tmdb_id':
           return $this->model->findByTmdbId($value)->with('latestEpisode')->first();
         case 'tmdb_id_strict':
-          return $this->model->findByTmdbIdStrict($value, $mediaType)->with('creditCast', 'creditCrew', 'latestEpisode')->first();
+          return $this->model->findByTmdbIdStrict($value, $mediaType)->with('creditCast', 'creditCrew', 'latestEpisode', 'review')->first();
         case 'src':
           return $this->model->findBySrc($value)->first();
       }

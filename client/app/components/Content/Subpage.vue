@@ -15,7 +15,7 @@
                     <i class="icon-suggest"></i>
                   </router-link>
                   <span class="is-on-watchlist" :title="lang('add to watchlist')"
-                        v-if="item.rating == null && auth && ! rated" @click="addToWatchlist(item)">
+                        v-if="!isLocalContent && auth && ! rated" @click="addToWatchlist(item)">
                     <i class="icon-watchlist"></i>
                   </span>
                   <span class="is-on-watchlist" :title="lang('remove from watchlist')"
@@ -39,7 +39,7 @@
               </div>
 
               <!-- todo: move to own component -->
-              <div class="subpage-sidebar-buttons no-select" v-if="item.rating != null && auth">
+              <div class="subpage-sidebar-buttons no-select" v-if="isLocalContent && auth">
                 <span class="refresh-infos" @click="refreshInfos()">{{ lang('refresh infos') }}</span>
                 <span class="remove-item" @click="removeItem()" v-if=" ! item.watchlist">{{ lang('delete item') }}</span>
               </div>
@@ -56,7 +56,7 @@
                                v-for="genre in item.genre">{{ genre.name }}</router-link>
                 </div>
               </div>
-              <div class="big-teaser-buttons no-select" :class="{'without-watchlist': item.rating != null || ! auth}">
+              <div class="big-teaser-buttons no-select" :class="{'without-watchlist': isLocalContent || ! auth}">
                 <a v-if="isOn('netflix', item.homepage)" :href="item.homepage" target="_blank" class="button-netflix">
                   Netflix
                 </a>
@@ -116,6 +116,10 @@
               v-for="(item, index) in creditCrew"
             />
           </ol>
+          <ReviewItems
+            :itemId="item.id"
+            :reviews="reviews"
+          />
         </div>
       </div>
     </div>
@@ -130,6 +134,7 @@
   import MiscHelper from '../../helpers/misc';
   import ItemHelper from '../../helpers/item';
   import Person from './Person.vue';
+  import ReviewItems from '../Review/ReviewItems.vue';
 
   import http from 'axios';
 
@@ -154,9 +159,11 @@
     data() {
       return {
         item: {},
+        isLocalContent: false,
         latestEpisode: null,
         creditCast: [],
         creditCrew: [],
+        reviews: [],
         loadingImdb: false,
         auth: config.auth,
         rated: false,
@@ -175,27 +182,27 @@
       },
 
       backdropImage() {
-        let backdropUrl = config.backdropTMDB;
-
-        if (this.item.rating != null) {
-          backdropUrl = config.backdrop;
+        if(typeof(this.item.backdrop) !== 'string') {
+            return '';
         }
 
+        const backdropBaseUrl = this.isLocalContent ?
+          config.backdrop : config.backdropTMDB;
+
         return {
-          backgroundImage: `url(${backdropUrl}${this.item.backdrop})`
+          backgroundImage: `url(${backdropBaseUrl}${this.item.backdrop})`
         }
       },
 
       posterImage() {
-        if (!this.item.poster) {
+        if (typeof(this.item.poster) !== 'string') {
           return this.noImage;
         }
 
-        if (this.item.rating != null) {
-          return config.posterSubpage + this.item.poster;
-        }
+        const posterBaseUrl = this.isLocalContent ?
+          config.posterSubpage : config.posterSubpageTMDB;
 
-        return config.posterSubpageTMDB + this.item.poster;
+        return posterBaseUrl + this.item.poster;
       },
 
       noImage() {
@@ -224,7 +231,7 @@
       },
 
       fetchImdbRating() {
-        if (this.item.imdb_id && this.item.rating == null) {
+        if (this.item.imdb_id && this.isLocalContent === false) {
           this.loadingImdb = true;
 
           http(`${config.api}/imdb-rating/${this.item.imdb_id}`).then(response => {
@@ -251,8 +258,10 @@
         this.SET_LOADING(true);
         http(`${config.api}/item/${tmdbId}/${this.mediaType}`).then(response => {
           this.item = response.data;
+          this.isLocalContent = !!response.data.rating;
           this.creditCast = response.data.credit_cast;
           this.creditCrew = response.data.credit_crew;
+          this.reviews = response.data.review;
           this.item.tmdb_rating = this.intToFloat(response.data.tmdb_rating);
           this.latestEpisode = this.item.latest_episode;
 
@@ -317,7 +326,8 @@
 
     components: {
       Person,
-      Rating
+      Rating,
+      ReviewItems
     }
   }
 </script>

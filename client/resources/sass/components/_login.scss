@@ -20,38 +20,7 @@
 }
 
 .login-form {
-  float: left;
   max-width: 300px;
-  width: 100%;
-
-  input[type="text"],
-  input[type="email"],
-  input[type="password"] {
-    float: left;
-    width: 100%;
-    font-size: 15px;
-    margin: 0 0 5px 0;
-    background: #333;
-    padding: 12px;
-    color: #fff;
-    border: 0;
-  }
-
-  input[type="submit"] {
-    background: $main2;
-    background: $gradient;
-    color: #fff;
-    font-size: 17px;
-    border: 0;
-    text-transform: uppercase;
-    padding: 8px 20px;
-    cursor: pointer;
-    float: left;
-
-    &:active {
-      opacity: .8;
-    }
-  }
 }
 
 .login-error {

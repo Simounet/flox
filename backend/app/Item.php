@@ -159,6 +159,14 @@
     }
 
     /**
+     * Belongs to many reviews.
+     */
+    public function review()
+    {
+      return $this->hasMany(Review::class);
+    }
+
+    /**
      * Can have many alternative titles.
      */
     public function alternativeTitles()

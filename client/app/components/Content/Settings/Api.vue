@@ -3,7 +3,7 @@
   <div class="settings-box element-ui-checkbox no-select" v-if=" ! loading">
     <div class="login-error" v-if="config.env === 'demo'"><span>Data cannot be changed in the demo</span></div>
 
-    <form class="login-form" @submit.prevent="generateApiKey()">
+    <form class="settings-form" @submit.prevent="generateApiKey()">
       <span class="update-check">API-Key</span>
 
       <input type="text" v-model="api_key" readonly>

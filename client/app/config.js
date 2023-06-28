@@ -7,7 +7,7 @@ const config = {
   env,
   uri,
   url,
-  auth,
+  auth: parseInt(auth),
   language,
   poster: url + '/assets/poster',
   backdrop: url + '/assets/backdrop',

@@ -900,18 +900,9 @@ main {
   }
 }
 
-.settings-box {
-  float: left;
-  width: 100%;
-
-  &:last-child {
-    margin: 0;
-  }
-
-  .login-form {
-    clear: both;
-    margin: 0 0 30px 0;
-  }
+.settings-form {
+  margin-bottom: 30px;
+  max-width: 300px;
 }
 
 .setting-box {
@@ -959,15 +950,13 @@ main {
 }
 
 .userdata-changed {
-  float: left;
-  width: 100%;
+  color: $rating1;
+  margin: 10px 0;
+  font-size: 14px;
+}
 
-  span {
-    float: left;
-    color: $rating1;
-    margin: 10px 0;
-    font-size: 14px;
-  }
+.userdata-changed--error {
+  color: $rating3;
 }
 
 .userdata-info,
@@ -1009,27 +998,25 @@ main {
   }
 }
 
-.setting-btn {
-  background: $main2;
-  background: $gradient;
-  color: #fff;
-  font-size: 17px;
-  border: 0;
-  text-transform: uppercase;
-  padding: 8px 20px;
-  cursor: pointer;
-  text-decoration: none;
-  float: left;
-
-  &:active {
-    opacity: .8;
-  }
-}
-
 .production-message {
   color: $main2;
   font-size: 16px;
   float: left;
   width: 100%;
   margin: 0 0 20px 0;
+}
+
+.login-form,
+.settings-form {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    font-size: 15px;
+    margin: 0 0 5px 0;
+    background: #333;
+    padding: 12px;
+    color: #fff;
+    border: 0;
+  }
 }

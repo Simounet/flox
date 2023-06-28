@@ -47,6 +47,32 @@ a {
   outline: 0
 }
 
+a {
+  color: #f1309a;
+}
+
+button,
+input[type="submit"],
+.setting-btn {
+  display: inline-block;
+  padding: 8px 20px;
+  color: #fff;
+  font-size: 17px;
+  text-transform: uppercase;
+  text-decoration: none;
+  background: $main1;
+  background: $gradient;
+  border: 0;
+  cursor: pointer;
+
+  &:hover,
+  &:active,
+  &:focus {
+    background: $main2;
+    opacity: .8;
+  }
+}
+
 ::selection {
   background: rgba($main1, .99);
   color: #fff;
