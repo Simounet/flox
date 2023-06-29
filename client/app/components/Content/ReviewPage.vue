@@ -2,11 +2,14 @@
   <main>
     <div class="wrap-review" v-if=" ! loading">
         <h1>{{ pageTitle }}</h1>
-        <p>{{ review.content }}</p>
-        <router-link
-          :to="{ name: `subpage-${item.media_type}`, params: { tmdbId: item.tmdb_id, slug: item.slug }}"
-          class="review-back-link"
-          :title="item.title">{{ lang('return_item') }}</router-link>
+        <p class="review-content">{{ review.content }}</p>
+        <div class="review-actions">
+            <router-link
+              :to="itemLink"
+              class="review-back-link"
+              :title="item.title">{{ lang('return_item') }}</router-link>
+            <button @click="deleteReview">{{ lang('delete item') }}</button>
+        </div>
     </div>
 
     <span class="loader fullsize-loader" v-if="loading"><i></i></span>
@@ -41,7 +44,11 @@
     computed: {
       ...mapState({
         loading: state => state.loading
-      })
+      }),
+
+      itemLink() {
+        return { name: `subpage-${this.item.media_type}`, params: { tmdbId: this.item.tmdb_id, slug: this.item.slug }};
+      }
     },
 
     methods: {
@@ -62,9 +69,23 @@
 
           this.disableLoading();
         }, error => {
-          console.log(error);
           this.SET_LOADING(false);
           this.$router.push('/');
+        });
+      },
+
+      deleteReview() {
+        const confirmed = confirm('tintin');
+        if(confirmed === false) {
+          return false;
+        }
+
+        http.delete(`${config.api}/review/${this.review.id}`).then(() => {
+          this.$router.push(this.itemLink);
+        })
+        .catch(error => {
+            console.log( error );
+            console.log( 'try refreshing the page' );
         });
       },
 

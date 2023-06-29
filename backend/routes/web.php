@@ -50,6 +50,7 @@
       Route::get('/userdata', 'UserController@getUserData');
       Route::patch('/userdata', 'UserController@changeUserData')->middleware('csrf');
 
+      Route::delete('/review/{id}', 'ReviewController@delete')->middleware('csrf');
       Route::post('/review', 'ReviewController@store')->middleware('csrf');
 
       Route::get('/search-tmdb', 'TMDBController@search');

@@ -60,8 +60,19 @@ class ReviewController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Review $review)
+    public function delete(string $id)
     {
-        //
+        if(!Auth::check()) {
+          return response('Bad request.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $userId = Auth::id();
+        $review = Review::where([
+            'id' => $id,
+            'user_id' => $userId
+        ])->firstOrFail();
+        $review->delete();
+
+        return response('Success', Response::HTTP_OK);
     }
 }

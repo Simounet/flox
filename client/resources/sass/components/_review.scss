@@ -4,9 +4,19 @@
     color: white;
 }
 
+.review-content {
+    min-height: 100px;
+}
+
+.review-actions {
+    display: flex;
+    margin-top: 50px;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .review-back-link {
     display: inline-block;
-    margin-top: 30px;
 }
 
 .review-add-actions {
@@ -19,5 +29,9 @@
     .wrap-review {
         margin-left: 10px;
         margin-right: 10px;
+    }
+
+    .review-content {
+        min-height: 50px;
     }
 }
