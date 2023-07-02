@@ -3,29 +3,35 @@
 namespace App\Services\Fediverse\Activity;
 
 use ActivityPhp\Type\Extended\Actor\Person;
+use ActivityPhp\Type\Extended\Object\Image;
+use App\Profile;
 
 class ActorActivity
 {
-    public function actorObject(string $username): Person
-    {
-        $userRoute = route('federation.user', ['username' => $username]);
+    public const DEFAULT_PROFILE_AVATAR = '/assets/img/logo-small.png';
 
-        $publicKey = [
-            'id' => $userRoute . '#main-key',
-            'owner' => $userRoute,
-            'publicKeyPem' => '@TODO'
-        ];
+    public function actorObject(Profile $profile): Person
+    {
+        $avatarUrl = $profile->avatar_url ?? env('APP_URL') . self::DEFAULT_PROFILE_AVATAR;
+        $icon = new Image();
+        $icon->set('mediaType', 'image/jpg');
+        $icon->set('url', $avatarUrl);
 
         $person = new Person();
         $person->set('@context', 'https://www.w3.org/ns/activitystreams');
-        $person->set('id', $userRoute);
-        $person->set('outbox', route('federation.user.outbox', ['username' => $username]));
-        $person->set('following', route('federation.user.following', ['username' => $username]));
-        $person->set('followers', route('federation.user.followers', ['username' => $username]));
-        $person->set('inbox', route('federation.user.inbox', ['username' => $username]));
-        $person->set('preferredUsername', $username);
-        $person->set('name', $username);
-        $person->set('publicKey', $publicKey);
+        $person->set('id', $profile->remote_url);
+        $person->set('name', $profile->name);
+        $person->set('preferredUsername', $profile->username);
+        $person->set('inbox', $profile->inbox_url);
+        $person->set('outbox', $profile->outbox_url);
+        $person->set('following', $profile->following_url);
+        $person->set('followers', $profile->followers_url);
+        $person->set('icon', $icon);
+        $person->set('publicKey', [
+            'id' => $profile->key_id_url,
+            'owner' => $profile->remote_url,
+            'publicKeyPem' => $profile->public_key
+        ]);
         return $person;
     }
 }
