@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Models;
 
+use ActivityPhp\Type\AbstractObject;
 use App\Profile;
 use App\User;
 
@@ -14,7 +17,7 @@ class ProfileService
         $this->profile = $profile;
     }
 
-    public function storeLocal(User $user): void
+    public function storeLocal(User $user, int $forcedId = null): Profile
     {
         $profileExists = Profile::select('user_id')->where('user_id', $user->id)->first();
         if($profileExists) {
@@ -25,7 +28,7 @@ class ProfileService
         $snowflake = app('Kra8\Snowflake\Snowflake');
         $keys = $this->generateKeys();
         $profile = [
-            'id' => $snowflake->next(),
+            'id' => $forcedId ?? $snowflake->next(),
             'user_id' => $user->id,
             'domain' => env('APP_DOMAIN'),
             'username' => $user->username,
@@ -41,7 +44,29 @@ class ProfileService
             'remote_url' => self::user(),
         ];
 
-        Profile::create($profile);
+        return Profile::create($profile);
+    }
+
+    public function updateOrCreate(AbstractObject $person): Profile
+    {
+        $snowflake = app('Kra8\Snowflake\Snowflake');
+        $domain = parse_url($person->get('url'))['host'];
+        $entity = [
+            'id' => $snowflake->next(),
+            'domain' => $domain,
+            'username' => $person->get('preferredUsername') . '@' . $domain,
+            'name' => $person->get('name'),
+            'shared_inbox_url' => $person->get('endpoints')['sharedInbox'],
+            'inbox_url' => $person->get('inbox'),
+            'outbox_url' => $person->get('outbox'),
+            'key_id_url' => $person->get('publicKey')['id'],
+            'followers_url' => $person->get('followers'),
+            'following_url' => $person->get('following'),
+            'public_key' => $person->get('publicKey')['publicKeyPem'],
+            'remote_url' => $person->get('url'),
+        ];
+
+        return Profile::updateOrCreate(['domain' => $entity['domain'], 'username' => $entity['username']], $entity);
     }
 
     public function user(): string
@@ -80,7 +105,7 @@ class ProfileService
     }
 
 
-    public function generateKeys(): array
+    private function generateKeys(): array
     {
         $pkiConfig = [
             'digest_alg'       => 'sha512',
@@ -94,5 +119,10 @@ class ProfileService
             'public' => $pkiPublic,
             'private' => $pkiPrivate,
         ];
+    }
+
+    public function acceptFollowsId(Profile $sourceProfile, Profile $targetProfile): string
+    {
+        return $sourceProfile->remote_url . '#accepts/follows/' . $targetProfile->id;
     }
 }

@@ -9,6 +9,8 @@ class Profile extends Model
 {
     use HasSnowflakePrimary;
 
+    public const INSTANCE_ACTOR_ID = 1;
+
     /**
      * Indicates if the IDs are auto-incrementing.
      *
