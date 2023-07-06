@@ -151,4 +151,17 @@ class FederationTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    /** @test */
+    public function shouldFollowerList(): void
+    {
+        $this->getJson($this->profile->followers_url)
+            ->assertStatus(200)
+            ->assertJsonFragment([
+                '@context' => 'https://www.w3.org/ns/activitystreams',
+                'id' => $this->profile->followers_url,
+                'type' => 'OrderedCollection',
+                'totalItems' => 0
+            ]);
+    }
 }

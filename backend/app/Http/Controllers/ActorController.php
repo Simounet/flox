@@ -10,6 +10,8 @@ use App\Services\Fediverse\Activity\ActivityService;
 use App\Services\Fediverse\Activity\ActorActivity;
 use App\Services\Fediverse\Activity\UndoActivity;
 use App\Services\Fediverse\Activity\FollowActivity;
+use App\Services\Fediverse\FollowingCollection;
+use App\Services\Fediverse\FollowersCollection;
 use Illuminate\Http\Request;
 
 class ActorController
@@ -26,12 +28,34 @@ class ActorController
             ->header('Access-Control-Allow-Origin', '*');
     }
 
-    public function followers()
+    public function followers(string $username)
     {
+        $profileBuilder = Profile::where('username', $username);
+        switch($profileBuilder->count()) {
+            case 0:
+                return response('', 404);
+            case 1:
+                $followers = (new FollowersCollection())->get($profileBuilder->first());
+                return response()->json($followers->toArray(), 200, [], JSON_UNESCAPED_SLASHES)
+                    ->header('Access-Control-Allow-Origin', '*');
+            default:
+                return response('', 500);
+        }
     }
 
-    public function following()
+    public function following(string $username)
     {
+        $profileBuilder = Profile::where('username', $username);
+        switch($profileBuilder->count()) {
+            case 0:
+                return response('', 404);
+            case 1:
+                $followings = (new FollowingCollection())->get($profileBuilder->first());
+                return response()->json($followings->toArray(), 200, [], JSON_UNESCAPED_SLASHES)
+                    ->header('Access-Control-Allow-Origin', '*');
+            default:
+                return response('', 500);
+        }
     }
 
     public function inbox(Request $request)
