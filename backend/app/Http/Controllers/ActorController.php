@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use ActivityPhp\Type;
 use ActivityPhp\Type\Extended\Activity\Follow;
+use ActivityPhp\Type\Extended\Activity\Undo;
 use App\Profile;
+use App\Services\Fediverse\Activity\ActivityService;
 use App\Services\Fediverse\Activity\ActorActivity;
+use App\Services\Fediverse\Activity\UndoActivity;
 use App\Services\Fediverse\Activity\FollowActivity;
 use Illuminate\Http\Request;
 
@@ -34,7 +37,12 @@ class ActorController
     public function inbox(Request $request)
     {
         $payload = $request->getContent();
-        $activity = Type::fromJson($payload);
+        try {
+            $activity = Type::fromJson($payload);
+        } catch(\Exception $e) {
+            return response('', 400);
+        }
+        $activityService = new ActivityService();
 
         switch($activity::class) {
             case Follow::class:
@@ -45,13 +53,32 @@ class ActorController
                     switch($e->getMessage()) {
                         case $followActivity::ACTIVITY_ALREADY_PROCESSED:
                             return response()->json(['message' => 'Already processed.'], 200);
-                        case $followActivity::ACTIVITY_WRONG_TARGET:
+                        case $activityService::ACTIVITY_WRONG_TARGET:
                             return response('', 404);
                         default:
                             return response($e->getMessage(), 500);
                     }
                 }
                 return response()->json($accept->toArray(), 200, [], JSON_UNESCAPED_SLASHES)
+                    ->header('Access-Control-Allow-Origin', '*');
+            case Undo::class:
+                try {
+                    $undoActivity = new UndoActivity();
+                    $undoActivity->activity($activity);
+                } catch(\Exception $e) {
+                    switch($e->getMessage()) {
+                        case $activityService::ACTIVITY_WRONG_TARGET:
+                            return response('', 404);
+                        case $undoActivity::ACTIVITY_WRONG_OBJECT:
+                            return response('', 400);
+                        case $undoActivity::ACTIVITY_UNKNOWN_FOLLOWER:
+                            return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
+                                ->header('Access-Control-Allow-Origin', '*');
+                        default:
+                            return response($e->getMessage(), 500);
+                    }
+                }
+                return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
                     ->header('Access-Control-Allow-Origin', '*');
             default:
                 return response('', 501);

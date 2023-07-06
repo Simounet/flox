@@ -12,12 +12,12 @@ use App\Services\Models\ProfileService;
 class FollowActivity
 {
     public const ACTIVITY_ALREADY_PROCESSED = 'activity-already-processed';
-    public const ACTIVITY_WRONG_TARGET = 'activity-wrong-target';
 
     public function activity(Follow $followActivity): Accept
     {
+        $activityService = new ActivityService();
         $targetProfile = Profile::firstWhere(['remote_url' => $followActivity->get('object')]);
-        $this->targetValidation($targetProfile);
+        $activityService->targetValidation($targetProfile);
         $actor = (new ActivityPubFetchService())->get($followActivity->get('actor'));
         $profileService = new ProfileService(new Profile());
         $sourceProfile = $profileService->updateOrCreate($actor);
@@ -42,16 +42,6 @@ class FollowActivity
                 ->exists()
         ) {
             throw new \Exception(self::ACTIVITY_ALREADY_PROCESSED);
-        }
-    }
-
-    private function targetValidation(Profile|null $targetProfile): void
-    {
-        if(
-                $targetProfile === null
-                || $targetProfile->domain !== env('APP_DOMAIN')
-          ) {
-            throw new \Exception(self::ACTIVITY_WRONG_TARGET);
         }
     }
 }

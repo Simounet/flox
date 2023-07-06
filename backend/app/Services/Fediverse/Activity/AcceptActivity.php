@@ -11,14 +11,14 @@ class AcceptActivity
 
     public function activity(
         string $acceptId,
-        Follow $followActivity
+        Follow $object
     ): Accept
     {
         $accept = Type::create('Accept');
         $accept->set('@context', 'https://www.w3.org/ns/activitystreams');
         $accept->set('id', $acceptId);
-        $accept->set('actor', $followActivity->object);
-        $accept->set('object', $followActivity);
+        $accept->set('actor', $object->get('object'));
+        $accept->set('object', $object);
         return $accept;
     }
 }
