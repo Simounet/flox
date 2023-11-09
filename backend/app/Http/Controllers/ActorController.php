@@ -13,6 +13,7 @@ use App\Services\Fediverse\Activity\FollowActivity;
 use App\Services\Fediverse\FollowingCollection;
 use App\Services\Fediverse\FollowersCollection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ActorController
 {
@@ -61,11 +62,13 @@ class ActorController
     public function inbox(Request $request)
     {
         $payload = $request->getContent();
+        Log::debug("[InboxRequest]", $request->all());
         try {
             $activity = Type::fromJson($payload);
         } catch(\Exception $e) {
             return response('', 400);
         }
+        Log::debug("[InboxActivity] " . $activity::class . ': ' . $activity->toJson(JSON_UNESCAPED_SLASHES));
         $activityService = new ActivityService();
 
         switch($activity::class) {
@@ -76,6 +79,7 @@ class ActorController
                 } catch(\Exception $e) {
                     switch($e->getMessage()) {
                         case $activityService::ACTIVITY_WRONG_TARGET:
+                            Log::debug("[InboxFollowResponse] Wrong target");
                             return response('', 404);
                         default:
                             throw new \Exception($e);
@@ -90,10 +94,13 @@ class ActorController
                 } catch(\Exception $e) {
                     switch($e->getMessage()) {
                         case $activityService::ACTIVITY_WRONG_TARGET:
+                            Log::debug("[InboxUndoResponse] Wrong target");
                             return response('', 404);
                         case $undoActivity::ACTIVITY_WRONG_OBJECT:
+                            Log::debug("[InboxUndoResponse] Wrong object");
                             return response('', 400);
                         case $undoActivity::ACTIVITY_UNKNOWN_FOLLOWER:
+                            Log::debug("[InboxUndoResponse] Unknown follower");
                             return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
                                 ->header('Access-Control-Allow-Origin', '*');
                         default:
@@ -103,6 +110,7 @@ class ActorController
                 return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
                     ->header('Access-Control-Allow-Origin', '*');
             default:
+                Log::debug("[InboxDefaultResponse] Unknown activity: " . $activity::class);
                 return response('', 501);
         }
 
