@@ -2,46 +2,62 @@
 
 namespace App\Services\Fediverse\Activity;
 
-use ActivityPhp\Type\Extended\Activity\Accept;
+use ActivityPhp\Type\Extended\AbstractActor;
 use ActivityPhp\Type\Extended\Activity\Follow;
 use App\Follower;
 use App\Profile;
 use App\Services\Fediverse\ActivityPubFetchService;
+use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ProfileService;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class FollowActivity
 {
-    public const ACTIVITY_ALREADY_PROCESSED = 'activity-already-processed';
-
-    public function activity(Follow $followActivity): Accept
+    public function activity(Follow $followActivity): void
     {
         $activityService = new ActivityService();
         $targetProfile = Profile::firstWhere(['remote_url' => $followActivity->get('object')]);
         $activityService->targetValidation($targetProfile);
+        Log::debug("[FollowActivityTest] followActivityActor", (array) $followActivity->get('actor'));
         $actor = (new ActivityPubFetchService())->get($followActivity->get('actor'));
         $profileService = new ProfileService(new Profile());
         $sourceProfile = $profileService->updateOrCreate($actor);
-        $this->alreadyProcessedValidation($sourceProfile, $targetProfile);
 
-        Follower::create([
+        Follower::firstOrCreate([
             'profile_id' => $sourceProfile->id,
-            'target_profile_id' => $targetProfile->id,
+            'target_profile_id' => $targetProfile->id
+        ], [
             'activity_id' => $followActivity->get('id')
         ]);
 
-        $acceptId = $profileService->acceptFollowsId($sourceProfile, $targetProfile);
-        $accept = (new AcceptActivity())->activity($acceptId, $followActivity);
-        return $accept;
+        $this->sendAcceptActivity($profileService, $sourceProfile, $targetProfile, $followActivity, $actor);
     }
 
-    private function alreadyProcessedValidation($sourceProfile, $targetProfile): void
+    private function sendAcceptActivity(
+        ProfileService $profileService,
+        Profile $sourceProfile,
+        Profile $targetProfile,
+        Follow $followActivity,
+        AbstractActor $actor
+    ): void
     {
-        if(
-            Follower::where('profile_id', $sourceProfile->id)
-                ->where('target_profile_id', $targetProfile->id)
-                ->exists()
-        ) {
-            throw new \Exception(self::ACTIVITY_ALREADY_PROCESSED);
+        $acceptId = $profileService->acceptFollowsId($sourceProfile, $targetProfile);
+        $accept = (new AcceptActivity())->activity($acceptId, $followActivity);
+        Log::debug("[FollowActivityAccept]", $accept->toArray());
+
+        $remoteInboxUrl = $actor->endpoints['sharedInbox'];
+        $headers = (new HttpSignature)->sign(
+                $remoteInboxUrl,
+                $targetProfile->private_key,
+                $targetProfile->key_id_url,
+                $accept->toJson()
+                );
+
+        $response = Http::withHeaders($headers)
+            ->post($remoteInboxUrl, $accept->toArray());
+        if($response->getStatusCode() !== 202) {
+            throw new \Exception('Accept activity not validated');
         }
     }
 }

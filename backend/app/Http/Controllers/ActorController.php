@@ -72,18 +72,16 @@ class ActorController
             case Follow::class:
                 try {
                     $followActivity = new FollowActivity();
-                    $accept = $followActivity->activity($activity);
+                    $followActivity->activity($activity);
                 } catch(\Exception $e) {
                     switch($e->getMessage()) {
-                        case $followActivity::ACTIVITY_ALREADY_PROCESSED:
-                            return response()->json(['message' => 'Already processed.'], 200);
                         case $activityService::ACTIVITY_WRONG_TARGET:
                             return response('', 404);
                         default:
-                            return response($e->getMessage(), 500);
+                            throw new \Exception($e);
                     }
                 }
-                return response()->json($accept->toArray(), 200, [], JSON_UNESCAPED_SLASHES)
+                return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
                     ->header('Access-Control-Allow-Origin', '*');
             case Undo::class:
                 try {
@@ -99,7 +97,7 @@ class ActorController
                             return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
                                 ->header('Access-Control-Allow-Origin', '*');
                         default:
-                            return response($e->getMessage(), 500);
+                            throw new \Exception($e);
                     }
                 }
                 return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)

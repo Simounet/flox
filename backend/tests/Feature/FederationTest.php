@@ -24,7 +24,10 @@ class FederationTest extends TestCase
     {
         parent::setUp();
 
-        Http::fake(['https://mastodon.tld/users/alice' => Http::response('{"@context":["https://www.w3.org/ns/activitystreams","https://w3id.org/security/v1"],"id":"https://mastodon.tld/users/alice","type":"Person","following":"https://mastodon.tld/users/alice/following","followers":"https://mastodon.tld/users/alice/followers","inbox":"https://mastodon.tld/users/alice/inbox","outbox":"https://mastodon.tld/users/alice/outbox","featured":"https://mastodon.tld/users/alice/collections/featured","featuredTags":"https://mastodon.tld/users/alice/collections/tags","preferredUsername":"alice","name":"Simounet","summary":"\u003cp\u003eHumain // Développeur web // Partisan des logiciels libres // Jamais loin de mes flux RSS\u003c/p\u003e","url":"https://mastodon.tld/@alice","manuallyApprovesFollowers":false,"discoverable":true,"published":"2019-03-29T00:00:00Z","devices":"https://mastodon.tld/users/alice/collections/devices","publicKey":{"id":"https://mastodon.tld/users/alice#main-key","owner":"https://mastodon.tld/users/alice","publicKeyPem":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtWONzwymF2OW/oTM7/3U\nWoofFL7+ma6w5OfjRo3KitF3F6XAlBzdGZPhBBOie235DEs1dG4iOjK0HvljMcU3\nsj6MS3hGnAQLhPBooLEDmk4PpwuEeniKxTf0Yt5licKvHWX0cdrS7uXo/aopk4Gj\no2y9TUBlQm8qRaMHcN81D3fd4v4w2NPKXlEWVaOf76ZdxoBIKMWjIIlESi+U6Skm\nSzCtOFoMEVGjw1uiB8/OA313NialvLVb2qBabD7DkqJtDWwc7HNNM3JTPa36Z1Hd\nTf8U3cU0ZvRDh3XhKTjuhDSyceu/0vLjNAr+d1jBgSK0holloOUbRKXLeuGnBdf5\nhwIDAQAB\n-----END PUBLIC KEY-----\n"},"endpoints":{"sharedInbox":"https://mastodon.tld/inbox"},"icon":{"type":"Image","mediaType":"image/jpeg","url":"https://mastodon.tld/system/accounts/avatars/000/000/002/original/fd898e1a5ff33258.jpg"},"image":{"type":"Image","mediaType":"image/jpeg","url":"https://mastodon.tld/system/accounts/headers/000/000/002/original/f9c0a36fa5258d2e.jpg"}}')]);
+        Http::fake([
+            'https://mastodon.tld/users/alice' => Http::response('{"@context":["https://www.w3.org/ns/activitystreams","https://w3id.org/security/v1",{"manuallyApprovesFollowers":"as:manuallyApprovesFollowers","toot":"http://joinmastodon.org/ns#","featured":{"@id":"toot:featured","@type":"@id"},"featuredTags":{"@id":"toot:featuredTags","@type":"@id"},"alsoKnownAs":{"@id":"as:alsoKnownAs","@type":"@id"},"movedTo":{"@id":"as:movedTo","@type":"@id"},"schema":"http://schema.org#","PropertyValue":"schema:PropertyValue","value":"schema:value","discoverable":"toot:discoverable","Device":"toot:Device","Ed25519Signature":"toot:Ed25519Signature","Ed25519Key":"toot:Ed25519Key","Curve25519Key":"toot:Curve25519Key","EncryptedMessage":"toot:EncryptedMessage","publicKeyBase64":"toot:publicKeyBase64","deviceId":"toot:deviceId","claim":{"@type":"@id","@id":"toot:claim"},"fingerprintKey":{"@type":"@id","@id":"toot:fingerprintKey"},"identityKey":{"@type":"@id","@id":"toot:identityKey"},"devices":{"@type":"@id","@id":"toot:devices"},"messageFranking":"toot:messageFranking","messageType":"toot:messageType","cipherText":"toot:cipherText","suspended":"toot:suspended","focalPoint":{"@container":"@list","@id":"toot:focalPoint"}}],"id":"https://mastodon.dev/users/alice","type":"Person","following":"https://mastodon.dev/users/alice/following","followers":"https://mastodon.dev/users/alice/followers","inbox":"https://mastodon.dev/users/alice/inbox","outbox":"https://mastodon.dev/users/alice/outbox","featured":"https://mastodon.dev/users/alice/collections/featured","featuredTags":"https://mastodon.dev/users/alice/collections/tags","preferredUsername":"alice","name":"Alice","summary":"\u003cp\u003eHumain // Développeur web // Partisan des logiciels libres // Jamais loin de mes flux RSS\u003c/p\u003e","url":"https://mastodon.dev/@alice","manuallyApprovesFollowers":false,"discoverable":true,"published":"2019-03-29T00:00:00Z","devices":"https://mastodon.dev/users/alice/collections/devices","publicKey":{"id":"https://mastodon.dev/users/alice#main-key","owner":"https://mastodon.dev/users/alice","publicKeyPem":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtWONzwymF2OW/oTM7/3U\nWoofFL7+ma6w5OfjRo3KitF3F6XAlBzdGZPhBBOie235DEs1dG4iOjK0HvljMcU3\nsj6MS3hGnAQLhPBooLEDmk4PpwuEeniKxTf0Yt5licKvHWX0cdrS7uXo/aopk4Gj\no2y9TUBlQm8qRaMHcN81D3fd4v4w2NPKXlEWVaOf76ZdxoBIKMWjIIlESi+U6Skm\nSzCtOFoMEVGjw1uiB8/OA313NialvLVb2qBabD7DkqJtDWwc7HNNM3JTPa36Z1Hd\nTf8U3cU0ZvRDh3XhKTjuhDSyceu/0vLjNAr+d1jBgSK0holloOUbRKXLeuGnBdf5\nhwIDAQAB\n-----END PUBLIC KEY-----\n"},"tag":[],"attachment":[{"type":"PropertyValue","name":"Blog","value":"\u003ca href=\"https://www.alice.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\"\u003e\u003cspan class=\"invisible\"\u003ehttps://www.\u003c/span\u003e\u003cspan class=\"\"\u003ealice.net\u003c/span\u003e\u003cspan class=\"invisible\"\u003e\u003c/span\u003e\u003c/a\u003e"},{"type":"PropertyValue","name":"Photos","value":"\u003ca href=\"https://photos.alice.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\"\u003e\u003cspan class=\"invisible\"\u003ehttps://\u003c/span\u003e\u003cspan class=\"\"\u003ephotos.alice.net\u003c/span\u003e\u003cspan class=\"invisible\"\u003e\u003c/span\u003e\u003c/a\u003e"},{"type":"PropertyValue","name":"DeviantArt","value":"\u003ca href=\"https://www.deviantart.com/alice\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\"\u003e\u003cspan class=\"invisible\"\u003ehttps://www.\u003c/span\u003e\u003cspan class=\"\"\u003edeviantart.com/alice\u003c/span\u003e\u003cspan class=\"invisible\"\u003e\u003c/span\u003e\u003c/a\u003e"},{"type":"PropertyValue","name":"PeerTube","value":"\u003ca href=\"https://peertube.alice.net\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\"\u003e\u003cspan class=\"invisible\"\u003ehttps://\u003c/span\u003e\u003cspan class=\"\"\u003epeertube.alice.net\u003c/span\u003e\u003cspan class=\"invisible\"\u003e\u003c/span\u003e\u003c/a\u003e"}],"endpoints":{"sharedInbox":"https://mastodon.dev/inbox"},"icon":{"type":"Image","mediaType":"image/jpeg","url":"https://mastodon.dev/system/accounts/avatars/000/000/002/original/fd898e1a5ff33258.jpg"},"image":{"type":"Image","mediaType":"image/jpeg","url":"https://mastodon.dev/system/accounts/headers/000/000/002/original/f9c0a36fa5258d2e.jpg"}}'),
+            'https://mastodon.dev/inbox' => Http::response('', 202)
+        ]);
         $this->host = parse_url(env('APP_URL'))['host'];
         $this->withHeader('Host', $this->host);
         $user = factory(User::class)->create();
@@ -39,18 +42,7 @@ class FederationTest extends TestCase
         $data = (array) json_decode($dataStr);
 
         $response = $this->postJson($this->profile->inbox_url, $data);
-
-        $sourceProfile = Profile::latest('id')->first();
-
         $response->assertStatus(200);
-        $response->assertJsonIsObject();
-        $response->assertJsonFragment([
-            'type' => 'Accept',
-            '@context' => 'https://www.w3.org/ns/activitystreams',
-            'id' => $this->profileService->acceptFollowsId($sourceProfile, $this->profile),
-            'actor' => $this->profile->remote_url,
-            'object' => $data
-        ]);
     }
 
     /** @test */
@@ -63,7 +55,6 @@ class FederationTest extends TestCase
         $response = $this->postJson($this->profile->inbox_url, $data);
 
         $response->assertStatus(200);
-        $response->assertJson(['message' => 'Already processed.']);
     }
 
     /** @test */
@@ -122,17 +113,7 @@ class FederationTest extends TestCase
 
         $response = $this->postJson($this->profile->inbox_url, $data);
 
-        $sourceProfile = Profile::latest('id')->first();
-
         $response->assertStatus(200);
-        $response->assertJsonIsObject();
-        $response->assertJsonFragment([
-            'type' => 'Accept',
-            '@context' => 'https://www.w3.org/ns/activitystreams',
-            'id' => $this->profileService->acceptFollowsId($sourceProfile, $this->profile),
-            'actor' => $this->profile->remote_url,
-            'object' => $data
-        ]);
         $this->getJson($this->profile->followers_url)
             ->assertStatus(200)
             ->assertJsonFragment([
@@ -141,13 +122,10 @@ class FederationTest extends TestCase
                 'type' => 'OrderedCollection',
                 'totalItems' => 1
             ]);
-        $dataStrWithWrongObject = '{"@context":"https://www.w3.org/ns/activitystreams","id":"https://mastodon.tld/c5a8e80d-eeba-4f1f-827a-e759687881cc","type":"Undo","actor":"https://mastodon.tld/users/alice","object":"' . $this->profile->remote_url . '"}';
         $dataStr = '{"@context":"https://www.w3.org/ns/activitystreams","id":"https://mastodon.tld/c5a8e80d-eeba-4f1f-827a-e759687881dd","type":"Undo","actor":"https://mastodon.tld/users/alice","object":{"@context":"https://www.w3.org/ns/activitystreams","id":"https://mastodon.tld/c5a8e80d-eeba-4f1f-827a-e759687881cc","type":"Follow","actor":"https://mastodon.tld/users/alice","object":"' . $this->profile->remote_url . '"}}';
         $data = (array) json_decode($dataStr);
 
         $response = $this->postJson($this->profile->inbox_url, $data);
-
-        $sourceProfile = Profile::latest('id')->first();
 
         $response->assertStatus(200);
     }
