@@ -12,6 +12,7 @@ use App\Services\Fediverse\Activity\UndoActivity;
 use App\Services\Fediverse\Activity\FollowActivity;
 use App\Services\Fediverse\FollowingCollection;
 use App\Services\Fediverse\FollowersCollection;
+use App\Services\Fediverse\HttpSignature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -59,7 +60,7 @@ class ActorController
         }
     }
 
-    public function inbox(Request $request)
+    public function inbox(Request $request, string $username)
     {
         $payload = $request->getContent();
         Log::debug("[InboxRequest]", $request->all());
@@ -70,6 +71,14 @@ class ActorController
         }
         Log::debug("[InboxActivity] " . $activity::class . ': ' . $activity->toJson(JSON_UNESCAPED_SLASHES));
         $activityService = new ActivityService();
+
+        $headers = $request->headers;
+        Log::debug("[InboxRequestHeaders] " . (string) $headers);
+        $verifiedSignature = (new HttpSignature())->verifySignature($request->getMethod(),  $request->getPathInfo(), $headers, $payload);
+        if(!$verifiedSignature) {
+            Log::debug("[InboxActivity] Wrong signature");
+            return response('', 401);
+        }
 
         switch($activity::class) {
             case Follow::class:
@@ -120,7 +129,8 @@ class ActorController
     {
     }
 
-    public function sharedInbox()
+    public function sharedInbox(Request $request)
     {
+        return $this->inbox($request, '');
     }
 }
