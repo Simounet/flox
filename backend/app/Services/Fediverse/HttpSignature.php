@@ -129,7 +129,6 @@ class HttpSignature {
         string $method,
         string $path,
         HeaderBag $headers,
-        Profile $profile,
         string $payload
     ): bool
     {
