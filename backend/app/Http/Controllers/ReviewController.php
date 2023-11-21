@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ReviewResource;
+use App\Jobs\ReviewSendActivities;
 use App\Review;
 use App\Services\Fediverse\Activity\ReviewActivity;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +33,8 @@ class ReviewController extends Controller
 
       if(Auth::check() || $request->validate(['content' => 'required|unique:content|max:255'])) {
         $reviewModel = new Review();
-        $reviewModel->store(Auth::user()->id, $itemId, $content);
+        $storedReview = $reviewModel->store(Auth::user()->id, $itemId, $content);
+        ReviewSendActivities::dispatch($storedReview->id, $storedReview->user->username);
         return response('Success', Response::HTTP_OK);
       }
 
