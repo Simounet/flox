@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use ActivityPhp\Type;
+use ActivityPhp\Type\Extended\Activity\Delete;
 use ActivityPhp\Type\Extended\Activity\Follow;
 use ActivityPhp\Type\Extended\Activity\Undo;
 use ActivityPhp\Type\TypeConfiguration;
 use App\Profile;
 use App\Services\Fediverse\Activity\ActivityService;
 use App\Services\Fediverse\Activity\ActorActivity;
+use App\Services\Fediverse\Activity\DeleteActivity;
 use App\Services\Fediverse\Activity\UndoActivity;
 use App\Services\Fediverse\Activity\FollowActivity;
 use App\Services\Fediverse\FollowingCollection;
@@ -76,13 +78,49 @@ class ActorController
 
         $headers = $request->headers;
         Log::debug("[InboxRequestHeaders] " . (string) $headers);
-        $verifiedSignature = (new HttpSignature())->verifySignature($request->getMethod(),  $request->getPathInfo(), $headers, $payload);
+        try {
+            $actor = false;
+            if(Delete::class === $activity::class) {
+                if(!$activity->object || ($activity->object !== $activity->actor)) {
+                    Log::debug("[InboxActivity] " . $activity::class . ' invalid state');
+                    return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
+                        ->header('Access-Control-Allow-Origin', '*');
+                }
+                $profiles = Profile::where(['remote_url' => $activity->object]);
+                if(0 === $profiles->count()) {
+                    Log::debug("[InboxActivity] " . $activity::class . ' unknown profile: ' . $activity->object);
+                    return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
+                        ->header('Access-Control-Allow-Origin', '*');
+                } else {
+                    $actor = (new ActorActivity())->actorObject($profiles->first());
+                }
+            }
+            $verifiedSignature = (new HttpSignature())->verifySignature($request->getMethod(),  $request->getPathInfo(), $headers, $payload, $actor);
+        } catch(\Exception $e) {
+            Log::error('[InboxActivity] Error: ' . $e->getMessage());
+            return response('', 500);
+        }
+
         if(!$verifiedSignature) {
             Log::debug("[InboxActivity] Wrong signature");
             return response('', 401);
         }
 
         switch($activity::class) {
+            case Delete::class:
+                try {
+                    $deleteActivity = new DeleteActivity();
+                    $deleteActivity->activity($activity);
+                } catch(\Exception $e) {
+                    switch($e->getMessage()) {
+                        default:
+                            throw new \Exception($e);
+                    }
+                }
+                Log::debug("[InboxDeleteResponse] Deleted: " . $activity->get('object'));
+                return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
+                    ->header('Access-Control-Allow-Origin', '*');
+                return false;
             case Follow::class:
                 try {
                     $followActivity = new FollowActivity();

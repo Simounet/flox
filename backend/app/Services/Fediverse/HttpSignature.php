@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Fediverse;
 
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use OpenSSLAsymmetricKey;
@@ -129,7 +130,8 @@ class HttpSignature {
         string $method,
         string $path,
         HeaderBag $headers,
-        string $payload
+        string $payload,
+        $actor = false
     ): bool
     {
         $message = json_decode($payload, true, 8);
@@ -197,7 +199,7 @@ class HttpSignature {
             $this->log('[' . self::class . '] Missing or not equalse keyDomain: ' . $keyDomain . ' - idDomain: ' . $idDomain);
             return false;
         }
-        $actor = (new ActivityPubFetchService())->get($message['actor']);
+        $actor = is_object($actor) ? $actor : (new ActivityPubFetchService())->get($message['actor']);
         if(!$actor) {
             $this->log('[' . self::class . '] Wrong actor');
             return false;

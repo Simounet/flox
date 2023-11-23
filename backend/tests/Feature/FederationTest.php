@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Follower;
 use App\Profile;
 use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ProfileService;
@@ -145,5 +146,49 @@ class FederationTest extends TestCase
                 'type' => 'OrderedCollection',
                 'totalItems' => 0
             ]);
+    }
+
+    /** @test */
+    public function shouldReturn200ForUnknownProfileDeleteActivity(): void
+    {
+        $payload = '{"@context":"https://www.w3.org/ns/activitystreams","id":"https://fediverse.tld/users/testuser#delete","type":"Delete","actor":"https://fediverse.tld/users/testuser","to":["https://www.w3.org/ns/activitystreams#Public"],"object":"https://fediverse.tld/users/testuser","signature":{"type":"RsaSignature2017","creator":"https://fediverse.tld/users/testuser#main-key","created":"2023-11-30T05:01:05Z","signatureValue":"PWVGCagVgZToMyHT6aCUCE9qmn/JuYRrUAqDL/EGt1Pde/+LjpvnLOzB3H61EWKWVaSX0EYfZN96nJbSnxrtDE9MgqXjAM91X1Lg/oB9iF1DZAcpympuGUQ1mvRs2e5qVaXxb9rO9urW7MrO2lY2xMHd9LRIvP8b3O74m4GwwRcBOL3CEovOjfseV2uyBPm20USskCZo862KcXYaY7FqzvcnM55EuJHJIc0Zff7Y0VjmBTCZhmNgDvAoeF0Whfousuv+aAmgGAY6EFZmgoX/oxkINchfRSbGtvv5hE/NA2XxJDOKAWCO6L/b/0ozR/wJafxZfVMBHtGX0EsBkB+Gvw=="}}';
+        $headers = '{"content-length":["763"],"connection":["Keep-Alive"],"signature":["keyId=\"https://fediverse.tld/users/testuser#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date digest content-type\",signature=\"J0+4Kym+gHSsLl+AaNOal/PqkQesJFpNI6pIIA/z2pVqU57lNSfqFXNsjSl6x/YmFSWuhsX4FpOWh8g98BEVh1qHU43m5sdPCIoW5/86aeiZMpPsHU+zl3KQaN1HYggRIzrRB3OrRcyZKzECiOulbKOB5j+JSSbftkGxYeI/VUcHXkJP17DS5lTYEv0TbgN46kfvNCa3cQp9WoSnWO1hPmOYtLTT0FYWYQUEqF7eP1TGZLHcwZ1wp2/gwc9nMHJOk8ineCl4P3SS6aV+K2FekKGBM5yfIBYfx3DYLjO0F2mOCM5v03a1yXIoXTqHb+YTAkruROMpuckyaewF6Z2UfA==\""],"content-type":["application/activity+json"],"digest":["SHA-256=Mg+W0QxohcR9zMik1BOX492LppyvdHLuqP9UWC95f6M="],"accept-encoding":["gzip"],"date":["Thu, 30 Nov 2023 05:01:17 GMT"],"host":["' . $this->profile->domain . '"],"user-agent":["http.rb/5.1.1 (Fediverse/1.0.0; +https://fediverse.tld/)"]}';
+        $response = $this->postJson(
+            $this->profile->shared_inbox_url,
+            (array) json_decode($payload),
+            (array) json_decode($headers)
+        );
+        $response->assertStatus(200);
+    }
+
+    /** @test */
+    public function shouldRemoveProfileAndAssociatedFollowerOnDeleteActivity(): void
+    {
+        $dataStr = '{"@context":"https://www.w3.org/ns/activitystreams","id":"https://fediverse.tld/c5a8e80d-eeba-4f1f-827a-e759687881cc","type":"Follow","actor":"' . $this->remoteProfile->remote_url . '","object":"' . $this->profile->remote_url . '"}';
+        $response = $this->postJson(
+            $this->profile->shared_inbox_url,
+            (array) json_decode($dataStr),
+            $this->getHeaders($dataStr)
+        );
+
+        $deleteStr = '{"@context":"https://www.w3.org/ns/activitystreams","id":"' . $this->remoteProfile->remote_url . '#delete","type":"Delete","actor":"' . $this->remoteProfile->remote_url . '","to":["https://www.w3.org/ns/activitystreams#Public"],"object":"' . $this->remoteProfile->remote_url . '"}';
+        $response = $this->postJson(
+            $this->profile->shared_inbox_url,
+            (array) json_decode($deleteStr),
+            $this->getHeaders($deleteStr)
+        );
+        $response->assertStatus(200);
+
+        $this->assertEquals(0, Follower::count());
+    }
+
+    private function getHeaders(string $dataStr): array
+    {
+	return (new HttpSignature)->sign(
+            $this->profile->shared_inbox_url,
+            $this->remoteProfile->private_key,
+            $this->remoteProfile->key_id_url,
+            json_encode(json_decode($dataStr))
+        );
     }
 }
