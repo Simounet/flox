@@ -22,6 +22,7 @@ class ActorActivity
         $person = new Person();
         $person->set('@context', 'https://www.w3.org/ns/activitystreams');
         $person->set('id', $profile->remote_url);
+        $person->set('url', $profile->remote_url);
         $person->set('name', $profile->name);
         $person->set('preferredUsername', $profile->username);
         $person->set('inbox', $profile->inbox_url);
@@ -33,6 +34,10 @@ class ActorActivity
             'id' => $profile->key_id_url,
             'owner' => $profile->remote_url,
             'publicKeyPem' => $profile->public_key
+        ]);
+
+        $person->set('endpoints', (object) [
+            'sharedInbox' => $profile->shared_inbox_url
         ]);
         return $person;
     }
