@@ -50,6 +50,7 @@ return [
             'driver' => 'sqlite',
             'database' => env('DB_DATABASE', ':memory:'),
             'prefix' => '',
+            'foreign_key_constraints' => true,
         ],
 
         'mysql' => [
