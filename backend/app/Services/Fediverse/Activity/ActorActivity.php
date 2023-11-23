@@ -4,6 +4,7 @@ namespace App\Services\Fediverse\Activity;
 
 use ActivityPhp\Type\Extended\Actor\Person;
 use ActivityPhp\Type\Extended\Object\Image;
+use ActivityPhp\Type\TypeConfiguration;
 use App\Profile;
 
 class ActorActivity
@@ -12,6 +13,7 @@ class ActorActivity
 
     public function actorObject(Profile $profile): Person
     {
+        TypeConfiguration::set('undefined_properties', 'ignore');
         $avatarUrl = $profile->avatar_url ?? env('APP_URL') . self::DEFAULT_PROFILE_AVATAR;
         $icon = new Image();
         $icon->set('mediaType', 'image/jpg');

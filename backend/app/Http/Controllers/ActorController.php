@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use ActivityPhp\Type;
 use ActivityPhp\Type\Extended\Activity\Follow;
 use ActivityPhp\Type\Extended\Activity\Undo;
+use ActivityPhp\Type\TypeConfiguration;
 use App\Profile;
 use App\Services\Fediverse\Activity\ActivityService;
 use App\Services\Fediverse\Activity\ActorActivity;
@@ -65,6 +66,7 @@ class ActorController
         $payload = $request->getContent();
         Log::debug("[InboxRequest]", $request->all());
         try {
+            TypeConfiguration::set('undefined_properties', 'ignore');
             $activity = Type::fromJson($payload);
         } catch(\Exception $e) {
             return response('', 400);
