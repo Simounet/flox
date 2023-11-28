@@ -2,13 +2,20 @@
 
 namespace Tests\Api;
 
+use App\Profile;
+use App\Services\Models\ItemService;
+use App\Services\Models\ProfileService;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\Traits\Fixtures;
+use Tests\Traits\Mocks;
 
 class ReviewTest extends TestCase {
 
     use RefreshDatabase;
+    use Fixtures;
+    use Mocks;
 
     protected $user;
 
@@ -16,7 +23,10 @@ class ReviewTest extends TestCase {
     {
       parent::setUp();
 
+      $profileService = new ProfileService(new Profile());
       $this->user = factory(User::class)->create();
+      $profileService->storeLocal($this->user);
+      $this->createStorageDownloadsMock();
     }
 
     /** @test */
@@ -39,6 +49,7 @@ class ReviewTest extends TestCase {
     /** @test */
     public function shouldPostAReview()
     {
+      $this->mockItem();
       $this->actingAs($this->user)->postJson('api/review', [
         'itemId' => 1,
         'content' => 'Lorem ipsum.'
@@ -52,6 +63,7 @@ class ReviewTest extends TestCase {
     /** @test */
     public function shouldUpdateAReview()
     {
+      $this->mockItem();
       $this->actingAs($this->user)->postJson('api/review', [
         'itemId' => 1,
         'content' => 'Lorem ipsum.'
@@ -64,5 +76,15 @@ class ReviewTest extends TestCase {
         'item_id' => 1,
         'content' => 'Lorem ipsum dolor.',
       ]);
+    }
+
+    private function mockItem()
+    {
+        $this->createGuzzleMock(
+            $this->tmdbFixtures('movie/details'),
+            $this->tmdbFixtures('movie/alternative_titles')
+        );
+        $itemService = app(ItemService::class);
+        $itemService->create($this->floxFixtures('movie'));
     }
 }
