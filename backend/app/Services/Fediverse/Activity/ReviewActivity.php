@@ -44,9 +44,9 @@ class ReviewActivity
 
     private function getReviewContent(int $rating, string $content): string
     {
-        $htmlContent = preg_replace("/\r\n|\r|\n/", '<br/>', $content);
+        $htmlContent = preg_replace("/\r\n|\r|\n/", '<br>', $content);
         $starsRating = (new ReviewService)->getRating($rating);
-        $ratingContent = '<br/><br/>Note: ' . $starsRating;
+        $ratingContent = '<br><br>Avis : ' . $starsRating;
         return $htmlContent . $ratingContent;
     }
 }
