@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ReviewResource;
 use App\Jobs\ReviewSendActivities;
+use App\Profile;
 use App\Review;
 use App\Services\Fediverse\Activity\ReviewActivity;
 use Illuminate\Support\Facades\Auth;
@@ -82,9 +83,10 @@ class ReviewController extends Controller
     public function showObject(Request $request, string $username, string $id)
     {
         $review = Review::findOrFail($id);
-        $note =  (new ReviewActivity)->reviewObject($request, $review);
+        $profile = Profile::where(['username' => $username])->first();
+        $reviewActivity = (new ReviewActivity)->activity($review, $profile);
 
-        return response()->json($note->toArray(), 200, ['Content-Type' => 'application/activity+json'], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return response()->json($reviewActivity->toArray(), 200, ['Content-Type' => 'application/activity+json'], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
     }
 
 }

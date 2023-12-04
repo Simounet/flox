@@ -5,36 +5,38 @@ namespace App\Services\Fediverse\Activity;
 use ActivityPhp\Type;
 use ActivityPhp\Type\Extended\Object\Note;
 use App\Item;
+use App\Profile;
 use App\Review;
 use App\Services\Models\ReviewService;
-use App\User;
-use Illuminate\Support\Facades\Request;
 
 class ReviewActivity
 {
 
-    public function reviewObject(Request $request, Review $review): Note
+    public function activity(Review $review, Profile $profile, array $followersInbox = []): Note
     {
-        $url = $request::url();
         $item = Item::select(['poster', 'rating', 'title'])->where('id', $review->item_id)->firstOrFail();
-        $username = User::select('username')->where('id', $review->user_id)->value('username');
-        $content = $this->getReviewContent($item->rating, $review->content);
+        $created = $review->created_at->toAtomString();
+        $updated = $review->updated_at->toAtomString();
+        $reviewUrl = route('user.review', ['username' => $profile->username, 'id' => $review->id]);
+        $content = $this->getReviewContent((int) $item->rating, $review->content);
         $poster = $item->getPoster();
 
-        $document = Type::create('Document', [
-                '@context' => 'https://www.w3.org/ns/activitystreams',
-                'url' => $poster['url'],
-                'name' => $poster['title'],
-        ]);
-
         $note = new Note();
-        $note->set('@context', 'https://www.w3.org/ns/activitystreams');
-        $note->set('id', $url);
-        $note->set('content', $content);
-        $note->set('attributedTo', route('federation.user', ['username' => $username]));
-        $note->set('published', $review->created_at->toAtomString());
-        $note->set('to', ['https://www.w3.org/ns/activitystreams#Public']);
-        $note->set('cc', [route('federation.user.followers', ['username' => $username])]);
+        $note->set('id', $reviewUrl);
+        $note->set('published', $created);
+        $note->set('updated', $updated);
+        $note->set('attributedTo', $profile->remote_url);
+        $note->set('content', '<p>' . $content . '</p>');
+        $note->set('url', $reviewUrl);
+        $note->set('to', 'https://www.w3.org/ns/activitystreams#Public');
+        if(count($followersInbox)) {
+            $note->set('cc', $followersInbox);
+        }
+        $document = Type::create('Document', [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'url' => $poster['url'],
+            'name' => 'Poster ' . $poster['title'],
+        ]);
         $note->set('attachment', [$document]);
 
         return $note;

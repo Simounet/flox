@@ -64,7 +64,7 @@
   });
 
   Route::middleware([JsonRequestOnly::class])->group(function () {
-      Route::get('/users/{username}/review/{id}', 'ReviewController@showObject');
+      Route::get('/users/{username}/review/{id}', 'ReviewController@showObject')->name('user.review');
   });
 
   Route::fallback('HomeController@app');

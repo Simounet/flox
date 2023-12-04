@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Services\Fediverse\Activity\NoteActivity;
+use App\Profile;
+use App\Services\Fediverse\Activity\ActivityService;
+use App\Services\Fediverse\Activity\ReviewActivity;
+use App\Services\Fediverse\HttpSignature;
 use App\Review;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
@@ -36,12 +40,25 @@ class ReviewSendActivity implements ShouldQueue
 
     public function handle(): void
     {
-        (new NoteActivity())->activity(
+        $profile = Profile::where(['username' => $this->username])->first();
+        $reviewActivity = (new ReviewActivity())->activity(
             $this->review,
-            $this->username,
-            $this->followersInbox,
-            $this->sharedInboxUrl
+            $profile,
+            $this->followersInbox
         );
+        $createId = $profile->remote_url . '#' . ActivityService::TYPE_TO_REPLACE_PLACEHOLDER . '/review/' . $this->review->id;
+        $activity = (new ActivityService())->wrappedActivity($createId, $profile->remote_url, $reviewActivity);
+
+        $headers = (new HttpSignature)->sign(
+            $this->sharedInboxUrl,
+            $profile->private_key,
+            $profile->key_id_url,
+            $activity->toJson()
+        );
+
+        $response = Http::withHeaders($headers)
+            ->post($this->sharedInboxUrl, $activity->toArray());
+        $response->successful();
     }
 
     public function backoff(): array
