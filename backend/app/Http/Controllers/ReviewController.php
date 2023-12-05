@@ -7,6 +7,7 @@ use App\Jobs\ReviewSendActivities;
 use App\Profile;
 use App\Review;
 use App\Services\Fediverse\Activity\ReviewActivity;
+use App\Services\Fediverse\Activity\Verbs;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,7 +36,13 @@ class ReviewController extends Controller
       if(Auth::check() || $request->validate(['content' => 'required|unique:content|max:255'])) {
         $reviewModel = new Review();
         $storedReview = $reviewModel->store(Auth::user()->id, $itemId, $content);
-        ReviewSendActivities::dispatch($storedReview->id, $storedReview->user->username);
+        $activityType = $storedReview->wasRecentlyCreated ?
+            Verbs::CREATE : Verbs::UPDATE;
+        ReviewSendActivities::dispatch(
+            $activityType,
+            $storedReview->id,
+            $storedReview->user->username
+        );
         return response('Success', Response::HTTP_OK);
       }
 

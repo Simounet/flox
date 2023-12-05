@@ -20,11 +20,13 @@ class ActivityService
         }
     }
 
-    public function wrappedActivity(string $activityId, string $actorUrl, Note $objectActivity)
+    public function wrappedActivity(string $type, string $activityId, string $actorUrl, Note $objectActivity)
     {
-        $type = $objectActivity->get('published') === $objectActivity->get('updated') ?
-            Verbs::CREATE : Verbs::UPDATE;
-        $activity = (new CreateOrUpdateActivity($type))->activity(str_replace(self::TYPE_TO_REPLACE_PLACEHOLDER, strtolower($type), $activityId), $actorUrl, $objectActivity);
+        $activity = (new Activity($type))->activity(
+            str_replace(self::TYPE_TO_REPLACE_PLACEHOLDER, strtolower($type), $activityId),
+            $actorUrl,
+            $objectActivity
+        );
         return $activity;
     }
 }

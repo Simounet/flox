@@ -15,11 +15,13 @@ class ReviewSendActivities implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private $activityType;
     private $reviewId;
     private $username;
 
-    public function __construct(int $reviewId, string $username)
+    public function __construct(string $activityType, int $reviewId, string $username)
     {
+        $this->activityType = $activityType;
         $this->reviewId = $reviewId;
         $this->username = $username;
     }
@@ -33,6 +35,7 @@ class ReviewSendActivities implements ShouldQueue
         }
         foreach($bySharedInboxUrl as $sharedInboxUrl => $followersInbox) {
             ReviewSendActivity::dispatch(
+                $this->activityType,
                 $this->reviewId,
                 $this->username,
                 $followersInbox,

@@ -10,7 +10,6 @@ use ActivityPhp\Type\TypeConfiguration;
 use App\Profile;
 use App\Services\Fediverse\Activity\ActivityService;
 use App\Services\Fediverse\Activity\ActorActivity;
-use App\Services\Fediverse\Activity\DeleteActivity;
 use App\Services\Fediverse\Activity\UndoActivity;
 use App\Services\Fediverse\Activity\FollowActivity;
 use App\Services\Fediverse\FollowingCollection;
@@ -109,8 +108,7 @@ class ActorController
         switch($activity::class) {
             case Delete::class:
                 try {
-                    $deleteActivity = new DeleteActivity();
-                    $deleteActivity->activity($activity);
+                    Profile::where(['remote_url' => $activity->get('object')])->delete();
                 } catch(\Exception $e) {
                     switch($e->getMessage()) {
                         default:

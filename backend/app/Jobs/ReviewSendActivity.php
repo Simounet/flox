@@ -7,6 +7,7 @@ namespace App\Jobs;
 use App\Profile;
 use App\Services\Fediverse\Activity\ActivityService;
 use App\Services\Fediverse\Activity\ReviewActivity;
+use App\Services\Fediverse\Activity\Verbs;
 use App\Services\Fediverse\HttpSignature;
 use App\Review;
 use Illuminate\Bus\Queueable;
@@ -15,23 +16,27 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class ReviewSendActivity implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private $activityType = '';
     private $review;
     private $username = '';
     private $followersInbox = [];
     private $sharedInboxUrl = '';
 
     public function __construct(
+        string $activityType,
         int $reviewId,
         string $username,
         array $followersInbox,
         string $sharedInboxUrl
     )
     {
+        $this->activityType = $activityType;
         $this->review = Review::find($reviewId)->withoutRelations();
         $this->username = $username;
         $this->followersInbox = $followersInbox;
@@ -47,7 +52,12 @@ class ReviewSendActivity implements ShouldQueue
             $this->followersInbox
         );
         $createId = $profile->remote_url . '#' . ActivityService::TYPE_TO_REPLACE_PLACEHOLDER . '/review/' . $this->review->id;
-        $activity = (new ActivityService())->wrappedActivity($createId, $profile->remote_url, $reviewActivity);
+        $activity = (new ActivityService())->wrappedActivity(
+            $this->activityType,
+            $createId,
+            $profile->remote_url,
+            $reviewActivity
+        );
 
         $headers = (new HttpSignature)->sign(
             $this->sharedInboxUrl,

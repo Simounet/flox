@@ -43,7 +43,7 @@ class FollowActivity
     ): void
     {
         $acceptId = $profileService->acceptFollowsId($sourceProfile, $targetProfile);
-        $accept = (new AcceptActivity())->activity($acceptId, $followActivity);
+        $accept = (new Activity(Verbs::ACCEPT))->activity($acceptId, $followActivity->get('object'), $followActivity);
         Log::debug("[FollowActivityAccept]", $accept->toArray());
 
         $remoteInboxUrl = $actor->endpoints['sharedInbox'];
