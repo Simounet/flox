@@ -83,6 +83,11 @@ class ReviewController extends Controller
             'user_id' => $userId
         ])->firstOrFail();
         $review->delete();
+        ReviewSendActivities::dispatch(
+            Verbs::DELETE,
+            $review->id,
+            $review->user->username
+        );
 
         return response('Success', Response::HTTP_OK);
     }
