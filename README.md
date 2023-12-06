@@ -56,6 +56,25 @@ https://mydomain.com
   - A simple calendar for your episodes and movies.
   - Movies and tv shows have different colors for better differentiation. You can also use the arrow keys to jump months forward or backward.
 - Reminders.
+- [Federation](#activitypubfederation)
+
+## ActivityPub Federation
+
+### About federation
+
+Thanks to [the ActivityPub protocol](https://en.wikipedia.org/wiki/ActivityPub), Flox users can share theirs activities to other people using platforms that understand ActivityPub.
+
+### Which Flox actions are federated
+
+- Reviews: when a review is created/updated/deleted, the review's content will be delivered to their followers
+
+### Disabling federation
+
+If you want to use Flox in solo, without sharing anything outside of your server, you can disable this feature by adding this configuration to your `backend/.env` file:
+
+```
+FEDERATION_ENABLED=false
+```
 
 ## Plex
 
@@ -67,7 +86,13 @@ https://YOUR-FLOX-URL/api/plex?token=YOUR-TOKEN
 
 If you start a tv show or movie in Plex, Flox will search the item via the title from TMDb and add them into the Flox database. If you rate a movie or tv show in Plex, Flox will also rate the item. Note that rating for seasons or episodes are not supported in Flox. If you rate an movie or tv show, which is not in the Flox database, Flox will also fetch them from TMDb first. If you complete an episode (passing the 90% mark), Flox will also check this episode as seen.
 
-### Queue
+## Queues
+
+### Federation
+
+ActivityPub implementation for Flox uses queues to asynchronously send activities to the federated servers without blocking user's actions. Don't forget to [setup the cronjob](#cronjob).
+
+### Flox content
 
 To import or refresh any of your entries you need to have at least one worker running.
 

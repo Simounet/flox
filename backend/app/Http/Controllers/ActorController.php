@@ -22,6 +22,8 @@ class ActorController
 {
     public function actor(string $username)
     {
+        abort_if(config('flox.federation.enabled') === false, 404);
+
         $profile = (new Profile())->whereLocalProfile($username);
         if($profile === null) {
             return response('', 404);
@@ -34,6 +36,8 @@ class ActorController
 
     public function followers(string $username)
     {
+        abort_if(config('flox.federation.enabled') === false, 404);
+
         $profileBuilder = Profile::where('username', $username);
         switch($profileBuilder->count()) {
             case 0:
@@ -49,6 +53,8 @@ class ActorController
 
     public function following(string $username)
     {
+        abort_if(config('flox.federation.enabled') === false, 404);
+
         $profileBuilder = Profile::where('username', $username);
         switch($profileBuilder->count()) {
             case 0:
@@ -64,6 +70,8 @@ class ActorController
 
     public function inbox(Request $request, string $username)
     {
+        abort_if(config('flox.federation.enabled') === false, 404);
+
         $payload = $request->getContent();
         Log::debug("[InboxRequest]", $request->all());
         try {
@@ -169,6 +177,8 @@ class ActorController
 
     public function sharedInbox(Request $request)
     {
+        abort_if(config('flox.federation.enabled') === false, 404);
+
         return $this->inbox($request, '');
     }
 }

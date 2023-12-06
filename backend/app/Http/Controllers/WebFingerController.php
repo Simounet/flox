@@ -12,6 +12,8 @@ class WebFingerController extends Controller
 
     public function handle(Request $request)
     {
+        abort_if(config('flox.federation.enabled') === false, 404);
+
         $webFingerService = new WebFingerService();
         try {
             $resource = $this->resource($request, $webFingerService);
