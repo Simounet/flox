@@ -4,18 +4,18 @@ Flox
 Flox is a self hosted Movie, Series and Animes watch list. It's build on top of Laravel and Vue.js and uses [The Movie Database](https://www.themoviedb.org/) API.
 The rating based on an 3-Point system for `good`, `medium` and `bad`.
 
-### [Try live demo](https://flox-demo.pyxl.dev) and [login](https://flox-demo.pyxl.dev/login) with `demo / demo` to add new stuff or change ratings.
+## [Try live demo](https://flox-demo.pyxl.dev) and [login](https://flox-demo.pyxl.dev/login) with `demo / demo` to add new stuff or change ratings.
 
 ![flox](./public/assets/screenshot.jpg)
 
-### Requirements
+## Requirements
 
 * PHP >=8.1
 * Database (MySQL or [other](https://laravel.com/docs/database))
 * [Composer](https://getcomposer.org/)
 * The Movie Database Account for the free [API-Key](https://www.themoviedb.org/faq/api)
 
-### Install
+## Install
 
 ```bash
 git clone https://github.com/devfake/flox
@@ -43,7 +43,7 @@ https://mydomain.com/subfolder/for/flox/public
 https://mydomain.com
 ```
 
-### Features
+## Features
 
 - API for Plex.
   - Sync movies, shows and watched episodes from Plex to Flox.
@@ -57,7 +57,7 @@ https://mydomain.com
   - Movies and tv shows have different colors for better differentiation. You can also use the arrow keys to jump months forward or backward.
 - Reminders.
 
-### Plex
+## Plex
 
 To enable the sync from Plex to Flox, you first need to generate an API-Key in Flox in the settings page. Then enter the Flox API-URL to the webhooks section in Plex.
 
@@ -88,7 +88,7 @@ The default queue driver is set to `database`. All your jobs will be stored in t
 
 Check the [documentation](https://laravel.com/docs/queues) for more informations.
 
-### Cron Job
+## Cron Job
 
 To utilize the queues to update automatically you have to set up a cron task once manually on your server.
 
@@ -115,24 +115,24 @@ Currently in Flox defined tasks (which you can activate in the settings):
 
 You can change the time for daily and weekly reminder in your `.env`.
 
-### Export / Import
+## Export / Import
 
 Also you can make a backup of all your movies and shows in the settings page. If you click the `EXPORT` button, there will be an download for an `json` file. This file contains all your movies and shows from your database. This backup file will also be automatically saved in your `public/exports` folder.
 
 If you import an backup, all movies and shows in your database will be deleted and replaced. Be sure to make an current backup before you import.
 The import will download all poster images.
 
-### Refresh data
+## Refresh data
 
 To keep your entries up to date (e.g. ratings, episodes, images) you need to refresh them. In the settings there is the possibility to refresh the data manually or via a cron job (you need the queue worker for this). If you want to refresh only a single entry, there is a button on the subpage of this item.
 
-### Reminders
+## Reminders
 
 Flox can send you a daily reminder of episodes or movies coming out today via mail. Or a weekly summary of episodes and movies coming out in the last 7 days. There are options in the settings page for this.
 
 Make sure you tweak the `DATE_FORMAT_PATTERN` config in your `.env` file.
 
-### Translation
+## Translation
 
 All titles are in english by default. You can change your language by setting `TRANSLATION` in `backend/.env`. The most commons are `DE`, `IT`, `FR`, `ES` and `RU`. You can try to use your language code.
 
@@ -140,7 +140,7 @@ This will also affect the language of you website. See in `client/resources/lang
 
 If there isn't a translation for your language, english will be used.
 
-### Settings
+## Settings
 
 You can edit your admin account (username and password) in the settings page (link is in footer).
 
@@ -148,26 +148,26 @@ You can also set options to display release date and/or genre of your own list. 
 
 There is an option to enable or disable spoiler protection for episode names.
 
-### Troubleshooting
+## Troubleshooting
 
-#### Import does not work
+### Import does not work
 
 - Your import file is probably to big. In default php.ini the max upload file is 2MB. Set the number higher and try again.
 - Make sure that the queue worker is active! Otherwise flox will tell you the import is running, but nothing happens!
 
-### Development
+## Development
 
 * Run `npm install` or `yarn` in your `/client` folder.
 * Run `npm run dev`.
 
-### Contribution
+## Contribution
 
 Like this project? Want to contribute? Awesome! Feel free to open some pull requests or just open an issue.
 
-### Changelog
+## Changelog
 
 Detailed changes for each release are documented in the [release notes](https://github.com/devfake/flox/releases).
 
-### License
+## License
 
 Flox is published under the MIT license. See LICENSE for more information.
