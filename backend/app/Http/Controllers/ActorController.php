@@ -173,6 +173,7 @@ class ActorController
 
     public function outbox()
     {
+        return response('', 501);
     }
 
     public function sharedInbox(Request $request)
