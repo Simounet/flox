@@ -1,0 +1,18 @@
+{
+  "user_id": "2",
+  "domain": "fediverse.tld",
+  "username": "michelwolffmd@fediverse.tld",
+  "name": "michelwolffmd",
+  "shared_inbox_url": "https://fediverse.tld/inbox",
+  "inbox_url": "https://fediverse.tld/users/michelwolffmd/inbox",
+  "outbox_url": "https://fediverse.tld/users/michelwolffmd/outbox",
+  "key_id_url": "https://fediverse.tld/users/michelwolffmd#main-key",
+  "followers_url": "https://fediverse.tld/users/michelwolffmd/followers",
+  "following_url": "https://fediverse.tld/users/michelwolffmd/following",
+  "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtE6kSA0u/wSaiW5+j+LI\nqhtlhGxq8SytLG1LBG/i4r7KCGddjbYXrur0VrO1FkcFcSKExX4bLAYgWexhhpDL\nyxI6ots24NrUaInwzK4jKwWmD98dfbnvLJTQkurTRWm/jO7of+QUnPEvkFa6uIW7\nFXl5wfB+frk1OnAllzRO1J9E1yCqv2Cu//ty+txnGxVZPU1k0h9cggvOFihp9p4X\nHwiwcVFS+e1LQjW7XbWNcLdbkjI7ykZqQwiJBPS1o1TkJhSeYTzDPGNJ3nZp8jW+\ndFd5lGNy15gFceWXv9GQ/WPbO+19ryBLLdL/qIfAqnLk3d04Hf1dQAUMwYuQOt07\n1wIDAQAB\n-----END PUBLIC KEY-----",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC0TqRIDS7/BJqJ\nbn6P4siqG2WEbGrxLK0sbUsEb+LivsoIZ12Ntheu6vRWs7UWRwVxIoTFfhssBiBZ\n7GGGkMvLEjqi2zbg2tRoifDMriMrBaYP3x19ue8slNCS6tNFab+M7uh/5BSc8S+Q\nVrq4hbsVeXnB8H5+uTU6cCWXNE7Un0TXIKq/YK7/+3L63GcbFVk9TWTSH1yCC84W\nKGn2nhcfCLBxUVL57UtCNbtdtY1wt1uSMjvKRmpDCIkE9LWjVOQmFJ5hPMM8Y0ne\ndmnyNb50V3mUY3LXmAVx5Ze/0ZD9Y9s77X2vIEst0v+oh8CqcuTd3Tgd/V1ABQzB\ni5A63TvXAgMBAAECggEALKoweuK9KhIPYAz9kBIbKDxaJPggc7bf/Rnj0+kNeKLP\ndE56t9CMRFnShinFKYwVVoW5Ax0uiPTJjc0HCakTuq281bvc981tgant+x4F+zHO\nha785Liq/U2t7z75b//2oehKsueijZAXerdpUK1b/0FUvoyfITAq9dtzDGY6QuP4\naBKhMuJe2JNg1vwYYD1tY7oHEGA8CkTLy/cRZCWeOumu1wJRiTAzkpPTAjsTwyOw\nMlcbS7TDtCE3vW2Tgw7hsLtqor8ZaaeMLVDB5OpSaSn+QO679BzpqD+A85sY9CYQ\nLvGtfNDNMQPKvVBEwebeRlvGfMK9lEm1fm02Ayy8OQKBgQDrxEzDD5PoKL8yQetN\n6O0Ux1M2uFTaIJNi6df1S84nqOR8GzKNyUzpA1eJEbgTU+msUNlZHc4EXJhAGiIM\nDIY1Ae5+U+32+oJKkbOUqB2Tp1ocC4skiN6jgZ9XwkX4Kn0bRxFVvyEJfcY/KURo\nXlbKgL1B3b4fweuoJJe5eeN6qQKBgQDDx+rGBRnBvYlTGGhcV6qskIqQNVmxLsis\nYZdzFD4teN7tf+GwU93Ajg2Uo32HQqZJ4m/4DSgCep699aSsZtcPt0lm/FpAYBvF\nQ74HOg3VW3SKP5c8xFy2YuVa2doFyHA9zMseacaRPJsmHDPp97RvfxUVdP+NXI3h\nmFxK/veSfwKBgDrOxQLmsNL4zvAfRy0wy2oiadw9UFT0SS8j+w0hcnOsCgn20r5R\nFtEMV1pGRC72AFRN+ljjOU8XNZbPrexpd1RjffSexL2VMMie3TdYU8BPvwc9zeA4\nD6ijHXbLa56CIqCaMnW77earK7b3eSu7VFTAlfSG9fR/72MKdZn7EEW5AoGBAJCG\nNOZm/4OIoiYIP4njYWev78nSyFpGufaeuElIaTnyH0bdf0JGNs2dT6MpKVI/PjgO\ngy9urtldoW+DNUPbSukcGYB/yzP4fqeZgV8eWPXmZFpl5QQDxJkS2lK9vPdF5q2I\nT20tEltGjRWN/ji6FaW0/2BulPPKniYp7f+iximLAoGBAKgHw/XPFOUE8ltxerE9\nPH0e2ZZZ/yOFFhR6Xk/lPYyS9ge2MvlLlANwVOMQcI1rVZWZPSX1j4AmIKPA3zGN\njWDjxaX/CAkbPf1Sc7bodBri5Tx64t5YQDnahhL/VdpFFzuLiWerjuYhFMPFF2dV\nFmleynBtpn0e711tXGkia2cZ\n-----END PRIVATE KEY-----",
+  "remote_url": "https://fediverse.tld/users/michelwolffmd",
+  "id": "371375718988389262",
+  "updated_at": "2023-11-23 19:14:31",
+  "created_at": "2023-11-23 19:14:31"
+}

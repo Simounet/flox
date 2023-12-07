@@ -27,6 +27,11 @@
       return 'flox--' . date('Y-m-d---H-i') . '.json';
     }
 
+    public function getPosterUrl(string $poster): string
+    {
+      return LaravelStorage::disk('local')->url($poster);
+    }
+
     /**
      * Download poster and backdrop image files.
      *

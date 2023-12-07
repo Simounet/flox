@@ -45,6 +45,7 @@
 
       'local' => [
         'driver' => 'local',
+        'url' => env('APP_URL') . '/assets/poster',
         'root' => base_path('../public/assets/poster'),
       ],
 

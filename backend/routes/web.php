@@ -1,5 +1,7 @@
 <?php
 
+  use App\Http\Middleware\JsonRequestOnly;
+
   Route::prefix('api')->group(function() {
     Route::get('/logout', 'UserController@logout');
     Route::post('/login', 'UserController@login');
@@ -59,6 +61,10 @@
 
       Route::get('/video/{type}/{id}', 'VideoController@serve');
     });
+  });
+
+  Route::middleware([JsonRequestOnly::class])->group(function () {
+      Route::get('/users/{username}/review/{id}', 'ReviewController@showObject')->name('user.review');
   });
 
   Route::fallback('HomeController@app');

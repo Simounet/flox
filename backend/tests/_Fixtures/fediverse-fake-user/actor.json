@@ -1,0 +1,26 @@
+{
+  "type": "Person",
+  "streams": [],
+  "@context": "https://www.w3.org/ns/activitystreams",
+  "id": "https://fediverse.tld/users/michelwolffmd",
+  "url": "https://fediverse.tld/users/michelwolffmd",
+  "name": "michelwolffmd",
+  "preferredUsername": "michelwolffmd",
+  "inbox": "https://fediverse.tld/users/michelwolffmd/inbox",
+  "outbox": "https://fediverse.tld/users/michelwolffmd/outbox",
+  "following": "https://fediverse.tld/users/michelwolffmd/following",
+  "followers": "https://fediverse.tld/users/michelwolffmd/followers",
+  "icon": {
+    "type": "Image",
+    "mediaType": "image/jpg",
+    "url": "https://fediverse.tld/assets/img/logo-small.png"
+  },
+  "publicKey": {
+    "id": "https://fediverse.tld/users/michelwolffmd#main-key",
+    "owner": "https://fediverse.tld/users/michelwolffmd",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtE6kSA0u/wSaiW5+j+LI\nqhtlhGxq8SytLG1LBG/i4r7KCGddjbYXrur0VrO1FkcFcSKExX4bLAYgWexhhpDL\nyxI6ots24NrUaInwzK4jKwWmD98dfbnvLJTQkurTRWm/jO7of+QUnPEvkFa6uIW7\nFXl5wfB+frk1OnAllzRO1J9E1yCqv2Cu//ty+txnGxVZPU1k0h9cggvOFihp9p4X\nHwiwcVFS+e1LQjW7XbWNcLdbkjI7ykZqQwiJBPS1o1TkJhSeYTzDPGNJ3nZp8jW+\ndFd5lGNy15gFceWXv9GQ/WPbO+19ryBLLdL/qIfAqnLk3d04Hf1dQAUMwYuQOt07\n1wIDAQAB\n-----END PUBLIC KEY-----\n"
+  },
+  "endpoints": {
+    "sharedInbox": "https://fediverse.tld/inbox"
+  }
+}

@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ReviewResource;
+use App\Jobs\ReviewSendActivities;
+use App\Profile;
 use App\Review;
+use App\Services\Fediverse\Activity\ReviewActivity;
+use App\Services\Fediverse\Activity\Verbs;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +35,14 @@ class ReviewController extends Controller
 
       if(Auth::check() || $request->validate(['content' => 'required|unique:content|max:255'])) {
         $reviewModel = new Review();
-        $reviewModel->store(Auth::user()->id, $itemId, $content);
+        $storedReview = $reviewModel->store(Auth::user()->id, $itemId, $content);
+        $activityType = $storedReview->wasRecentlyCreated ?
+            Verbs::CREATE : Verbs::UPDATE;
+        ReviewSendActivities::dispatch(
+            $activityType,
+            $storedReview->id,
+            $storedReview->user->username
+        );
         return response('Success', Response::HTTP_OK);
       }
 
@@ -72,7 +83,22 @@ class ReviewController extends Controller
             'user_id' => $userId
         ])->firstOrFail();
         $review->delete();
+        ReviewSendActivities::dispatch(
+            Verbs::DELETE,
+            $review->id,
+            $review->user->username
+        );
 
         return response('Success', Response::HTTP_OK);
     }
+
+    public function showObject(Request $request, string $username, string $id)
+    {
+        $review = Review::findOrFail($id);
+        $profile = Profile::where(['username' => $username])->first();
+        $reviewActivity = (new ReviewActivity)->activity($review, $profile);
+
+        return response()->json($reviewActivity->toArray(), 200, ['Content-Type' => 'application/activity+json'], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+    }
+
 }
