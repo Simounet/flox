@@ -8,7 +8,7 @@ use App\Models\Follower;
 use App\Models\Profile;
 use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ProfileService;
-use App\User;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;

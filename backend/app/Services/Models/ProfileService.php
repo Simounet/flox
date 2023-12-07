@@ -6,7 +6,7 @@ namespace App\Services\Models;
 
 use ActivityPhp\Type\AbstractObject;
 use App\Models\Profile;
-use App\User;
+use App\Models\User;
 
 class ProfileService
 {

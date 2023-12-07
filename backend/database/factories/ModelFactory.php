@@ -2,7 +2,7 @@
 
   use Carbon\Carbon;
 
-  $factory->define(App\User::class, function(Faker\Generator $faker) {
+  $factory->define(App\Models\User::class, function(Faker\Generator $faker) {
     static $password;
 
     $username = strtolower(str_replace(' ', '', $faker->name));

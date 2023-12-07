@@ -8,7 +8,7 @@
   use App\Models\Episode;
   use App\Models\Item;
   use App\Models\Setting;
-  use App\User;
+  use App\Models\User;
   use App\Services\FileParser;
   use Tests\Traits\Factories;
   use Tests\Traits\Fixtures;
