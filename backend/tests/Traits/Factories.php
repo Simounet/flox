@@ -3,7 +3,7 @@
   namespace Tests\Traits;
 
   use App\Episode;
-  use App\Item;
+  use App\Models\Item;
   use App\Setting;
   use App\User;
 

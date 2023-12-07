@@ -3,7 +3,7 @@
   namespace Tests\Services;
 
   use App\Genre;
-  use App\Item;
+  use App\Models\Item;
   use App\Services\Models\GenreService;
   use Illuminate\Foundation\Testing\RefreshDatabase;
   use Illuminate\Support\Facades\DB;

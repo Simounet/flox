@@ -4,7 +4,7 @@
 
   use Illuminate\Support\Facades\File;
   use App\Episode;
-  use App\Item;
+  use App\Models\Item;
 
   class VideoController {
 

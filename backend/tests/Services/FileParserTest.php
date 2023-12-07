@@ -6,7 +6,7 @@
   use Illuminate\Support\Facades\Hash;
   use Tests\TestCase;
   use App\Episode;
-  use App\Item;
+  use App\Models\Item;
   use App\Setting;
   use App\User;
   use App\Services\FileParser;

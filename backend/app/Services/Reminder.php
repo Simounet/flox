@@ -3,7 +3,7 @@
   namespace App\Services;
   
   use App\Episode;
-  use App\Item;
+  use App\Models\Item;
   use App\Mail\DailyReminder;
   use App\Mail\WeeklyReminder;
   use App\Setting;

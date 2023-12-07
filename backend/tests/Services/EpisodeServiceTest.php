@@ -5,7 +5,7 @@
   use Illuminate\Foundation\Testing\RefreshDatabase;
   use Tests\TestCase;
   use App\Episode;
-  use App\Item;
+  use App\Models\Item;
   use App\Services\Models\EpisodeService;
   use Tests\Traits\Factories;
   use Tests\Traits\Fixtures;

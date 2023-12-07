@@ -3,7 +3,7 @@
   namespace App\Services\Models;
 
   use App\Episode as Model;
-  use App\Item;
+  use App\Models\Item;
   use App\Services\TMDB;
   use App\Setting;
   use Carbon\Carbon;

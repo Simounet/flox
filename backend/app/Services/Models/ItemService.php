@@ -2,8 +2,7 @@
 
   namespace App\Services\Models;
 
-  use App\Item as Model;
-  use App\Item;
+  use App\Models\Item;
   use App\Services\IMDB;
   use App\Services\Storage;
   use App\Services\Models\PersonService;
@@ -15,7 +14,7 @@
 
   class ItemService {
 
-    private $model;
+    private $item;
     private $tmdb;
     private $storage;
     private $alternativeTitleService;
@@ -26,7 +25,7 @@
     private $personService;
 
     /**
-     * @param Model $model
+     * @param Item $item
      * @param TMDB $tmdb
      * @param Storage $storage
      * @param AlternativeTitleService $alternativeTitleService
@@ -37,7 +36,7 @@
      * @param PersonService $personService
      */
     public function __construct(
-      Model $model,
+      Item $item,
       TMDB $tmdb,
       Storage $storage,
       AlternativeTitleService $alternativeTitleService,
@@ -47,7 +46,7 @@
       Setting $setting,
       PersonService $personService
     ){
-      $this->model = $model;
+      $this->item = $item;
       $this->tmdb = $tmdb;
       $this->storage = $storage;
       $this->alternativeTitleService = $alternativeTitleService;
@@ -60,7 +59,7 @@
 
     /**
      * @param $data
-     * @return Model
+     * @return Item
      */
     public function create($data)
     {
@@ -68,7 +67,7 @@
 
       $data = $this->makeDataComplete($data);
 
-      $item = $this->model->store($data);
+      $item = $this->item->store($data);
       $this->personService->storeCredits(
         [
           'cast' => $data['credit_cast'],
@@ -124,7 +123,7 @@
 
       $this->genreService->updateGenreLists();
 
-      $this->model->orderBy('refreshed_at')->get()->each(function($item) {
+      $this->item->orderBy('refreshed_at')->get()->each(function($item) {
         UpdateItem::dispatch($item->id);
       });
     }
@@ -141,7 +140,7 @@
     {
       logInfo("Start refresh for item [$itemId]");
 
-      $item = $this->model->findOrFail($itemId);
+      $item = $this->item->findOrFail($itemId);
 
       $details = $this->tmdb->details($item->tmdb_id, $item->media_type);
 
@@ -240,7 +239,7 @@
     /**
      * @param $data
      * @param $mediaType
-     * @return Model
+     * @return Item
      */
     public function createEmpty($data, $mediaType)
     {
@@ -252,7 +251,7 @@
         'subtitles' => $data->changed->subtitles ?? $data->subtitles,
       ];
 
-      return $this->model->storeEmpty($data, $mediaType);
+      return $this->item->storeEmpty($data, $mediaType);
     }
 
     /**
@@ -264,7 +263,7 @@
      */
     public function remove($itemId)
     {
-      $item = $this->model->find($itemId);
+      $item = $this->item->find($itemId);
 
       if( ! $item) {
         return response('Not Found', Response::HTTP_NOT_FOUND);
@@ -292,7 +291,7 @@
     {
       $filter = $this->getSortFilter($orderBy);
 
-      $items = $this->model->orderBy($filter, $sortDirection)->with('latestEpisode')->withCount('episodesWithSrc');
+      $items = $this->item->orderBy($filter, $sortDirection)->with('latestEpisode')->withCount('episodesWithSrc');
 
       if($type == 'watchlist') {
         $items->where('watchlist', true);
@@ -316,7 +315,7 @@
      */
     public function changeRating($itemId, $rating)
     {
-      $item = $this->model->find($itemId);
+      $item = $this->item->find($itemId);
 
       if( ! $item) {
         return response('Not Found', Response::HTTP_NOT_FOUND);
@@ -324,7 +323,7 @@
 
       // Update the parent relation only if we change rating from neutral.
       if($item->rating == 0) {
-        $this->model->updateLastSeenAt($item->tmdb_id);
+        $this->item->updateLastSeenAt($item->tmdb_id);
       }
 
       $item->update([
@@ -341,7 +340,7 @@
      */
     public function search($title)
     {
-      return $this->model->findByTitle($title)->with('latestEpisode')->withCount('episodesWithSrc')->get();
+      return $this->item->findByTitle($title)->with('latestEpisode')->withCount('episodesWithSrc')->get();
     }
 
     /**
@@ -393,17 +392,17 @@
 
       switch($type) {
         case 'title':
-          return $this->model->findByTitle($value, $mediaType)->first();
+          return $this->item->findByTitle($value, $mediaType)->first();
         case 'title_strict':
-          return $this->model->findByTitleStrict($value, $mediaType)->first();
+          return $this->item->findByTitleStrict($value, $mediaType)->first();
         case 'fp_name':
-          return $this->model->findByFPName($value, $mediaType)->first();
+          return $this->item->findByFPName($value, $mediaType)->first();
         case 'tmdb_id':
-          return $this->model->findByTmdbId($value)->with('latestEpisode')->first();
+          return $this->item->findByTmdbId($value)->with('latestEpisode')->first();
         case 'tmdb_id_strict':
-          return $this->model->findByTmdbIdStrict($value, $mediaType)->with('creditCast', 'creditCrew', 'latestEpisode', 'review')->first();
+          return $this->item->findByTmdbIdStrict($value, $mediaType)->with('creditCast', 'creditCrew', 'latestEpisode', 'review')->first();
         case 'src':
-          return $this->model->findBySrc($value)->first();
+          return $this->item->findBySrc($value)->first();
       }
 
       return null;

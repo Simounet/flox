@@ -3,7 +3,7 @@
   namespace App\Services;
 
   use App\AlternativeTitle;
-  use App\Item;
+  use App\Models\Item;
   use App\Services\Models\EpisodeService;
   use App\Services\Models\ItemService;
   use App\Setting;

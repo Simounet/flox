@@ -23,7 +23,7 @@
     ];
   });
 
-  $factory->define(App\Item::class, function(Faker\Generator $faker) {
+  $factory->define(App\Models\Item::class, function(Faker\Generator $faker) {
     return [
       'poster' => '',
       'rating' => 1,
@@ -44,13 +44,13 @@
     ];
   });
 
-  $factory->state(App\Item::class, 'movie', function() {
+  $factory->state(App\Models\Item::class, 'movie', function() {
     return [
       'media_type' => 'movie',
     ];
   });
 
-  $factory->state(App\Item::class, 'tv', function() {
+  $factory->state(App\Models\Item::class, 'tv', function() {
     return [
       'media_type' => 'tv',
     ];

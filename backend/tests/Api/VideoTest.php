@@ -3,7 +3,7 @@
   namespace Tests\Api;
 
   use App\Episode;
-  use App\Item;
+  use App\Models\Item;
   use Illuminate\Foundation\Testing\RefreshDatabase;
   use Tests\TestCase;
   use Tests\Traits\Factories;

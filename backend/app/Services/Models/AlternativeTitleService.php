@@ -3,7 +3,7 @@
   namespace App\Services\Models;
 
   use App\AlternativeTitle as Model;
-  use App\Item;
+  use App\Models\Item;
   use App\Services\TMDB;
 
   class AlternativeTitleService {

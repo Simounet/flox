@@ -6,7 +6,7 @@
   use App\Jobs\ImportEpisode;
   use App\AlternativeTitle;
   use App\Episode;
-  use App\Item;
+  use App\Models\Item;
   use App\Services\Storage;
   use App\Setting;
   use Illuminate\Support\Facades\DB;
