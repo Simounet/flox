@@ -35,7 +35,7 @@
     ];
   });
 
-  $factory->define(App\Episode::class, function(Faker\Generator $faker) {
+  $factory->define(App\Models\Episode::class, function(Faker\Generator $faker) {
     return [
       'name' => $faker->name,
       'season_tmdb_id' => 1,

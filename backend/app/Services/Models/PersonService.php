@@ -4,7 +4,7 @@
 
   use App\Models\CreditCast;
   use App\Models\CreditCrew;
-  use App\Person;
+  use App\Models\Person;
 
   class PersonService {
 
