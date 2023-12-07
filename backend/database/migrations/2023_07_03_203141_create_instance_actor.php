@@ -1,6 +1,6 @@
 <?php
 
-use App\Profile;
+use App\Models\Profile;
 use App\Services\Models\ProfileService;
 use App\User;
 use Illuminate\Database\Migrations\Migration;

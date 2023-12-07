@@ -4,7 +4,7 @@ namespace Tests\Api;
 
 use App\Jobs\ReviewSendActivity;
 use App\Jobs\ReviewSendActivities;
-use App\Profile;
+use App\Models\Profile;
 use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ItemService;
 use App\Services\Models\ProfileService;

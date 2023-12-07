@@ -5,7 +5,7 @@ namespace App\Services\Fediverse\Activity;
 use ActivityPhp\Type;
 use ActivityPhp\Type\Extended\Object\Note;
 use App\Models\Item;
-use App\Profile;
+use App\Models\Profile;
 use App\Review;
 use App\Services\Models\ReviewService;
 

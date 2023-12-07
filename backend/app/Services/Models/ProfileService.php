@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Models;
 
 use ActivityPhp\Type\AbstractObject;
-use App\Profile;
+use App\Models\Profile;
 use App\User;
 
 class ProfileService

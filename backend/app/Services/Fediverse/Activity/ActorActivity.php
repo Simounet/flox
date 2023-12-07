@@ -5,7 +5,7 @@ namespace App\Services\Fediverse\Activity;
 use ActivityPhp\Type\Extended\Actor\Person;
 use ActivityPhp\Type\Extended\Object\Image;
 use ActivityPhp\Type\TypeConfiguration;
-use App\Profile;
+use App\Models\Profile;
 
 class ActorActivity
 {

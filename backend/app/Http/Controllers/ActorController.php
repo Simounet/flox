@@ -7,7 +7,7 @@ use ActivityPhp\Type\Extended\Activity\Delete;
 use ActivityPhp\Type\Extended\Activity\Follow;
 use ActivityPhp\Type\Extended\Activity\Undo;
 use ActivityPhp\Type\TypeConfiguration;
-use App\Profile;
+use App\Models\Profile;
 use App\Services\Fediverse\Activity\ActivityService;
 use App\Services\Fediverse\Activity\ActorActivity;
 use App\Services\Fediverse\Activity\UndoActivity;
