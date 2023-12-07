@@ -2,7 +2,7 @@
 
   namespace Tests\Traits;
 
-  use App\Episode;
+  use App\Models\Episode;
   use App\Models\Item;
   use App\Models\Setting;
   use App\User;

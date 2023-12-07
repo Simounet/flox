@@ -3,7 +3,7 @@
   namespace Tests\Setting;
 
   use App\AlternativeTitle;
-  use App\Episode;
+  use App\Models\Episode;
   use App\Models\Item;
   use App\Jobs\ImportEpisode;
   use App\Jobs\ImportItem;

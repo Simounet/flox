@@ -3,7 +3,7 @@
   namespace App\Http\Controllers;
 
   use App\AlternativeTitle;
-  use App\Episode;
+  use App\Models\Episode;
   use App\Models\Item;
   use App\Models\Setting;
   use GuzzleHttp\Client;

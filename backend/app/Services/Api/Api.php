@@ -2,7 +2,7 @@
 
 namespace App\Services\Api;
 
-use App\Episode;
+use App\Models\Episode;
 use App\Models\Item;
 use App\Services\Models\ItemService;
 use App\Services\TMDB;

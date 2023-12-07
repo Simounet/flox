@@ -5,7 +5,7 @@
   use Illuminate\Foundation\Testing\RefreshDatabase;
   use Illuminate\Support\Facades\Hash;
   use Tests\TestCase;
-  use App\Episode;
+  use App\Models\Episode;
   use App\Models\Item;
   use App\Models\Setting;
   use App\User;

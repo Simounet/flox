@@ -2,7 +2,7 @@
 
 namespace Tests\Services\Api;
 
-use App\Episode;
+use App\Models\Episode;
 use App\Models\Item;
 use App\Services\Api\Plex;
 use Illuminate\Foundation\Testing\RefreshDatabase;
