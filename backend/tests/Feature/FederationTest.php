@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Follower;
+use App\Models\Follower;
 use App\Models\Profile;
 use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ProfileService;
