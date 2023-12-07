@@ -2,7 +2,7 @@
 
   namespace App\Services;
 
-  use App\CreditCast;
+  use App\Models\CreditCast;
   use App\CreditCrew;
   use App\Models\Genre;
   use App\Models\Item;
