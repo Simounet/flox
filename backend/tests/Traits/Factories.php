@@ -2,10 +2,10 @@
 
   namespace Tests\Traits;
 
-  use App\Episode;
-  use App\Item;
-  use App\Setting;
-  use App\User;
+  use App\Models\Episode;
+  use App\Models\Item;
+  use App\Models\Setting;
+  use App\Models\User;
 
   trait Factories {
 

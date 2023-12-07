@@ -1,9 +1,9 @@
 <?php
 
-use App\Profile;
+use App\Models\Profile;
 use App\Services\Fediverse\Activity\ActorActivity;
 use App\Services\Models\ProfileService;
-use App\User;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

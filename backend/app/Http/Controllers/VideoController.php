@@ -3,8 +3,8 @@
   namespace App\Http\Controllers;
 
   use Illuminate\Support\Facades\File;
-  use App\Episode;
-  use App\Item;
+  use App\Models\Episode;
+  use App\Models\Item;
 
   class VideoController {
 

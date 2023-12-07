@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ReviewResource;
 use App\Jobs\ReviewSendActivities;
-use App\Profile;
-use App\Review;
+use App\Models\Profile;
+use App\Models\Review;
 use App\Services\Fediverse\Activity\ReviewActivity;
 use App\Services\Fediverse\Activity\Verbs;
 use Illuminate\Support\Facades\Auth;

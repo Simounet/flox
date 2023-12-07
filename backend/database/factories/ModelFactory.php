@@ -2,7 +2,7 @@
 
   use Carbon\Carbon;
 
-  $factory->define(App\User::class, function(Faker\Generator $faker) {
+  $factory->define(App\Models\User::class, function(Faker\Generator $faker) {
     static $password;
 
     $username = strtolower(str_replace(' ', '', $faker->name));
@@ -14,7 +14,7 @@
     ];
   });
 
-  $factory->define(App\Setting::class, function(Faker\Generator $faker) {
+  $factory->define(App\Models\Setting::class, function(Faker\Generator $faker) {
     return [
       'show_date' => 1,
       'show_genre' => 1,
@@ -23,7 +23,7 @@
     ];
   });
 
-  $factory->define(App\Item::class, function(Faker\Generator $faker) {
+  $factory->define(App\Models\Item::class, function(Faker\Generator $faker) {
     return [
       'poster' => '',
       'rating' => 1,
@@ -35,7 +35,7 @@
     ];
   });
 
-  $factory->define(App\Episode::class, function(Faker\Generator $faker) {
+  $factory->define(App\Models\Episode::class, function(Faker\Generator $faker) {
     return [
       'name' => $faker->name,
       'season_tmdb_id' => 1,
@@ -44,13 +44,13 @@
     ];
   });
 
-  $factory->state(App\Item::class, 'movie', function() {
+  $factory->state(App\Models\Item::class, 'movie', function() {
     return [
       'media_type' => 'movie',
     ];
   });
 
-  $factory->state(App\Item::class, 'tv', function() {
+  $factory->state(App\Models\Item::class, 'tv', function() {
     return [
       'media_type' => 'tv',
     ];

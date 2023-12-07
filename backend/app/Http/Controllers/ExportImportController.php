@@ -4,11 +4,11 @@
 
   use App\Jobs\ImportItem;
   use App\Jobs\ImportEpisode;
-  use App\AlternativeTitle;
-  use App\Episode;
-  use App\Item;
+  use App\Models\AlternativeTitle;
+  use App\Models\Episode;
+  use App\Models\Item;
   use App\Services\Storage;
-  use App\Setting;
+  use App\Models\Setting;
   use Illuminate\Support\Facades\DB;
   use Illuminate\Support\Facades\Request;
   use Symfony\Component\HttpFoundation\Response;

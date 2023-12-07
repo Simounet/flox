@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Profile;
+use App\Models\Profile;
 use App\Services\Models\ProfileService;
-use App\User;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

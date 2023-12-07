@@ -8,7 +8,7 @@ use ActivityPhp\Type;
 use ActivityPhp\Type\AbstractObject;
 use ActivityPhp\Type\Ontology;
 use ActivityPhp\Type\TypeConfiguration;
-use App\Profile;
+use App\Models\Profile;
 use App\Services\Fediverse\HttpSignature;
 use App\Services\HelpersService;
 use Illuminate\Http\Client\ConnectionException;

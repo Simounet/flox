@@ -5,10 +5,10 @@
   use Illuminate\Foundation\Testing\RefreshDatabase;
   use Illuminate\Support\Facades\Hash;
   use Tests\TestCase;
-  use App\Episode;
-  use App\Item;
-  use App\Setting;
-  use App\User;
+  use App\Models\Episode;
+  use App\Models\Item;
+  use App\Models\Setting;
+  use App\Models\User;
   use App\Services\FileParser;
   use Tests\Traits\Factories;
   use Tests\Traits\Fixtures;

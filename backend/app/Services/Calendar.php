@@ -2,8 +2,8 @@
 
   namespace App\Services;
 
-  use App\Episode;
-  use App\Item;
+  use App\Models\Episode;
+  use App\Models\Item;
   use Illuminate\Support\Collection;
 
   class Calendar {

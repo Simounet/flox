@@ -2,10 +2,10 @@
 
   namespace App\Http\Controllers;
 
-  use App\AlternativeTitle;
-  use App\Episode;
-  use App\Item;
-  use App\Setting;
+  use App\Models\AlternativeTitle;
+  use App\Models\Episode;
+  use App\Models\Item;
+  use App\Models\Setting;
   use GuzzleHttp\Client;
   use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\Cache;

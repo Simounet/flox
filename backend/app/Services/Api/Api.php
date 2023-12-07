@@ -2,8 +2,8 @@
 
 namespace App\Services\Api;
 
-use App\Episode;
-use App\Item;
+use App\Models\Episode;
+use App\Models\Item;
 use App\Services\Models\ItemService;
 use App\Services\TMDB;
 use Symfony\Component\HttpFoundation\Response;

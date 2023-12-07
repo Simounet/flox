@@ -3,7 +3,7 @@
 namespace App\Services\Fediverse\Activity;
 
 use ActivityPhp\Type\Extended\Object\Note;
-use App\Profile;
+use App\Models\Profile;
 
 class ActivityService
 {

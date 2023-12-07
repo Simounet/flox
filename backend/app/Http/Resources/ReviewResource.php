@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources;
 
-use App\Item;
-use App\User;
+use App\Models\Item;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 

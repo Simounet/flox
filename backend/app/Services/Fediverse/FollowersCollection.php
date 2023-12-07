@@ -4,7 +4,7 @@ namespace App\Services\Fediverse;
 
 use ActivityPhp\Type;
 use ActivityPhp\Type\Core\OrderedCollection;
-use App\Profile;
+use App\Models\Profile;
 
 class FollowersCollection
 {

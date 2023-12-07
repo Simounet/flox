@@ -2,14 +2,14 @@
 
   namespace Tests\Setting;
 
-  use App\AlternativeTitle;
-  use App\Episode;
-  use App\Item;
+  use App\Models\AlternativeTitle;
+  use App\Models\Episode;
+  use App\Models\Item;
   use App\Jobs\ImportEpisode;
   use App\Jobs\ImportItem;
   use App\Services\Models\ItemService;
   use App\Services\Storage;
-  use App\Setting;
+  use App\Models\Setting;
   use Illuminate\Foundation\Testing\RefreshDatabase;
   use Illuminate\Http\UploadedFile;
   use Illuminate\Support\Facades\Queue;

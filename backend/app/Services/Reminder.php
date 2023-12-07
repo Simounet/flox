@@ -2,11 +2,11 @@
 
   namespace App\Services;
   
-  use App\Episode;
-  use App\Item;
+  use App\Models\Episode;
+  use App\Models\Item;
   use App\Mail\DailyReminder;
   use App\Mail\WeeklyReminder;
-  use App\Setting;
+  use App\Models\Setting;
   use Illuminate\Support\Facades\Mail;
 
   class Reminder {

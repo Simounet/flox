@@ -4,8 +4,8 @@ namespace App\Services\Fediverse\Activity;
 
 use ActivityPhp\Type\Extended\AbstractActor;
 use ActivityPhp\Type\Extended\Activity\Follow;
-use App\Follower;
-use App\Profile;
+use App\Models\Follower;
+use App\Models\Profile;
 use App\Services\Fediverse\ActivityPubFetchService;
 use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ProfileService;

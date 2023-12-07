@@ -2,24 +2,24 @@
 
   namespace App\Services\Models;
 
-  use App\AlternativeTitle as Model;
-  use App\Item;
+  use App\Models\AlternativeTitle;
+  use App\Models\Item;
   use App\Services\TMDB;
 
   class AlternativeTitleService {
 
-    private $model;
+    private $alternativeTitle;
     private $item;
     private $tmdb;
 
     /**
-     * @param Model $model
+     * @param AlternativeTitle $alternativeTitle
      * @param Item  $item
      * @param TMDB  $tmdb
      */
-    public function __construct(Model $model, Item $item, TMDB $tmdb)
+    public function __construct(AlternativeTitle $alternativeTitle, Item $item, TMDB $tmdb)
     {
-      $this->model = $model;
+      $this->alternativeTitle = $alternativeTitle;
       $this->item = $item;
       $this->tmdb = $tmdb;
     }
@@ -31,7 +31,7 @@
     {
       $titles = $this->tmdb->getAlternativeTitles($item);
 
-      $this->model->store($titles, $item->tmdb_id);
+      $this->alternativeTitle->store($titles, $item->tmdb_id);
     }
 
     /**
@@ -41,7 +41,7 @@
      */
     public function remove($tmdbId)
     {
-      $this->model->where('tmdb_id', $tmdbId)->delete();
+      $this->alternativeTitle->where('tmdb_id', $tmdbId)->delete();
     }
 
     /**
