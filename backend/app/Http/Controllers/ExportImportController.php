@@ -4,7 +4,7 @@
 
   use App\Jobs\ImportItem;
   use App\Jobs\ImportEpisode;
-  use App\AlternativeTitle;
+  use App\Models\AlternativeTitle;
   use App\Models\Episode;
   use App\Models\Item;
   use App\Services\Storage;

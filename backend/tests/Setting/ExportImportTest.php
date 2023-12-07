@@ -2,7 +2,7 @@
 
   namespace Tests\Setting;
 
-  use App\AlternativeTitle;
+  use App\Models\AlternativeTitle;
   use App\Models\Episode;
   use App\Models\Item;
   use App\Jobs\ImportEpisode;

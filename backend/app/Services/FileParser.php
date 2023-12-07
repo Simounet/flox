@@ -2,7 +2,7 @@
 
   namespace App\Services;
 
-  use App\AlternativeTitle;
+  use App\Models\AlternativeTitle;
   use App\Models\Item;
   use App\Services\Models\EpisodeService;
   use App\Services\Models\ItemService;
