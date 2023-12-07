@@ -55,6 +55,7 @@
     data() {
       return {
         sticky: false,
+        displayHeader: true,
         enableStickyOn: 100,
         latestRoute: '',
         mobileNavigationOpen: false
@@ -62,13 +63,31 @@
     },
 
     mounted() {
-      this.latestRoute = this.$route.name;
       this.initSticky();
+    },
+
+    watch: {
+      $route(to, from) {
+        if(to.name.includes('subpage')) {
+          this.setDisplayHeader(this.itemLoadedSubpage);
+        }
+      },
+
+      itemLoadedSubpage() {}
     },
 
     computed: {
       ...mapState({
-        itemLoadedSubpage: state => state.itemLoadedSubpage
+        itemLoadedSubpage: function(state) {
+            const routeName = this.$route.name;
+            if(routeName) {
+              const isDisplayed = routeName.includes('subpage') ?
+                state.itemLoadedSubpage : true;
+              this.setDisplayHeader(isDisplayed);
+              this.latestRoute = routeName;
+            }
+            return state.itemLoadedSubpage;
+        }
       }),
 
       root() {
@@ -99,6 +118,10 @@
         }
 
         this.latestRoute = name;
+      },
+
+      setDisplayHeader(isDisplayed) {
+        this.displayHeader = isDisplayed;
       }
     },
 

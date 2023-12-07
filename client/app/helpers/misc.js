@@ -40,19 +40,5 @@ export default {
         day: '2-digit'
       });
     },
-
-    isSubpage() {
-      return this.$route.name.includes('subpage');
-    }
   },
-
-  computed: {
-    displayHeader() {
-      if(this.isSubpage()) {
-        return this.itemLoadedSubpage;
-      }
-
-      return true;
-    }
-  }
-}
+};
