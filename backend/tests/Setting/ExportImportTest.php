@@ -9,7 +9,7 @@
   use App\Jobs\ImportItem;
   use App\Services\Models\ItemService;
   use App\Services\Storage;
-  use App\Setting;
+  use App\Models\Setting;
   use Illuminate\Foundation\Testing\RefreshDatabase;
   use Illuminate\Http\UploadedFile;
   use Illuminate\Support\Facades\Queue;

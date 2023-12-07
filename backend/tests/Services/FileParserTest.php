@@ -7,7 +7,7 @@
   use Tests\TestCase;
   use App\Episode;
   use App\Models\Item;
-  use App\Setting;
+  use App\Models\Setting;
   use App\User;
   use App\Services\FileParser;
   use Tests\Traits\Factories;

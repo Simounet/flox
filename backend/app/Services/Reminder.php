@@ -6,7 +6,7 @@
   use App\Models\Item;
   use App\Mail\DailyReminder;
   use App\Mail\WeeklyReminder;
-  use App\Setting;
+  use App\Models\Setting;
   use Illuminate\Support\Facades\Mail;
 
   class Reminder {

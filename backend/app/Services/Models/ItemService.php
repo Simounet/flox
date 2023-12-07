@@ -8,7 +8,7 @@
   use App\Services\Models\PersonService;
   use App\Services\TMDB;
   use App\Jobs\UpdateItem;
-  use App\Setting;
+  use App\Models\Setting;
   use Illuminate\Support\Facades\DB;
   use Symfony\Component\HttpFoundation\Response;
 

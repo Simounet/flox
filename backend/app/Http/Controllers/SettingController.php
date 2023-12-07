@@ -5,7 +5,7 @@
   use App\AlternativeTitle;
   use App\Episode;
   use App\Models\Item;
-  use App\Setting;
+  use App\Models\Setting;
   use GuzzleHttp\Client;
   use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\Cache;

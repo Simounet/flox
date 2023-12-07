@@ -5,7 +5,7 @@
   use App\Episode as Model;
   use App\Models\Item;
   use App\Services\TMDB;
-  use App\Setting;
+  use App\Models\Setting;
   use Carbon\Carbon;
 
   class EpisodeService {

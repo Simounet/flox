@@ -14,7 +14,7 @@
     ];
   });
 
-  $factory->define(App\Setting::class, function(Faker\Generator $faker) {
+  $factory->define(App\Models\Setting::class, function(Faker\Generator $faker) {
     return [
       'show_date' => 1,
       'show_genre' => 1,

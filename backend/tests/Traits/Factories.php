@@ -4,7 +4,7 @@
 
   use App\Episode;
   use App\Models\Item;
-  use App\Setting;
+  use App\Models\Setting;
   use App\User;
 
   trait Factories {

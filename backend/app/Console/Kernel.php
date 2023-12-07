@@ -5,7 +5,7 @@ namespace App\Console;
 use App\Console\Commands\Daily;
 use App\Console\Commands\Refresh;
 use App\Console\Commands\Weekly;
-use App\Setting;
+use App\Models\Setting;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Schema;

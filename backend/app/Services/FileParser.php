@@ -6,7 +6,7 @@
   use App\Models\Item;
   use App\Services\Models\EpisodeService;
   use App\Services\Models\ItemService;
-  use App\Setting;
+  use App\Models\Setting;
   use GuzzleHttp\Client;
   use Illuminate\Database\Eloquent\ModelNotFoundException;
   use Illuminate\Support\Facades\DB;

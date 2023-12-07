@@ -8,7 +8,7 @@
   use App\Episode;
   use App\Models\Item;
   use App\Services\Storage;
-  use App\Setting;
+  use App\Models\Setting;
   use Illuminate\Support\Facades\DB;
   use Illuminate\Support\Facades\Request;
   use Symfony\Component\HttpFoundation\Response;
