@@ -2,22 +2,22 @@
 
   namespace App\Services\Models;
 
-  use App\Genre as Model;
+  use App\Models\Genre;
   use App\Services\TMDB;
   use Illuminate\Support\Facades\DB;
 
   class GenreService {
 
-    private $model;
+    private $genre;
     private $tmdb;
 
     /**
-     * @param Model $model
+     * @param Genre $genre
      * @param TMDB $tmdb
      */
-    public function __construct(Model $model, TMDB $tmdb)
+    public function __construct(Genre $genre, TMDB $tmdb)
     {
-      $this->model = $model;
+      $this->genre = $genre;
       $this->tmdb = $tmdb;
     }
 
@@ -43,7 +43,7 @@
 
       foreach($genres as $mediaType) {
         foreach($mediaType->genres as $genre) {
-          $this->model->firstOrCreate(
+          $this->genre->firstOrCreate(
             ['id' => $genre->id],
             ['name' => $genre->name]
           );

@@ -4,7 +4,7 @@
 
   use App\CreditCast;
   use App\CreditCrew;
-  use App\Genre;
+  use App\Models\Genre;
   use App\Models\Item;
   use App\Services\Models\PersonService;
   use Carbon\Carbon;

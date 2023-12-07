@@ -2,7 +2,7 @@
 
   namespace Tests\Services;
 
-  use App\Genre;
+  use App\Models\Genre;
   use App\Models\Item;
   use App\Services\Models\GenreService;
   use Illuminate\Foundation\Testing\RefreshDatabase;
