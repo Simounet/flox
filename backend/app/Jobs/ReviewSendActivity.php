@@ -9,7 +9,7 @@ use App\Services\Fediverse\Activity\ActivityService;
 use App\Services\Fediverse\Activity\ReviewActivity;
 use App\Services\Fediverse\Activity\Verbs;
 use App\Services\Fediverse\HttpSignature;
-use App\Review;
+use App\Models\Review;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
