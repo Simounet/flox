@@ -3,7 +3,7 @@
   namespace App\Services\Models;
 
   use App\Models\CreditCast;
-  use App\CreditCrew;
+  use App\Models\CreditCrew;
   use App\Person;
 
   class PersonService {
