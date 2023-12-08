@@ -140,7 +140,7 @@
      */
     public function creditCast()
     {
-      return $this->hasMany(CreditCast::class, 'tmdb_id', 'tmdb_id');
+      return $this->hasMany(CreditCast::class, 'tmdb_id', 'tmdb_id')->orderBy('order');
     }
 
     /**
