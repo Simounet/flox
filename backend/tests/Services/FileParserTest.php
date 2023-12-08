@@ -3,6 +3,7 @@
   namespace Tests\Services;
 
   use Illuminate\Foundation\Testing\RefreshDatabase;
+  use Illuminate\Routing\Middleware\ThrottleRequests;
   use Illuminate\Support\Facades\Hash;
   use Tests\TestCase;
   use App\Models\Episode;
@@ -29,6 +30,9 @@
     public function setUp(): void
     {
       parent::setUp();
+      $this->withoutMiddleware(
+          ThrottleRequests::class
+      );
 
       $this->user = User::create(['username' => 'jon', 'password' => Hash::make('snow')]);
       $this->item = app(Item::class);

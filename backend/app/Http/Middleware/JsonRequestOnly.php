@@ -2,8 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Http\Controllers\HomeController;
-use App\Services\Storage;
 use App\Services\VueAppService;
 use Closure;
 use Illuminate\Http\Request;

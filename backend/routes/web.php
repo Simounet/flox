@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
   use App\Http\Middleware\JsonRequestOnly;
 
   Route::prefix('api')->group(function() {

@@ -10,6 +10,7 @@ use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ProfileService;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -26,6 +27,9 @@ class FederationTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->withoutMiddleware(
+            ThrottleRequests::class
+        );
 
         $this->host = parse_url(env('APP_URL'))['host'];
         $this->withHeader('Host', $this->host);
