@@ -16,6 +16,11 @@ class Review extends Model
         'item_id',
         'content',
         'rating',
+        'watchlist',
+    ];
+
+    protected $casts = [
+      'watchlist' => 'boolean'
     ];
 
     protected $with = ['user'];

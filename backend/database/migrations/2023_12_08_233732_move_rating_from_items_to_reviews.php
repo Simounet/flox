@@ -17,6 +17,7 @@ return new class extends Migration
         $user = User::orderBy('id')->first();
         Schema::table('reviews', function (Blueprint $table) {
             $table->tinyInteger('rating')->nullable()->after('item_id');
+            $table->boolean('watchlist')->default(false)->after('rating');
             $table->longText('content')->nullable()->change();
         });
         Item::query()->orderBy('id')->chunk('1000', function($rows) use ($user) {
@@ -27,7 +28,8 @@ return new class extends Migration
                     'id' => $snowflake->next(),
                     'user_id' => $user->id,
                     'item_id' => $row->id,
-                    'rating' => $row->rating
+                    'rating' => $row->rating,
+                    'watchlist' => $row->watchlist
                 ];
             }
             Review::upsert(
@@ -37,7 +39,8 @@ return new class extends Migration
                     'item_id'
                 ],
                 [
-                    'rating'
+                    'rating',
+                    'watchlist'
                 ]
             );
         });
@@ -50,6 +53,7 @@ return new class extends Migration
     {
         Schema::table('reviews', function (Blueprint $table) {
             $table->dropColumn('rating');
+            $table->dropColumn('watchlist');
             Review::whereNull('content')->delete();
         });
     }
