@@ -55,3 +55,10 @@
       'media_type' => 'tv',
     ];
   });
+
+  $factory->define(App\Models\Review::class, function() {
+    return [
+      'user_id' => 1,
+      'item_id' => 1
+    ];
+  });

@@ -4,6 +4,7 @@
 
   use App\Models\Episode;
   use App\Models\Item;
+  use App\Models\Review;
   use App\Models\Setting;
   use App\Models\User;
 
@@ -31,6 +32,19 @@
       ];
 
       return factory(Item::class)->create(array_merge($data, $custom));
+    }
+
+    public function createReview(array $custom = []): Review
+    {
+        $item = $this->createMovie();
+
+        $data = [
+            'user_id' => 1,
+            'item_id' => $item->id,
+            'rating' => 1
+        ];
+
+        return factory(Review::class)->create(array_merge($data, $custom));
     }
 
     public function createTv($custom = [], $withEpisodes = true)
