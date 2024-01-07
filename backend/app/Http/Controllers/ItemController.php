@@ -2,9 +2,11 @@
 
   namespace App\Http\Controllers;
 
+  use App\Models\Review;
   use App\Services\Models\AlternativeTitleService;
   use App\Services\Models\EpisodeService;
   use App\Services\Models\ItemService;
+  use App\Services\Models\ReviewService;
   use Illuminate\Support\Facades\Request;
   use Symfony\Component\HttpFoundation\Response;
 
@@ -12,11 +14,14 @@
 
     private $itemService;
     private $episodeService;
+    private $reviewService;
 
-    public function __construct(ItemService $itemService, EpisodeService $episodeService)
+    public function __construct(ItemService $itemService, EpisodeService $episodeService, ReviewService $reviewService)
     {
       $this->itemService = $itemService;
       $this->episodeService = $episodeService;
+      // @TODO to remove after rating switched
+      $this->reviewService = $reviewService;
     }
 
     public function items($type, $orderBy, $sortDirection)
@@ -34,9 +39,12 @@
       return $this->itemService->search(Request::input('q'));
     }
 
+    // @TODO to remove after rating switched
     public function changeRating($itemId)
     {
-      return $this->itemService->changeRating($itemId, Request::input('rating'));
+      $this->itemService->changeRating($itemId, Request::input('rating'));
+      $review = Review::firstWhere('item_id', $itemId);
+      return $this->reviewService->changeRating($review->id, Request::input('rating'));
     }
 
     public function add()
