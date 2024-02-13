@@ -9,8 +9,14 @@ import TMDBContent from './components/Content/TMDBContent.vue';
 import Subpage from './components/Content/Subpage.vue';
 import ReviewPage from "./components/Content/ReviewPage.vue";
 
-const Calendar = () => import("./components/Content/Calendar.vue");
-const Settings = () => import("./components/Content/Settings/Index.vue");
+const Calendar = () =>
+  import(
+    /* webpackChunkName: "calendar" */ "./components/Content/Calendar.vue"
+  );
+const Settings = () =>
+  import(
+    /* webpackChunkName: "settings" */ "./components/Content/Settings/Index.vue"
+  );
 
 Vue.use(Router);
 
