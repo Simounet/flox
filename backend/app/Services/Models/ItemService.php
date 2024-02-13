@@ -171,6 +171,13 @@
         'original_title' => $details->original_name ?? $details->original_title,
       ]);
 
+      $this->personService->storeCredits(
+        [
+          'cast' => $this->personService->castFromTMDB($item->tmdb_id, $details->credits->cast),
+          'crew' => $this->personService->crewFromTMDB($item->tmdb_id, $details->credits->crew)
+        ]
+      );
+
       $this->episodeService->create($item);
       $this->alternativeTitleService->create($item);
 
