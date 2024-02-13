@@ -14,6 +14,8 @@ class ReviewResource extends JsonResource
         $data = [
             'id' => $this->id,
             'content' => $this->content,
+            'rating' => $this->rating,
+            'watchlist' => $this->watchlist,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'user' => $this->getUser($this->user),

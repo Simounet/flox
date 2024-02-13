@@ -7,6 +7,7 @@
   use App\Services\Models\EpisodeService;
   use App\Services\Models\ItemService;
   use App\Services\Models\ReviewService;
+  use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\Request;
   use Symfony\Component\HttpFoundation\Response;
 
@@ -40,10 +41,17 @@
     }
 
     // @TODO to remove after rating switched
-    public function changeRating($itemId)
+    public function changeRating(int $itemId): Response
     {
+      $user = Auth::user();
+      abort_if(!$user, 403);
+
       $this->itemService->changeRating($itemId, Request::input('rating'));
-      $review = Review::firstWhere('item_id', $itemId);
+      $review = Review::select('id', 'rating')
+        ->where('item_id', $itemId)
+        ->where('user_id', $user->id)
+        ->get()
+        ->first();
       return $this->reviewService->changeRating($review->id, Request::input('rating'));
     }
 
