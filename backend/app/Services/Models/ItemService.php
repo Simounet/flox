@@ -3,12 +3,15 @@
   namespace App\Services\Models;
 
   use App\Models\Item;
+  use App\Models\Review;
   use App\Services\IMDB;
   use App\Services\Storage;
   use App\Services\Models\PersonService;
   use App\Services\TMDB;
   use App\Jobs\UpdateItem;
   use App\Models\Setting;
+  use Illuminate\Database\Eloquent\Builder;
+  use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\DB;
   use Symfony\Component\HttpFoundation\Response;
 
@@ -298,7 +301,20 @@
     {
       $filter = $this->getSortFilter($orderBy);
 
-      $items = $this->item->orderBy($filter, $sortDirection)->with('latestEpisode')->withCount('episodesWithSrc');
+      $user = Auth::user();
+      $reviews = Review::select('item_id')
+        ->when($user, function(Builder $query, $user) {
+          $query->where('user_id', $user->id);
+        })
+        ->get()
+        ->map(function($item) {
+          return $item->item_id;
+        });
+      $items = $this->item
+        ->whereIn('id', $reviews)
+        ->orderBy($filter, $sortDirection)
+        ->with('latestEpisode')
+        ->withCount('episodesWithSrc');
 
       if($type == 'watchlist') {
         $items->where('watchlist', true);
