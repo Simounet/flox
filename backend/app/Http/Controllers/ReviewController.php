@@ -8,17 +8,36 @@ use App\Models\Profile;
 use App\Models\Review;
 use App\Services\Fediverse\Activity\ReviewActivity;
 use App\Services\Fediverse\Activity\Verbs;
+use App\Services\Models\ReviewService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ReviewController extends Controller
 {
+
+    private $reviewService;
+
+    public function __construct(
+        ReviewService $reviewService
+    )
+    {
+      $this->reviewService = $reviewService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+    }
+
+    public function changeRating(int $reviewId): Response
+    {
+      $user = Auth::user();
+      abort_if(!$user, 403);
+
+      return $this->reviewService->changeRating($reviewId, Request::input('rating'));
     }
 
     /**

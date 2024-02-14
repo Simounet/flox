@@ -14,11 +14,11 @@ class ReviewActivity
 
     public function activity(Review $review, Profile $profile, array $followersInbox = []): Note
     {
-        $item = Item::select(['poster', 'rating', 'title'])->where('id', $review->item_id)->firstOrFail();
+        $item = Item::select(['poster', 'title'])->where('id', $review->item_id)->firstOrFail();
         $created = $review->created_at->toAtomString();
         $updated = $review->updated_at->toAtomString();
         $reviewUrl = route('user.review', ['username' => $profile->username, 'id' => $review->id]);
-        $content = $this->getReviewContent((int) $item->rating, $review->content);
+        $content = $this->getReviewContent((int) $review->rating, $review->content);
         $poster = $item->getPoster();
 
         $note = new Note();

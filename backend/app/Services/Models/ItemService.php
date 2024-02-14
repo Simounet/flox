@@ -320,7 +320,7 @@
       $items = $this->item
         ->whereIn('id', $reviews)
         ->orderBy($filter, $sortDirection)
-        ->with('latestEpisode')
+        ->with('latestEpisode', 'review')
         ->withCount('episodesWithSrc');
 
       if($type == 'watchlist') {

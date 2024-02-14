@@ -36,7 +36,7 @@
      *
      * @var array
      */
-    protected $with = ['genre'];
+    protected $with = ['genre', 'review'];
 
     /**
      * Guard accessors from import.

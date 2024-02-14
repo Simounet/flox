@@ -46,7 +46,6 @@ class Review extends Model
             ['user_id' => $userId, 'item_id' => $itemId],
             [
                 'content' => $content,
-                'rating' => 0,
             ]
         );
     }

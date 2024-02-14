@@ -1,15 +1,15 @@
 <template>
   <div>
-    <span v-if="item.rating != null && ! item.watchlist" :class="'item-rating rating-' + item.rating" @click="changeRating()">
+    <span v-if="review && review.rating != null && ! item.watchlist" :class="'item-rating rating-' + review.rating" @click="changeRating()">
       <i class="icon-rating"></i>
     </span>
-    <span v-if="item.rating == null && ! item.watchlist && item.tmdb_id && auth && ! localRated" class="item-rating item-new" @click="addNewItem()">
+    <span v-if="review == null && ! item.watchlist && item.tmdb_id && auth && ! localRated" class="item-rating item-new" @click="addNewItem()">
       <i class="icon-add"></i>
     </span>
     <span v-if="item.watchlist" class="item-rating item-new" @click="changeRating()">
       <i class="icon-add"></i>
     </span>
-    <span v-if="item.rating == null && item.tmdb_id && localRated" class="item-rating item-new item-rating-loader">
+    <span v-if="review == null && item.tmdb_id && localRated" class="item-rating item-new item-rating-loader">
       <span class="loader smallsize-loader"></span>
     </span>
   </div>
@@ -27,13 +27,19 @@
 
     data() {
       return {
-        auth: config.auth
+        auth: config.auth,
       }
     },
 
     computed: {
       localRated() {
         return this.rated;
+      },
+
+      review() {
+        return this.item.review && this.item.review.length
+          ? this.item.review[0]
+          : null;
       }
     },
 
@@ -46,10 +52,12 @@
       changeRating() {
         if(this.auth) {
           if(this.item.watchlist) {
-            this.rating = 0;
+            this.review.rating = 0;
           } else {
-            this.prevRating = this.item.rating;
-            this.item.rating = this.prevRating == 3 ? 1 : +this.prevRating + 1; 
+            this.prevRating = this.review.rating;
+            this.review.rating = this.prevRating == 3
+              ? 1
+              : +this.prevRating + 1;
           }
           
           this.item.watchlist = false;
@@ -59,8 +67,8 @@
       },
 
       saveNewRating() {
-        http.patch(`${config.api}/change-rating/${this.item.id}`, {rating: this.item.rating}).catch(error => {
-          this.item.rating = this.prevRating;
+        http.patch(`${config.api}/review/change-rating/${this.review.id}`, {rating: this.review.rating}).catch(error => {
+          this.review.rating = this.prevRating;
           alert('Error in saveNewRating()');
         });
       },

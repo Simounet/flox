@@ -46,13 +46,13 @@ use Illuminate\Support\Facades\Route;
       Route::patch('/update-genre', 'ItemController@updateGenre');
       Route::patch('/toggle-episode/{id}', 'ItemController@toggleEpisode');
       Route::patch('/toggle-season', 'ItemController@toggleSeason');
-      Route::patch('/change-rating/{itemId}', 'ItemController@changeRating');
       Route::patch('/refresh/{itemId}', 'ItemController@refresh');
       Route::delete('/remove/{itemId}', 'ItemController@remove')->middleware('csrf');
 
       Route::get('/userdata', 'UserController@getUserData');
       Route::patch('/userdata', 'UserController@changeUserData')->middleware('csrf');
 
+      Route::patch('/review/change-rating/{reviewId}', 'ReviewController@changeRating');
       Route::delete('/review/{id}', 'ReviewController@delete')->middleware('csrf');
       Route::post('/review', 'ReviewController@store')->middleware('csrf');
 
