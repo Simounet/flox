@@ -108,7 +108,7 @@ class ReviewTest extends TestCase {
             $this->tmdbFixtures('movie/alternative_titles')
         );
         $itemService = app(ItemService::class);
-        $itemService->create($this->floxFixtures('movie'));
+        $itemService->create($this->floxFixtures('movie'), $this->user->id);
     }
 
     private function getHeaders(string $dataStr): array

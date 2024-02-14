@@ -26,6 +26,7 @@
     private $setting;
     private $genreService;
     private $personService;
+    private $reviewService;
 
     /**
      * @param Item $item
@@ -47,7 +48,8 @@
       GenreService $genreService,
       IMDB $imdb,
       Setting $setting,
-      PersonService $personService
+      PersonService $personService,
+      ReviewService $reviewService
     ){
       $this->item = $item;
       $this->tmdb = $tmdb;
@@ -58,13 +60,17 @@
       $this->setting = $setting;
       $this->genreService = $genreService;
       $this->personService = $personService;
+      $this->reviewService = $reviewService;
     }
 
     /**
      * @param $data
      * @return Item
      */
-    public function create($data)
+    public function create(
+      array $data,
+      int $userId
+    ): Item
     {
       DB::beginTransaction();
 
@@ -81,6 +87,7 @@
       $this->episodeService->create($item);
       $this->genreService->sync($item, $data['genre_ids'] ?? []);
       $this->alternativeTitleService->create($item);
+      $this->reviewService->create($item, $userId);
 
       $this->storage->downloadImages($item->poster, $item->backdrop);
 

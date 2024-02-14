@@ -9,6 +9,7 @@
   use App\Models\Setting;
   use GuzzleHttp\Client;
   use Illuminate\Database\Eloquent\ModelNotFoundException;
+  use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\DB;
   use Symfony\Component\HttpFoundation\Response;
 
@@ -184,7 +185,7 @@
       }
 
       // Create a new item with TMDb specific values.
-      $created = $this->itemService->create($found);
+      $created = $this->itemService->create($found, Auth::user()->id);
 
       // We are searching for the changed name (if available) in the next iteration.
       if($this->itemCategory == 'tv') {
@@ -241,7 +242,7 @@
       }
 
       // Otherwise create a new item from the result.
-      $created = $this->itemService->create($firstResult);
+      $created = $this->itemService->create($firstResult, Auth::user()->id);
       
       return $this->store($item, $created->tmdb_id);
     }

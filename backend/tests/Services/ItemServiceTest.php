@@ -31,6 +31,13 @@
       $this->createImdbRatingMock();
     }
 
+    private function createItem(array $data): void {
+      $userId = 1;
+      $this->createReviewServiceMock();
+      $itemService = app(ItemService::class);
+      $itemService->create($data, $userId);
+    }
+
     /** @test */
     public function it_should_create_a_new_movie()
     {
@@ -39,10 +46,8 @@
         $this->tmdbFixtures('movie/alternative_titles')
       );
 
-      $itemService = app(ItemService::class);
-
       $item1 = $this->item->all();
-      $itemService->create($this->floxFixtures('movie'));
+      $this->createItem($this->floxFixtures('movie'));
       $item2 = $this->item->all();
 
       $this->assertCount(0, $item1);
@@ -62,10 +67,8 @@
 
       $this->createTmdbEpisodeMock();
 
-      $itemService = app(ItemService::class);
-
       $item1 = $this->item->all();
-      $itemService->create($this->floxFixtures('tv'));
+      $this->createItem($this->floxFixtures('tv'));
       $item2 = $this->item->all();
 
       $this->assertCount(0, $item1);

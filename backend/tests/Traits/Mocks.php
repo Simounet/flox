@@ -2,8 +2,10 @@
 
   namespace Tests\Traits;
 
+  use App\Models\Review;
   use App\Services\IMDB;
   use App\Services\Models\ItemService;
+  use App\Services\Models\ReviewService;
   use App\Services\Storage;
   use App\Services\TMDB;
   use GuzzleHttp\Client;
@@ -52,6 +54,12 @@
     {
       $mock = $this->mock(IMDB::class);
       $mock->shouldReceive('parseRating')->andReturn(json_decode($this->imdbFixtures('rating.txt')));
+    }
+
+    private function createReviewServiceMock()
+    {
+      $mock = $this->mock(ReviewService::class);
+      $mock->shouldReceive('create')->andReturn(new Review());
     }
 
     public function mock($class, $mock = null)

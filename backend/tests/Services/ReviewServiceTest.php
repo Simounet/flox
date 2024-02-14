@@ -2,8 +2,9 @@
 
 namespace Tests\Services;
 
+use App\Models\Item;
 use App\Models\Review;
-use App\Models\User;
+use App\Services\Models\ItemService;
 use App\Services\Models\ReviewService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -21,18 +22,37 @@ class ReviewServiceTest extends TestCase
 
     private $review;
     private $reviewService;
+    private $user;
 
     public function setUp(): void
     {
       parent::setUp();
 
-      $user = $this->createUser();
+      $this->user = $this->createUser();
 
       $this->review = app(Review::class);
       $this->reviewService = app(ReviewService::class);
 
       $this->createStorageDownloadsMock();
       $this->createImdbRatingMock();
+    }
+
+    /** @test */
+    public function review_should_be_created_on_item_creation(): void
+    {
+      $this->createGuzzleMock(
+        $this->tmdbFixtures('movie/details'),
+        $this->tmdbFixtures('movie/alternative_titles')
+      );
+
+      $item = app(Item::class);
+      $itemService = app(ItemService::class);
+      $itemService->create($this->floxFixtures('movie'), $this->user->id);
+      $item = $item->all()->first();
+
+      $this->assertIsObject($item->review);
+      $this->assertCount(1, $item->review);
+      $this->assertEquals(0, $item->review[0]->rating);
     }
 
     /** @test */

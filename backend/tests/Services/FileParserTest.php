@@ -4,6 +4,7 @@
 
   use Illuminate\Foundation\Testing\RefreshDatabase;
   use Illuminate\Routing\Middleware\ThrottleRequests;
+  use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\Hash;
   use Tests\TestCase;
   use App\Models\Episode;
@@ -164,6 +165,7 @@
     /** @test */
     public function it_should_create_movie_and_store_fields_if_not_found_in_database()
     {
+      $this->be($this->user);
       $items = $this->item->get();
 
       $this->createGuzzleMock(
@@ -189,6 +191,7 @@
     /** @test */
     public function it_should_create_tv_with_episodes_and_store_fields_if_not_found_in_database()
     {
+      $this->be($this->user);
       $items = $this->item->get();
       $episodes1 = $this->episode->get();
 
@@ -348,6 +351,7 @@
     /** @test */
     public function it_should_update_empty_movie_if_found_in_tmdb()
     {
+      $this->be($this->user);
       $this->createMovie(['title' => 'NOT EXISTS MOVIE', 'tmdb_id' => null, 'fp_name' => 'NOT EXISTS MOVIE']);
 
       $empty = $this->item->first();
@@ -374,6 +378,7 @@
     /** @test */
     public function it_should_update_empty_tv_and_episodes_if_found_in_tmdb()
     {
+      $this->be($this->user);
       $this->createTv(['title' => 'NOT EXISTS TV', 'tmdb_id' => null, 'fp_name' => 'NOT EXISTS TV'], false);
 
       $empty = $this->item->first();
@@ -473,6 +478,7 @@
     /** @test */
     public function it_should_update_database_with_given_json_param()
     {
+      $this->be($this->user);
       $timestamp = 9999;
 
       $settings = Setting::first();

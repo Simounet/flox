@@ -57,7 +57,10 @@
 
     public function add()
     {
-      return $this->itemService->create(Request::input('item'));
+      $user = Auth::user();
+      abort_if(!$user, 403);
+
+      return $this->itemService->create(Request::input('item'), $user->id);
     }
 
     public function watchlist()

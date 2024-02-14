@@ -69,6 +69,8 @@ class ApiTest extends TestCase
 
   public function it_should_create_a_new_movie($fixture)
   {
+    $this->actingAsUser();
+
     $this->createGuzzleMock(
       $this->tmdbFixtures('movie/movie'),
       $this->tmdbFixtures('movie/details'),
@@ -105,6 +107,8 @@ class ApiTest extends TestCase
 
   public function it_should_create_a_new_tv_show($fixture)
   {
+    $this->actingAsUser();
+
     $this->createGuzzleMock(
       $this->tmdbFixtures('tv/tv'),
       $this->tmdbFixtures('tv/details'),
@@ -205,5 +209,11 @@ class ApiTest extends TestCase
     $lastSeenAfter = Item::first()->last_seen_at;
 
     $this->assertNotEquals($lastSeenBefore, $lastSeenAfter);
+  }
+
+  private function actingAsUser(): void
+  {
+    $user = $this->createUser(['api_key' => Str::random(24)]);
+    $this->be($user);
   }
 }

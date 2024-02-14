@@ -48,4 +48,14 @@ class ReviewService {
 
       return response('', Response::HTTP_OK);
     }
+
+    public function create(
+        Item $item,
+        int $userId
+    ): Review
+    {
+        $reviewModel = new Review();
+        $storedReview = $reviewModel->store($userId, $item->id, '');
+        return $storedReview;
+    }
 }

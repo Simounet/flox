@@ -6,6 +6,7 @@ use App\Models\Episode;
 use App\Models\Item;
 use App\Services\Models\ItemService;
 use App\Services\TMDB;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class Api
@@ -73,7 +74,7 @@ abstract class Api
       $found = $this->item->findByTmdbId($firstResult['tmdb_id'])->first();
 
       if (!$found) {
-        $found = $this->itemService->create($firstResult);
+        $found = $this->itemService->create($firstResult, Auth::user()->id);
       }
     }
 
