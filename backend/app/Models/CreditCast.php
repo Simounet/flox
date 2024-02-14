@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -51,8 +51,8 @@ class CreditCast extends Model
            'person_id' => $cast['person']['id']
          ],
          [
-           'character' => $cast['character'],
-           'known_for_department' => $cast['known_for_department'],
+           'character' => $cast['character'] ?? '',
+           'known_for_department' => $cast['known_for_department'] ?? '',
            'credit_id' => $cast['credit_id'],
            'order' => $cast['order']
          ]

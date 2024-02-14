@@ -2,10 +2,10 @@
 
   namespace App\Services;
 
-  use App\CreditCast;
-  use App\CreditCrew;
-  use App\Genre;
-  use App\Item;
+  use App\Models\CreditCast;
+  use App\Models\CreditCrew;
+  use App\Models\Genre;
+  use App\Models\Item;
   use App\Services\Models\PersonService;
   use Carbon\Carbon;
   use GuzzleHttp\Client;
@@ -287,6 +287,7 @@
         'genre_ids' => $data->genre_ids,
         'credit_cast' => $data->credit_cast ?? [],
         'credit_crew' => $data->credit_crew ?? [],
+        'review' => $data->review ?? [],
         'genre' => Genre::whereIn('id', $data->genre_ids)->get(),
         'episodes' => [],
         'overview' => $data->overview,

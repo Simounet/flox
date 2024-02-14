@@ -2,6 +2,7 @@
 
   namespace App\Services;
 
+  use App\Http\Resources\ItemResource;
   use App\Services\Models\ItemService;
   use App\Services\Models\PersonService;
   use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +27,7 @@
     public function item($tmdbId, $mediaType)
     {
       if($found = $this->itemService->findBy('tmdb_id_strict', $tmdbId, $mediaType)) {
-        return $found;
+        return new ItemResource($found);
       }
 
       $found = $this->tmdb->details($tmdbId, $mediaType);

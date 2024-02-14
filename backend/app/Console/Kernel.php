@@ -5,7 +5,7 @@ namespace App\Console;
 use App\Console\Commands\Daily;
 use App\Console\Commands\Refresh;
 use App\Console\Commands\Weekly;
-use App\Setting;
+use App\Models\Setting;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Schema;
@@ -27,14 +27,11 @@ class Kernel extends ConsoleKernel
 
     /**
      * Define the application's command schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
      */
-    protected function schedule(Schedule $schedule)
+    protected function schedule(Schedule $schedule): void
     {
       if(app()->runningUnitTests()) {
-        return null;
+        return;
       }
 
       if (Schema::hasTable('settings')) {
@@ -56,10 +53,8 @@ class Kernel extends ConsoleKernel
 
     /**
      * Register the Closure based commands for the application.
-     *
-     * @return void
      */
-    protected function commands()
+    protected function commands(): void
     {
         require base_path('routes/console.php');
     }

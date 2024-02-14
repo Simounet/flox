@@ -27,6 +27,11 @@
       return 'flox--' . date('Y-m-d---H-i') . '.json';
     }
 
+    public function getPosterUrl(string $poster): string
+    {
+      return LaravelStorage::disk('local')->url($poster);
+    }
+
     /**
      * Download poster and backdrop image files.
      *
@@ -51,11 +56,15 @@
      * @param $poster
      * @param $backdrop
      */
-    public function removeImages($poster, $backdrop)
+    public function removeImages(string | null $poster, string | null $backdrop): void
     {
-      LaravelStorage::delete($poster);
-      LaravelStorage::disk('subpage')->delete($poster);
-      LaravelStorage::disk('backdrop')->delete($backdrop);
+      if($poster) {
+        LaravelStorage::delete($poster);
+        LaravelStorage::disk('subpage')->delete($poster);
+      }
+      if($backdrop) {
+        LaravelStorage::disk('backdrop')->delete($backdrop);
+      }
     }
 
     /**

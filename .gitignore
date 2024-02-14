@@ -6,6 +6,7 @@ Homestead.yaml
 /backend/.env
 /bin/.worker.pid
 /backend/.phpunit.result.cache
+/backend/.phpunit.cache
 
 */.DS_Store
 /public/assets/app.css

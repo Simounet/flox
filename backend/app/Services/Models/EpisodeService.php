@@ -2,26 +2,26 @@
 
   namespace App\Services\Models;
 
-  use App\Episode as Model;
-  use App\Item;
+  use App\Models\Episode;
+  use App\Models\Item;
   use App\Services\TMDB;
-  use App\Setting;
+  use App\Models\Setting;
   use Carbon\Carbon;
 
   class EpisodeService {
 
-    private $model;
+    private $episode;
     private $tmdb;
     private $item;
 
     /**
-     * @param Model $model
+     * @param Episode $episode
      * @param TMDB  $tmdb
      * @param Item  $item
      */
-    public function __construct(Model $model, TMDB $tmdb, Item $item)
+    public function __construct(Episode $episode, TMDB $tmdb, Item $item)
     {
-      $this->model = $model;
+      $this->episode = $episode;
       $this->tmdb = $tmdb;
       $this->item = $item;
     }
@@ -42,7 +42,7 @@
             $episodeAirDate = isset($episode->air_date) ? ($episode->air_date ?: Item::FALLBACK_DATE) : Item::FALLBACK_DATE;
             $releaseEpisode = Carbon::createFromFormat('Y-m-d', $episodeAirDate);
 
-            $this->model->updateOrCreate(
+            $this->episode->updateOrCreate(
               [
                 'season_number' => $episode->season_number,
                 'episode_number' => $episode->episode_number,
@@ -68,7 +68,7 @@
      */
     public function remove($tmdbId)
     {
-      $this->model->where('tmdb_id', $tmdbId)->delete();
+      $this->episode->where('tmdb_id', $tmdbId)->delete();
     }
 
     /**
@@ -83,8 +83,8 @@
     {
       Carbon::setLocale(config('app.TRANSLATION'));
 
-      $episodes = $this->model->findByTmdbId($tmdbId)->oldest('episode_number')->get()->groupBy('season_number');
-      $nextEpisode = $this->model->findByTmdbId($tmdbId)->where('seen', 0)->oldest('season_number')->oldest('episode_number')->first();
+      $episodes = $this->episode->findByTmdbId($tmdbId)->oldest('episode_number')->get()->groupBy('season_number');
+      $nextEpisode = $this->episode->findByTmdbId($tmdbId)->where('seen', 0)->oldest('season_number')->oldest('episode_number')->first();
 
       return [
         'episodes' => $episodes,
@@ -101,7 +101,7 @@
      */
     public function toggleSeen($id)
     {
-      $episode = $this->model->find($id);
+      $episode = $this->episode->find($id);
 
       if($episode) {
         // Update the parent relation only if we mark the episode as seen.
@@ -124,7 +124,7 @@
      */
     public function toggleSeason($tmdbId, $season, $seen)
     {
-      $episodes = $this->model->findSeason($tmdbId, $season)->get();
+      $episodes = $this->episode->findSeason($tmdbId, $season)->get();
 
       // Update the parent relation only if we mark the episode as seen.
       if($seen) {
@@ -151,13 +151,13 @@
     {
       switch($type) {
         case 'src':
-          return $this->model->findBySrc($value)->first();
+          return $this->episode->findBySrc($value)->first();
         case 'fp_name':
-          return $this->model->findByFPName($value)->first();
+          return $this->episode->findByFPName($value)->first();
         case 'tmdb_id':
-          return $this->model->findByTmdbId($value)->first();
+          return $this->episode->findByTmdbId($value)->first();
         case 'episode':
-          return $this->model->findSpecificEpisode($value, $episode)->first();
+          return $this->episode->findSpecificEpisode($value, $episode)->first();
       }
 
       return null;

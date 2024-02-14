@@ -4,5 +4,5 @@
     "libraryName": "element-ui",
     "styleLibraryName": "theme-chalk"
   }]],
-  "comments": false
+  "comments": true
 }

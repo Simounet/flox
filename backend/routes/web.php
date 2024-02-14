@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+  use App\Http\Middleware\JsonRequestOnly;
+
   Route::prefix('api')->group(function() {
     Route::get('/logout', 'UserController@logout');
     Route::post('/login', 'UserController@login');
@@ -50,12 +53,19 @@
       Route::get('/userdata', 'UserController@getUserData');
       Route::patch('/userdata', 'UserController@changeUserData')->middleware('csrf');
 
+      Route::delete('/review/{id}', 'ReviewController@delete')->middleware('csrf');
+      Route::post('/review', 'ReviewController@store')->middleware('csrf');
+
       Route::get('/search-tmdb', 'TMDBController@search');
 
       Route::post('/fetch-files', 'FileParserController@call');
 
       Route::get('/video/{type}/{id}', 'VideoController@serve');
     });
+  });
+
+  Route::middleware([JsonRequestOnly::class])->group(function () {
+      Route::get('/users/{username}/review/{id}', 'ReviewController@showObject')->name('user.review');
   });
 
   Route::fallback('HomeController@app');

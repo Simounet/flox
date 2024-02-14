@@ -1,9 +1,12 @@
 const webpack = require("webpack");
+const BundleAnalyzerPlugin =
+  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const { VueLoaderPlugin } = require("vue-loader");
 
+const withReport = !!process.env.npm_config_withreport;
 const isProduction = process.env.NODE_ENV === "production";
 
 module.exports = {
@@ -51,7 +54,9 @@ module.exports = {
       },
     ],
   },
-  plugins: [new VueLoaderPlugin(), new MiniCssExtractPlugin()],
+  plugins: [new VueLoaderPlugin(), new MiniCssExtractPlugin()].concat(
+    withReport ? [new BundleAnalyzerPlugin({ analyzerMode: "static" })] : []
+  ),
   optimization: {
     minimize: true,
     minimizer: [

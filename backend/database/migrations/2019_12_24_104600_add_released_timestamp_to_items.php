@@ -1,6 +1,6 @@
 <?php
 
-use App\Item;
+use App\Models\Item;
 use Carbon\Carbon;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

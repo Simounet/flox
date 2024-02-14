@@ -2,9 +2,9 @@
 
   namespace App\Services\Models;
 
-  use App\CreditCast;
-  use App\CreditCrew;
-  use App\Person;
+  use App\Models\CreditCast;
+  use App\Models\CreditCrew;
+  use App\Models\Person;
 
   class PersonService {
 

@@ -4,7 +4,7 @@
 
   use Illuminate\Foundation\Testing\RefreshDatabase;
   use Tests\TestCase;
-  use App\Setting;
+  use App\Models\Setting;
   use Tests\Traits\Factories;
 
   class SettingTest extends TestCase {

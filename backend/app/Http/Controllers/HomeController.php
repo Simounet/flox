@@ -2,15 +2,12 @@
 
   namespace App\Http\Controllers;
 
-  use App\Services\Storage;
+  use App\Services\VueAppService;
 
   class HomeController {
 
-    public function app(Storage $storage, $uri = null)
+    public function app()
     {
-      $language = $storage->parseLanguage();
-
-      return view('app')
-        ->withLang($language);
+        return (new VueAppService)->view();
     }
   }

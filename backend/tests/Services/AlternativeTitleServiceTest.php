@@ -3,7 +3,7 @@
   namespace Tests\Services;
 
   use Tests\TestCase;
-  use App\AlternativeTitle;
+  use App\Models\AlternativeTitle;
   use App\Services\Models\AlternativeTitleService;
   use Illuminate\Foundation\Testing\RefreshDatabase;
   use Tests\Traits\Factories;

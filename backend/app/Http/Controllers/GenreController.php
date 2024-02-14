@@ -2,7 +2,7 @@
 
   namespace App\Http\Controllers;
   
-  use App\Genre;
+  use App\Models\Genre;
   use App\Services\Models\GenreService;
 
   class GenreController {

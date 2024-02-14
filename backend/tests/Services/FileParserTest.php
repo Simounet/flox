@@ -3,12 +3,13 @@
   namespace Tests\Services;
 
   use Illuminate\Foundation\Testing\RefreshDatabase;
+  use Illuminate\Routing\Middleware\ThrottleRequests;
   use Illuminate\Support\Facades\Hash;
   use Tests\TestCase;
-  use App\Episode;
-  use App\Item;
-  use App\Setting;
-  use App\User;
+  use App\Models\Episode;
+  use App\Models\Item;
+  use App\Models\Setting;
+  use App\Models\User;
   use App\Services\FileParser;
   use Tests\Traits\Factories;
   use Tests\Traits\Fixtures;
@@ -29,6 +30,9 @@
     public function setUp(): void
     {
       parent::setUp();
+      $this->withoutMiddleware(
+          ThrottleRequests::class
+      );
 
       $this->user = User::create(['username' => 'jon', 'password' => Hash::make('snow')]);
       $this->item = app(Item::class);

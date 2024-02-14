@@ -1,7 +1,8 @@
 <?php
 
-  namespace App;
+  namespace App\Models;
 
+  use App\Services\Storage;
   use Carbon\Carbon;
   use Illuminate\Database\Eloquent\Model;
 
@@ -139,7 +140,7 @@
      */
     public function creditCast()
     {
-      return $this->hasMany(CreditCast::class, 'tmdb_id', 'tmdb_id');
+      return $this->hasMany(CreditCast::class, 'tmdb_id', 'tmdb_id')->orderBy('order');
     }
 
     /**
@@ -156,6 +157,14 @@
     public function episodes()
     {
       return $this->hasMany(Episode::class, 'tmdb_id', 'tmdb_id');
+    }
+
+    /**
+     * Belongs to many reviews.
+     */
+    public function review()
+    {
+      return $this->hasMany(Review::class);
     }
 
     /**
@@ -285,5 +294,13 @@
             $query->where('title', $title);
           });
         });
+    }
+
+    public function getPoster(): array
+    {
+      return [
+        'url' => (new Storage)->getPosterUrl($this->poster),
+        'title' => $this->title
+      ];
     }
   }
