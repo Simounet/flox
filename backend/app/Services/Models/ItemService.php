@@ -105,7 +105,11 @@
      */
     public function makeDataComplete($data)
     {
-      if( ! isset($data['imdb_id'])) {
+      if(
+        ! isset($data['imdb_id'])
+        || ! isset($data['credit_cast'])
+        || ! isset($data['credit_crew'])
+      ) {
         $details = $this->tmdb->details($data['tmdb_id'], $data['media_type']);
         $title = $details->name ?? $details->title;
 
@@ -116,6 +120,8 @@
         $data['backdrop'] = $data['backdrop'] ?? $details->backdrop_path;
         $data['slug'] = $data['slug'] ?? getSlug($title);
         $data['homepage'] = $data['homepage'] ?? $details->homepage;
+        $data['credit_cast'] = $data['credit_cast'] ?? $this->personService->castFromTMDB($data['tmdb_id'], $details->credits->cast);
+        $data['credit_crew'] = $data['credit_crew'] ?? $this->personService->crewFromTMDB($data['tmdb_id'], $details->credits->crew);
       }
 
       $data['imdb_rating'] = $this->parseImdbRating($data);
