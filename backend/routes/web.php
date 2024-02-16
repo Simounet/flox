@@ -47,7 +47,6 @@ use Illuminate\Support\Facades\Route;
       Route::patch('/toggle-episode/{id}', 'ItemController@toggleEpisode');
       Route::patch('/toggle-season', 'ItemController@toggleSeason');
       Route::patch('/refresh/{itemId}', 'ItemController@refresh');
-      Route::delete('/remove/{itemId}', 'ItemController@remove')->middleware('csrf');
 
       Route::get('/userdata', 'UserController@getUserData');
       Route::patch('/userdata', 'UserController@changeUserData')->middleware('csrf');

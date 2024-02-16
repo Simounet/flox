@@ -55,11 +55,6 @@
       return $item;
     }
 
-    public function remove($itemId)
-    {
-      return $this->itemService->remove($itemId);
-    }
-
     public function refresh($itemId)
     {
       $this->itemService->refresh($itemId);

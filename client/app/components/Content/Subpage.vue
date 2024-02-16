@@ -38,7 +38,7 @@
               </div>
 
               <!-- todo: move to own component -->
-              <div class="subpage-sidebar-buttons no-select" v-if="isLocalContent && auth">
+              <div class="subpage-sidebar-buttons no-select" v-if="item.review && item.review.length > 0 && auth">
                 <span class="refresh-infos" @click="refreshInfos()">{{ lang('refresh infos') }}</span>
                 <span class="remove-item" @click="removeItem()" v-if=" ! item.watchlist">{{ lang('delete item') }}</span>
               </div>
@@ -116,6 +116,7 @@
             />
           </ol>
           <ReviewItems
+            v-if="item.review && item.review.length > 0"
             :itemId="item.id"
             :reviews="reviews"
           />
@@ -298,11 +299,14 @@
       },
 
       removeItem() {
+        if(!window.confirm(this.lang('Remove my content for this item (rating, review, watchlist…)'))) {
+          return false;
+        }
         this.rated = true;
 
-        http.delete(`${config.api}/remove/${this.item.id}`).then(response => {
+        http.delete(`${config.api}/review/${this.item.review[0].id}`).then(response => {
           this.rated = false;
-          this.item.rating = null;
+          this.item.review = null;
           this.item.watchlist = null;
         }, error => {
           alert(error);
