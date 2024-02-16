@@ -43,7 +43,10 @@
       $user = Auth::user();
       abort_if(!$user, 403);
 
-      return $this->itemService->create(Request::input('item'), $user->id);
+      $item = Request::input('item');
+      abort_if(!$item, 403);
+
+      return $this->itemService->create($item, $user->id);
     }
 
     public function watchlist()
