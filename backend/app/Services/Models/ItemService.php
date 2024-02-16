@@ -73,7 +73,24 @@
     ): Item
     {
       DB::beginTransaction();
+      $item = $this->createItemInfoIfNotExists($data);
+      $this->reviewService->create($item, $userId);
+      DB::commit();
 
+      return $item->fresh();
+    }
+
+    private function createItemInfoIfNotExists(array $data): Item
+    {
+      $existingItem = Item::where('tmdb_id', $data['tmdb_id'])
+        ->get()
+        ->first();
+
+      if($existingItem instanceof Item) {
+        return $existingItem;
+      }
+
+      // @TODO should use server fetched data instead of client data
       $data = $this->makeDataComplete($data);
 
       $item = $this->item->store($data);
@@ -87,13 +104,8 @@
       $this->episodeService->create($item);
       $this->genreService->sync($item, $data['genre_ids'] ?? []);
       $this->alternativeTitleService->create($item);
-      $this->reviewService->create($item, $userId);
-
       $this->storage->downloadImages($item->poster, $item->backdrop);
-
-      DB::commit();
-
-      return $item->fresh();
+      return $item;
     }
 
     /**
