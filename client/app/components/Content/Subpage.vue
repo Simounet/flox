@@ -19,7 +19,7 @@
                     <i class="icon-watchlist"></i>
                   </span>
                   <span class="is-on-watchlist" :title="lang('remove from watchlist')"
-                        v-if="item.watchlist && auth && ! rated" @click="removeItem()">
+                        v-if="item.user_review && item.user_review.watchlist && auth && ! rated" @click="removeItem()">
                     <i class="icon-watchlist-remove"></i>
                   </span>
                   <span :title="lang('episodes')" v-if="displaySeason(item) && latestEpisode" @click="openSeasonModal(item)"
@@ -40,7 +40,7 @@
               <!-- todo: move to own component -->
               <div class="subpage-sidebar-buttons no-select" v-if="item.user_review && auth">
                 <span class="refresh-infos" @click="refreshInfos()">{{ lang('refresh infos') }}</span>
-                <span class="remove-item" @click="removeItem()" v-if=" ! item.watchlist">{{ lang('delete item') }}</span>
+                <span class="remove-item" @click="removeItem()" v-if=" ! item.user_review.watchlist">{{ lang('delete item') }}</span>
               </div>
             </div>
 
@@ -306,8 +306,10 @@
 
         http.delete(`${config.api}/review/${this.item.user_review.id}`).then(response => {
           this.rated = false;
+          // @TODO update item.review list
           this.item.user_review = null;
-          this.item.watchlist = null;
+          this.reviews = [];
+          this.isLocalContent = false;
         }, error => {
           alert(error);
           this.rated = false;

@@ -8,6 +8,7 @@ export default {
 
         http.post(`${config.api}/watchlist`, {item}).then(response => {
           this.setItem(response.data);
+          this.isLocalContent = true;
           this.rated = false;
         }, error => {
           alert(error.message);

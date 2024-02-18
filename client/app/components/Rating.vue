@@ -1,12 +1,12 @@
 <template>
   <div>
-    <span v-if="item.user_review && item.user_review.rating != null && ! item.watchlist" :class="'item-rating rating-' + item.user_review.rating" @click="changeRating()">
+    <span v-if="item.user_review && item.user_review.rating != null && ! item.user_review.watchlist" :class="'item-rating rating-' + item.user_review.rating" @click="changeRating()">
       <i class="icon-rating"></i>
     </span>
-    <span v-if="item.user_review === null && ! item.watchlist && item.tmdb_id && auth && ! localRated" class="item-rating item-new" @click="addNewItem()">
+    <span v-if="item.user_review === null && item.tmdb_id && auth && ! localRated" class="item-rating item-new" @click="addNewItem()">
       <i class="icon-add"></i>
     </span>
-    <span v-if="item.watchlist" class="item-rating item-new" @click="changeRating()">
+    <span v-if="item.user_review && item.user_review.watchlist" class="item-rating item-new" @click="changeRating()">
       <i class="icon-add"></i>
     </span>
     <span v-if="item.user_review === null && item.tmdb_id && localRated" class="item-rating item-new item-rating-loader">
@@ -45,7 +45,7 @@
     methods: {
       changeRating() {
         if(this.auth) {
-          if(this.item.watchlist) {
+          if(this.item.user_review.watchlist) {
             this.item.user_review.rating = 0;
           } else {
             this.prevRating = this.item.user_review.rating;
@@ -54,7 +54,7 @@
               : +this.prevRating + 1;
           }
           
-          this.item.watchlist = false;
+          this.item.user_review.watchlist = false;
 
           this.saveNewRating();
         }
