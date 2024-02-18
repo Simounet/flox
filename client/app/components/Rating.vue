@@ -1,15 +1,15 @@
 <template>
   <div>
-    <span v-if="review && review.rating != null && ! item.watchlist" :class="'item-rating rating-' + review.rating" @click="changeRating()">
+    <span v-if="item.user_review && item.user_review.rating != null && ! item.watchlist" :class="'item-rating rating-' + item.user_review.rating" @click="changeRating()">
       <i class="icon-rating"></i>
     </span>
-    <span v-if="review == null && ! item.watchlist && item.tmdb_id && auth && ! localRated" class="item-rating item-new" @click="addNewItem()">
+    <span v-if="item.user_review === null && ! item.watchlist && item.tmdb_id && auth && ! localRated" class="item-rating item-new" @click="addNewItem()">
       <i class="icon-add"></i>
     </span>
     <span v-if="item.watchlist" class="item-rating item-new" @click="changeRating()">
       <i class="icon-add"></i>
     </span>
-    <span v-if="review == null && item.tmdb_id && localRated" class="item-rating item-new item-rating-loader">
+    <span v-if="item.user_review === null && item.tmdb_id && localRated" class="item-rating item-new item-rating-loader">
       <span class="loader smallsize-loader"></span>
     </span>
   </div>
@@ -34,12 +34,6 @@
     computed: {
       localRated() {
         return this.rated;
-      },
-
-      review() {
-        return this.item.review && this.item.review.length
-          ? this.item.review[0]
-          : null;
       }
     },
 
@@ -52,10 +46,10 @@
       changeRating() {
         if(this.auth) {
           if(this.item.watchlist) {
-            this.review.rating = 0;
+            this.item.user_review.rating = 0;
           } else {
-            this.prevRating = this.review.rating;
-            this.review.rating = this.prevRating == 3
+            this.prevRating = this.item.user_review.rating;
+            this.item.user_review.rating = this.prevRating == 3
               ? 1
               : +this.prevRating + 1;
           }
@@ -67,8 +61,8 @@
       },
 
       saveNewRating() {
-        http.patch(`${config.api}/review/change-rating/${this.review.id}`, {rating: this.review.rating}).catch(error => {
-          this.review.rating = this.prevRating;
+        http.patch(`${config.api}/review/change-rating/${this.item.user_review.id}`, {rating: this.item.user_review.rating}).catch(error => {
+          this.item.user_review.rating = this.prevRating;
           alert('Error in saveNewRating()');
         });
       },

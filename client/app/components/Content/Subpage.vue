@@ -38,7 +38,7 @@
               </div>
 
               <!-- todo: move to own component -->
-              <div class="subpage-sidebar-buttons no-select" v-if="item.review && item.review.length > 0 && auth">
+              <div class="subpage-sidebar-buttons no-select" v-if="item.user_review && auth">
                 <span class="refresh-infos" @click="refreshInfos()">{{ lang('refresh infos') }}</span>
                 <span class="remove-item" @click="removeItem()" v-if=" ! item.watchlist">{{ lang('delete item') }}</span>
               </div>
@@ -258,11 +258,11 @@
         this.SET_LOADING(true);
         http(`${config.api}/item/${tmdbId}/${this.mediaType}`).then(response => {
           this.item = response.data;
-          this.isLocalContent = !!response.data.rating;
-          this.creditCast = response.data.credit_cast;
-          this.creditCrew = response.data.credit_crew;
-          this.reviews = response.data.review;
-          this.item.tmdb_rating = this.intToFloat(response.data.tmdb_rating);
+          this.isLocalContent = !!this.item.user_review;
+          this.creditCast = this.item.credit_cast;
+          this.creditCrew = this.item.credit_crew;
+          this.reviews = this.item.review;
+          this.item.tmdb_rating = this.intToFloat(this.item.tmdb_rating);
           this.latestEpisode = this.item.latest_episode;
 
           this.setPageTitle(this.item.title);
@@ -304,9 +304,9 @@
         }
         this.rated = true;
 
-        http.delete(`${config.api}/review/${this.item.review[0].id}`).then(response => {
+        http.delete(`${config.api}/review/${this.item.user_review.id}`).then(response => {
           this.rated = false;
-          this.item.review = null;
+          this.item.user_review = null;
           this.item.watchlist = null;
         }, error => {
           alert(error);

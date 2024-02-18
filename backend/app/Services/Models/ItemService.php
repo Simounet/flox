@@ -338,7 +338,7 @@
       $items = $this->item
         ->whereIn('id', $reviews)
         ->orderBy($filter, $sortDirection)
-        ->with('latestEpisode', 'review')
+        ->with('latestEpisode', 'review', 'userReview')
         ->withCount('episodesWithSrc');
 
       if($type == 'watchlist') {
@@ -448,7 +448,7 @@
         case 'tmdb_id':
           return $this->item->findByTmdbId($value)->with('latestEpisode')->first();
         case 'tmdb_id_strict':
-          return $this->item->findByTmdbIdStrict($value, $mediaType)->with('creditCast', 'creditCrew', 'latestEpisode', 'review')->first();
+          return $this->item->findByTmdbIdStrict($value, $mediaType)->with('creditCast', 'creditCrew', 'latestEpisode', 'review', 'userReview')->first();
         case 'src':
           return $this->item->findBySrc($value)->first();
       }

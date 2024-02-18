@@ -36,7 +36,7 @@
      *
      * @var array
      */
-    protected $with = ['genre', 'review'];
+    protected $with = ['genre', 'review', 'userReview'];
 
     /**
      * Guard accessors from import.
@@ -165,6 +165,13 @@
     public function review()
     {
       return $this->hasMany(Review::class);
+    }
+
+    public function userReview()
+    {
+      // @TODO multi users handling
+      return $this->hasOne(Review::class)
+        ->oldest();
     }
 
     /**
