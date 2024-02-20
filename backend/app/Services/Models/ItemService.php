@@ -336,15 +336,15 @@
           return $item->item_id;
         });
       $items = $this->item
-        ->whereIn('id', $reviews)
+        ->whereIn('items.id', $reviews)
         ->orderBy($filter, $sortDirection)
         ->with('latestEpisode', 'review', 'userReview')
         ->withCount('episodesWithSrc');
 
       if($type == 'watchlist') {
-        $items->where('watchlist', true);
+        $items->findByReviewWatchlist(1);
       } elseif( ! $this->setting->first()->show_watchlist_everywhere) {
-        $items->where('watchlist', false);
+        $items->findByReviewWatchlist(0);
       }
 
       if($type == 'tv' || $type == 'movie') {
@@ -442,7 +442,7 @@
         case 'last seen':
           return 'last_seen_at';
         case 'own rating':
-          return 'rating';
+          return 'review.rating';
         case 'title':
           return 'title';
         case 'release':

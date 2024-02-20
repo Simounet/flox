@@ -4,6 +4,7 @@ namespace App\Services\Api;
 
 use App\Models\Episode;
 use App\Models\Item;
+use App\Models\Review;
 use App\Services\Models\ItemService;
 use App\Services\TMDB;
 use Illuminate\Support\Facades\Auth;
@@ -49,6 +50,10 @@ abstract class Api
   {
     logInfo('api data:', $data);
 
+    $user = Auth::user();
+    abort_if(!$user, 403);
+
+
     $this->data = $data;
 
     if ($this->abortRequest()) {
@@ -74,14 +79,18 @@ abstract class Api
       $found = $this->item->findByTmdbId($firstResult['tmdb_id'])->first();
 
       if (!$found) {
-        $found = $this->itemService->create($firstResult, Auth::user()->id);
+        $found = $this->itemService->create($firstResult, $user->id);
       }
     }
 
     if ($this->shouldRateItem()) {
-      $found->update([
-        'rating' => $this->getRating(),
-      ]);
+      Review::where([
+        'user_id' => $user->id,
+        'item_id' => $found->id
+      ])
+        ->update([
+          'rating' => $this->getRating(),
+        ]);
     }
 
     if ($this->shouldEpisodeMarkedAsSeen()) {

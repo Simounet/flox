@@ -26,7 +26,6 @@
   $factory->define(App\Models\Item::class, function(Faker\Generator $faker) {
     return [
       'poster' => '',
-      'rating' => 1,
       //'genre' => '',
       'released' => time(),
       'released_timestamp' => now(),
@@ -59,6 +58,7 @@
   $factory->define(App\Models\Review::class, function() {
     return [
       'user_id' => 1,
-      'item_id' => 1
+      'item_id' => 1,
+      'rating' => 1
     ];
   });

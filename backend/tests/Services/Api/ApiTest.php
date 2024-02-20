@@ -4,6 +4,7 @@ namespace Tests\Services\Api;
 
 use App\Models\Episode;
 use App\Models\Item;
+use App\Models\Review;
 use App\Services\Api\Plex;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -91,6 +92,7 @@ class ApiTest extends TestCase
 
   public function it_should_not_create_a_new_movie_if_it_exists($fixture)
   {
+    $this->actingAsUser();
     $this->createMovie();
 
     $api = app($this->apiClass);
@@ -131,6 +133,7 @@ class ApiTest extends TestCase
 
   public function it_should_not_create_a_new_tv_show_if_it_exists($fixture)
   {
+    $this->actingAsUser();
     $this->createTv();
 
     $api = app($this->apiClass);
@@ -147,15 +150,17 @@ class ApiTest extends TestCase
 
   public function it_should_rate_a_movie($fixture, $shouldHaveRating)
   {
+    $this->actingAsUser();
     $this->createMovie();
+    $this->createReview();
 
     $api = app($this->apiClass);
 
-    $movieBefore = Item::first();
+    $movieBefore = Review::first();
 
     $api->handle($this->apiFixtures($fixture));
 
-    $movieAfter = Item::first();
+    $movieAfter = Review::first();
 
     $this->assertEquals(1, $movieBefore->rating);
     $this->assertEquals($shouldHaveRating, $movieAfter->rating);
@@ -163,15 +168,17 @@ class ApiTest extends TestCase
 
   public function it_should_rate_a_tv_show($fixture, $shouldHaveRating)
   {
+    $this->actingAsUser();
     $this->createTv();
+    $this->createReview();
 
     $api = app($this->apiClass);
 
-    $tvBefore = Item::first();
+    $tvBefore = Review::first();
 
     $api->handle($this->apiFixtures($fixture));
 
-    $tvAfter = Item::first();
+    $tvAfter = Review::first();
 
     $this->assertEquals(1, $tvBefore->rating);
     $this->assertEquals($shouldHaveRating, $tvAfter->rating);
@@ -179,6 +186,7 @@ class ApiTest extends TestCase
 
   public function it_should_mark_an_episode_as_seen($fixture)
   {
+    $this->actingAsUser();
     $this->createTv();
 
     $api = app($this->apiClass);
@@ -195,6 +203,7 @@ class ApiTest extends TestCase
 
   public function it_should_update_last_seen_at($fixture)
   {
+    $this->actingAsUser();
     $this->createTv();
 
     $api = app($this->apiClass);

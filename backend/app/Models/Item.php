@@ -4,7 +4,9 @@
 
   use App\Services\Storage;
   use Carbon\Carbon;
+  use Illuminate\Database\Eloquent\Builder;
   use Illuminate\Database\Eloquent\Model;
+  use Illuminate\Database\Query\JoinClause;
 
   class Item extends Model {
 
@@ -19,7 +21,7 @@
      * @var array
      */
     protected $casts = [
-      'watchlist' => 'boolean', 'last_seen_at' => 'datetime', 'refreshed_at' => 'datetime', 'created_at' => 'datetime', 'updated_at' => 'datetime',
+      'last_seen_at' => 'datetime', 'refreshed_at' => 'datetime', 'created_at' => 'datetime', 'updated_at' => 'datetime',
     ];
     
     /**
@@ -60,7 +62,6 @@
         'title' => $data['title'],
         'original_title' => $data['original_title'],
         'poster' => $data['poster'] ?? '',
-        'rating' => 0,
         'released' => $data['released'],
         'released_timestamp' => Carbon::parse($data['released']),
         'overview' => $data['overview'],
@@ -90,7 +91,6 @@
         'title' => $data['name'],
         'media_type' => $mediaType,
         'poster' => '',
-        'rating' => 0,
         'released' => time(),
         'released_timestamp' => now(),
         'overview' => '',
@@ -236,6 +236,14 @@
     public function scopeFindByTmdbIdStrict($query, $tmdbId, $mediaType)
     {
       return $query->where('tmdb_id', $tmdbId)->where('media_type', $mediaType);
+    }
+
+    public function scopeFindByReviewWatchlist(Builder $query, int $watchlistValue): Builder
+    {
+        return $query->join('reviews', function(JoinClause $join) use ($watchlistValue) {
+          $join->on('items.id', '=', 'reviews.item_id')
+            ->where('reviews.watchlist', '=', $watchlistValue);
+        });
     }
 
     /**

@@ -48,6 +48,9 @@ return new class extends Migration
                 ]
             );
         });
+        Schema::table('items', function(Blueprint $table) {
+            $table->dropColumn('rating', 'watchlist');
+        });
     }
 
     /**
@@ -55,14 +58,26 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('items', function(Blueprint $table) {
+            $table->string('rating')->after('media_type');
+            $table->boolean('watchlist')->default(false)->after('imdb_rating');
+        });
+        Review::query()->orderBy('id')->chunk('1000', function($rows) {
+            foreach($rows as $row) {
+                Item::where('id', $row->item_id)
+                    ->update([
+                        'rating' => $row->rating,
+                        'watchlist' => $row->watchlist
+                    ]);
+            }
+        });
         Schema::table('reviews', function (Blueprint $table) {
             $table->dropIndex('reviews_id_index');
             $table->dropForeign(['user_id']);
             $table->dropForeign(['item_id']);
             $table->dropPrimary();
             $table->primary('id');
-            $table->dropColumn('rating');
-            $table->dropColumn('watchlist');
+            $table->dropColumn('rating', 'watchlist');
             Review::whereNull('content')->delete();
         });
     }
