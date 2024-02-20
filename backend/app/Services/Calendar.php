@@ -16,11 +16,15 @@
     public function items()
     {
       $episodes = Episode::with('calendarItem')
+        ->join('items', 'items.tmdb_id', 'episodes.tmdb_id')
+        ->join('reviews', 'reviews.item_id', 'items.id')
         ->whereHas('calendarItem')
         //->whereBetween('release_episode', [today()->subDays(7)->timestamp, today()->addDays(7)->timestamp])
-        ->get(['id', 'tmdb_id', 'release_episode', 'season_number', 'episode_number']);
+        ->get(['episodes.id', 'episodes.tmdb_id', 'release_episode', 'season_number', 'episode_number']);
 
       $movies = Item::where('media_type', 'movie')
+        ->select('items.*')
+        ->join('reviews', 'reviews.item_id', 'items.id')
         //->whereBetween('released', [today()->subDays(7)->timestamp, today()->addDays(70)->timestamp])
         ->get();
 
@@ -51,10 +55,10 @@
     private function isOnWatchlist($item, $type)
     {
       if($type === 'tv') {
-        return $item->calendarItem->watchlist;
+        return $item->calendarItem->userReview->watchlist;
       }
 
-      return $item->watchlist;
+      return $item->userReview->watchlist;
     }
 
     private function buildTitle($item, $type)

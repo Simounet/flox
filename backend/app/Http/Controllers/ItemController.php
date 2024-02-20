@@ -53,7 +53,7 @@
     {
       $item = $this->add();
 
-      $item->update(['watchlist' => true]);
+      $item->userReview->update(['watchlist' => true]);
 
       return $item;
     }

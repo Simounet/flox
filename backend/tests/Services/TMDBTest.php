@@ -115,15 +115,18 @@
         $this->tmdbFixtures('movie/trending')
       );
 
-      $this->createMovie();
-      $this->createTv();
+      $this->createUser();
+      $movie = $this->createMovie();
+      $this->createReview(['item_id' => $movie->id]);
+      $tv = $this->createTv();
+      $this->createReview(['item_id' => $tv['item']->id]);
 
       $tmdb = app(TMDB::class);
       $trending = $tmdb->trending();
 
-      $this->assertArrayHasKey('rating', $trending[0]);
-      $this->assertArrayHasKey('rating', $trending[1]);
-      $this->assertArrayNotHasKey('rating', $trending[2]);
+      $this->assertArrayHasKey('rating', $trending[0]['user_review']);
+      $this->assertArrayHasKey('rating', $trending[1]['user_review']);
+      $this->assertEquals(null, $trending[2]['user_review']);
     }
 
     /** @test */
@@ -134,13 +137,15 @@
         $this->tmdbFixtures('movie/upcoming')
       );
 
+      $this->createUser();
       $this->createMovie();
+      $this->createReview();
 
       $tmdb = app(TMDB::class);
       $trending = $tmdb->upcoming();
 
-      $this->assertArrayHasKey('rating', $trending[0]);
-      $this->assertArrayNotHasKey('rating', $trending[1]);
+      $this->assertArrayHasKey('rating', $trending[0]['user_review']);
+      $this->assertEquals(null, $trending[1]['user_review']);
     }
 
     /** @test */

@@ -56,12 +56,13 @@
         'backdrop' => '',
       ];
 
-      factory(Item::class)->create(array_merge($data, $custom));
+      $item = factory(Item::class)->create(array_merge($data, $custom));
 
+      $episodes = [];
       if($withEpisodes) {
         foreach([1, 2] as $season) {
           foreach([1, 2] as $episode) {
-            factory(Episode::class)->create([
+            $episodes[] = factory(Episode::class)->create([
               'tmdb_id' => 1399,
               'season_number' => $season,
               'episode_number' => $episode,
@@ -69,6 +70,11 @@
           }
         }
       }
+
+      return [
+        'item' => $item,
+        'episodes' => $episodes
+      ];
     }
 
     public function getMovie($custom = [])

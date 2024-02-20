@@ -17,7 +17,7 @@
     <div class="wrap-content" v-if=" ! loading">
       <div class="items-wrap">
         <Item v-for="(item, index) in items"
-              v-if=" ! item.watchlist || (showWatchlistItems && item.watchlist)"
+              v-if="item.user_review === null || (showWatchlistItems && item.user_review.watchlist)"
               :item="item"
               :key="index"
               :genre="true"

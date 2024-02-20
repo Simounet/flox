@@ -30,7 +30,7 @@ export default {
     },
 
     displaySeason(item) {
-      return item.media_type == 'tv' && item.user_review !== null && item.tmdb_id && ! item.watchlist;
+      return item.media_type == 'tv' && item.user_review !== null && item.tmdb_id && ! item.user_review.watchlist;
     },
 
     openSeasonModal(item) {
