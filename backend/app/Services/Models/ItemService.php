@@ -355,32 +355,6 @@
     }
 
     /**
-     * Update rating.
-     *
-     * @param $itemId
-     * @param $rating
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
-     */
-    public function changeRating($itemId, $rating)
-    {
-      $item = $this->item->find($itemId);
-
-      if( ! $item) {
-        return response('Not Found', Response::HTTP_NOT_FOUND);
-      }
-
-      // Update the parent relation only if we change rating from neutral.
-      if($item->rating == 0) {
-        $this->item->updateLastSeenAt($item->tmdb_id);
-      }
-
-      $item->update([
-        'rating' => $rating,
-        'watchlist' => false,
-      ]);
-    }
-
-    /**
      * Search for all items by title in our database.
      *
      * @param $title

@@ -31,10 +31,10 @@ class ReviewService {
       }
 
       // Update the parent relation only if we change rating from neutral.
-      if($review->rating == 0) {
-        // @TODO weird to update it with tmdb_id
-        // @TODO last_seen column should be moved from the items table
-        // $item->updateLastSeenAt($item->tmdb_id);
+      if($review->rating === 0) {
+        // @TODO last_seen_at column should be moved from the item table to review table
+        $item = Item::where('id', $review->item_id)->get()->first();
+        $item->updateLastSeenAt($item->tmdb_id);
       }
 
       $updatedReview = $review->update([

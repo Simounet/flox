@@ -58,7 +58,8 @@ class ReviewServiceTest extends TestCase
     /** @test */
     public function it_should_change_rating()
     {
-      $review = $this->createReview();
+      $item = $this->createMovie();
+      $review = $this->createReview(['item_id' => $item->id]);
       $reviewId = $review->id;
 
       $itemBefore = $this->review->find($reviewId);
@@ -68,5 +69,20 @@ class ReviewServiceTest extends TestCase
       $this->assertEquals(1, $itemBefore->rating);
       $this->assertEquals(3, $itemAfter->rating);
       $this->assertEquals($itemBefore->last_seen_at, $itemAfter->last_seen_at);
+    }
+
+    /** @test */
+    // @TODO move last_seen_at to the Review model
+    public function it_should_change_last_seen_if_rating_was_neutral()
+    {
+      $item = $this->createMovie();
+      $review = $this->createReview(['item_id' => $item->id, 'rating' => 0]);
+
+      $itemOrignal = $item->find($item->id);
+      sleep(1);
+      $this->reviewService->changeRating($review->id, 1);
+      $itemRated = $item->find($item->id);
+
+      $this->assertNotEquals($itemOrignal->last_seen_at, $itemRated->last_seen_at);
     }
 }

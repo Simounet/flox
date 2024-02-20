@@ -36,11 +36,9 @@
 
     public function createReview(array $custom = []): Review
     {
-        $item = $this->createMovie();
-
         $data = [
             'user_id' => 1,
-            'item_id' => $item->id,
+            'item_id' => 1,
             'rating' => 1
         ];
 
