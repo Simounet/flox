@@ -2,19 +2,11 @@
 
   namespace App\Http\Controllers;
 
-  use Illuminate\Contracts\Auth\Guard;
   use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\Request;
   use Symfony\Component\HttpFoundation\Response;
 
   class UserController {
-
-    private $auth;
-
-    public function __construct(Guard $auth)
-    {
-      $this->auth = $auth;
-    }
 
     /**
      * Login user and return correct response.
@@ -26,7 +18,7 @@
       $username = Request::input('username');
       $password = Request::input('password');
 
-      if($this->auth->attempt(['username' => $username, 'password' => $password], true)) {
+      if(Auth::attempt(['username' => $username, 'password' => $password], true)) {
         return response('Success', Response::HTTP_OK);
       }
 
@@ -78,7 +70,7 @@
      */
     public function logout()
     {
-      $this->auth->logout();
+      Auth::logout();
 
       return redirect('/');
     }
