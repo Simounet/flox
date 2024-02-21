@@ -2,23 +2,20 @@
 
   namespace App\Console\Commands;
 
-  use App\Services\Models\GenreService;
   use App\Models\User;
   use Illuminate\Console\Command;
   use Illuminate\Support\Facades\DB as LaravelDB;
 
   class DB extends Command {
 
-    private $genreService;
     
     protected $signature = 'flox:db {--fresh : Whether all data should be reset} {username?} {password?}';
     protected $description = 'Create database migrations and admin account';
 
-    public function __construct(GenreService $genreService)
+    public function __construct()
     {
       parent::__construct();
 
-      $this->genreService = $genreService;
     }
 
     public function handle()
