@@ -2,18 +2,14 @@
 
   namespace App\Http\Controllers;
 
+  use Illuminate\Http\RedirectResponse;
   use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\Request;
   use Symfony\Component\HttpFoundation\Response;
 
   class UserController {
 
-    /**
-     * Login user and return correct response.
-     *
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
-     */
-    public function login()
+    public function login(): Response
     {
       $username = Request::input('username');
       $password = Request::input('password');
@@ -25,10 +21,7 @@
       return response('Unauthorized', Response::HTTP_UNAUTHORIZED);
     }
 
-    /**
-     * @return array
-     */
-    public function getUserData()
+    public function getUserData(): array
     {
       return [
         'username' => Auth::user()->username,
@@ -37,10 +30,8 @@
 
     /**
      * Save new user credentials.
-     *
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    public function changeUserData()
+    public function changeUserData(): Response
     {
       if (isDemo()) {
         return response('Success', Response::HTTP_OK);
@@ -63,12 +54,7 @@
       return response('Server Error', Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
-    /**
-     * Logout user and redirect to home.
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function logout()
+    public function logout(): RedirectResponse
     {
       Auth::logout();
 
