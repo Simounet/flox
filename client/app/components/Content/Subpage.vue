@@ -33,7 +33,6 @@
                 </div>
 
                 <rating :rated="rated" :item="item" :set-item="setItem" :set-rated="setRated"></rating>
-                <img class="base" :src="noImage" width="272" height="408">
                 <img class="real" :src="posterImage" width="272" height="408">
 
               </div>
@@ -195,7 +194,7 @@
       },
 
       posterImage() {
-        if (typeof(this.item.poster) !== 'string') {
+        if (typeof(this.item.poster) !== 'string' || !this.item.poster) {
           return this.noImage;
         }
 
