@@ -57,6 +57,8 @@
     public function logout(): RedirectResponse
     {
       Auth::logout();
+      Request::session()->invalidate();
+      Request::session()->regenerateToken();
 
       return redirect('/');
     }
