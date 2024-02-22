@@ -27,6 +27,10 @@
       'remember_token',
     ];
 
+    public function episodes() {
+      return $this->belongsToMany(Episode::class)->using(EpisodeUser::class);
+    }
+
     /**
      * Scope to find a user by an api key.
      */

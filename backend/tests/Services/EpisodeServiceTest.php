@@ -2,6 +2,7 @@
 
   namespace Tests\Services;
 
+  use App\Models\EpisodeUser;
   use App\Models\Review;
   use Illuminate\Foundation\Testing\RefreshDatabase;
   use Tests\TestCase;
@@ -20,6 +21,7 @@
     use Mocks;
 
     private $episode;
+    private $episodeUser;
     private $episodeService;
     private $item;
     private Review $review;
@@ -29,6 +31,7 @@
       parent::setUp();
 
       $this->episode = app(Episode::class);
+      $this->episodeUser = app(EpisodeUser::class);
       $this->episodeService = app(EpisodeService::class);
       $this->item = app(Item::class);
       $this->review = app(Review::class);
@@ -91,41 +94,45 @@
     /** @test */
     public function it_should_set_a_episode_as_seen_or_unseen()
     {
+      $user = $this->createUser();
+      $this->actingAs($user);
       $this->createTv();
 
-      $episode1 = $this->episode->find(1);
+      $isEpisodeSeen1 = $this->episodeUser->isSeen(1, 1);
       $this->episodeService->toggleSeen(1);
-      $episode2 = $this->episode->find(1);
+      $isEpisodeSeen2 = $this->episodeUser->isSeen(1, 1);
       $this->episodeService->toggleSeen(1);
-      $episode3 = $this->episode->find(1);
+      $isEpisodeSeen3 = $this->episodeUser->isSeen(1, 1);
 
-      $this->assertEquals(0, $episode1->seen);
-      $this->assertEquals(1, $episode2->seen);
-      $this->assertEquals(0, $episode3->seen);
+      $this->assertEquals(0, $isEpisodeSeen1);
+      $this->assertEquals(1, $isEpisodeSeen2);
+      $this->assertEquals(0, $isEpisodeSeen3);
     }
 
     /** @test */
     public function it_should_set_all_episodes_of_a_season_as_seen_or_unseen()
     {
+      $user = $this->createUser();
+      $this->actingAs($user);
       $this->createTv();
 
       $season = 1;
       $tmdbId = 1399;
 
-      $episodes1 = $this->episode->where('season_number', $season)->get();
+      $episodes1 = $this->episode->select('id')->where('season_number', $season)->pluck('id');
       $this->episodeService->toggleSeason($tmdbId, $season, 1);
-      $episodes2 = $this->episode->where('season_number', $season)->get();
+      $episodes2 = $this->episode->select('id')->where('season_number', $season)->pluck('id');
       $this->episodeService->toggleSeason($tmdbId, $season, 0);
-      $episodes3 = $this->episode->where('season_number', $season)->get();
+      $episodes3 = $this->episode->select('id')->where('season_number', $season)->pluck('id');
 
-      $episodes1->each(function($episode) {
-        $this->assertEquals(0, $episode->seen);
+      $episodes1->each(function($episodeId) use ($user) {
+        $this->assertEquals(0, EpisodeUser::isSeen($episodeId, $user->id));
       });
-      $episodes2->each(function($episode) {
-        $this->assertEquals(1, $episode->seen);
+      $episodes2->each(function($episodeId) use ($user) {
+        $this->assertEquals(0, EpisodeUser::isSeen($episodeId, $user->id));
       });
-      $episodes3->each(function($episode) {
-        $this->assertEquals(0, $episode->seen);
+      $episodes3->each(function($episodeId) use ($user) {
+        $this->assertEquals(0, EpisodeUser::isSeen($episodeId, $user->id));
       });
     }
 
@@ -145,7 +152,8 @@
     /** @test */
     public function it_should_update_items_from_one_episode()
     {
-      $this->createUser();
+      $user = $this->createUser();
+      $this->actingAs($user);
       $this->createTv();
       $this->createReview();
 
@@ -160,7 +168,8 @@
     /** @test */
     public function it_should_update_items_only_on_seen_from_one_episode()
     {
-      $this->createUser();
+      $user = $this->createUser();
+      $this->actingAs($user);
       $this->createTv();
       $this->createReview();
 
@@ -176,7 +185,8 @@
     /** @test */
     public function it_should_update_items_from_all_episodes()
     {
-      $this->createUser();
+      $user = $this->createUser();
+      $this->actingAs($user);
       $this->createTv();
       $this->createReview();
 
@@ -201,5 +211,20 @@
       $reviewUpdated = $this->review->first();
 
       $this->assertEquals($reviewUpdated->updated_at, $review->updated_at);
+    }
+
+    /** @test */
+    public function it_should_toggle_season_even_with_some_episodes_already_watched(): void
+    {
+      $user = $this->createUser();
+      $this->actingAs($user);
+      $tv = $this->createTv();
+      $this->createReview();
+
+      $this->episodeService->toggleSeen(1);
+      $this->episodeService->toggleSeason($tv['item']->tmdb_id, 1, true);
+
+      $episodesSeenCount = EpisodeUser::count();
+      $this->assertEquals(2, $episodesSeenCount);
     }
   }

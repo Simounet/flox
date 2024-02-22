@@ -3,11 +3,14 @@
   namespace App\Services\Models;
 
   use App\Models\Episode;
+  use App\Models\EpisodeUser;
   use App\Models\Item;
   use App\Models\Review;
   use App\Services\TMDB;
   use App\Models\Setting;
   use Carbon\Carbon;
+  use Illuminate\Database\Eloquent\Collection;
+  use Illuminate\Support\Facades\Auth;
 
   class EpisodeService {
 
@@ -76,16 +79,14 @@
      * Get all episodes of a tv show grouped by seasons,
      * the data for the next unseen episode, which will be used in the modal as an indicator,
      * and the setting option to check if spoiler protection is enabled.
-     *
-     * @param $tmdbId
-     * @return array
      */
-    public function getAllByTmdbId($tmdbId)
+    public function getAllByTmdbId(int $tmdbId): array
     {
       Carbon::setLocale(config('app.TRANSLATION'));
 
       $episodes = $this->episode->findByTmdbId($tmdbId)->oldest('episode_number')->get()->groupBy('season_number');
-      $nextEpisode = $this->episode->findByTmdbId($tmdbId)->where('seen', 0)->oldest('season_number')->oldest('episode_number')->first();
+      $episodeUserSeen = EpisodeUser::select('episode_id')->from('episode_user');
+      $nextEpisode = $this->episode->findByTmdbId($tmdbId)->whereNotIn('id', $episodeUserSeen)->oldest('season_number')->oldest('episode_number')->first();
 
       return [
         'episodes' => $episodes,
@@ -96,47 +97,57 @@
 
     /**
      * Set an episode as seen / unseen.
-     *
-     * @param $id
-     * @return mixed
      */
-    public function toggleSeen($id)
+    public function toggleSeen(int $id): bool
     {
       $episode = $this->episode->find($id);
 
       if($episode) {
-        // Update the parent relation only if we mark the episode as seen.
-        if( ! $episode->seen) {
+        $episodeUserData = [
+          'user_id' => Auth::id(),
+          'episode_id' => $id
+        ];
+        $isEpisodeSeen = EpisodeUser::isSeen($episodeUserData['user_id'], $episodeUserData['episode_id']);
+
+        if(!$isEpisodeSeen) {
           $this->review->updateLastActivityAt($episode->tmdb_id);
+
+          return EpisodeUser::create($episodeUserData)->wasRecentlyCreated;
         }
 
-        return $episode->update([
-          'seen' => ! $episode->seen,
-        ]);
+        return EpisodeUser::where($episodeUserData)->delete();
       }
     }
 
     /**
      * Toggle all episodes of a season as seen / unseen.
-     *
-     * @param $tmdbId
-     * @param $season
-     * @param $seen
      */
-    public function toggleSeason($tmdbId, $season, $seen)
+    public function toggleSeason(
+      int $tmdbId,
+      int $season,
+      bool $seen
+    ): Collection
     {
-      $episodes = $this->episode->findSeason($tmdbId, $season)->get();
+      $episodes = $this->episode->select('episodes.id', 'episodes.tmdb_id')->findSeason($tmdbId, $season)->get();
 
-      // Update the parent relation only if we mark the episode as seen.
       if($seen) {
         $this->review->updateLastActivityAt($episodes[0]->tmdb_id);
+
+        return $episodes->each(function($episode) {
+          return EpisodeUser::updateOrCreate([
+            'user_id' => Auth::id(),
+            'episode_id' => $episode->id
+          ]);
+        });
       }
 
-      $episodes->each(function($episode) use ($seen) {
-        $episode->update([
-          'seen' => $seen,
-        ]);
+      return $episodes->each(function($episode) {
+        return EpisodeUser::where([
+            'user_id' => Auth::id(),
+            'episode_id' => $episode->id
+        ])->delete();
       });
+
     }
 
     /**

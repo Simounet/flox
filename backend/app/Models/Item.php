@@ -176,10 +176,12 @@
      */
     public function latestEpisode()
     {
+      $episodeUserSeen = EpisodeUser::select('episode_id')->from('episode_user');
+
       return $this->hasOne(Episode::class, 'tmdb_id', 'tmdb_id')
         ->orderBy('season_number', 'asc')
         ->orderBy('episode_number', 'asc')
-        ->where('seen', false)
+        ->whereNotIn('id', $episodeUserSeen)
         ->latest();
     }
 

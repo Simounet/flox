@@ -3,6 +3,7 @@
 namespace App\Services\Api;
 
 use App\Models\Episode;
+use App\Models\EpisodeUser;
 use App\Models\Item;
 use App\Models\Review;
 use App\Services\Models\ItemService;
@@ -100,15 +101,15 @@ abstract class Api
         ->findBySeasonNumber($this->getSeasonNumber())
         ->first();
 
-      // Mark the episode as seen and update the last_seen_at attribute of the item
       if ($episode) {
+        EpisodeUser::create([
+          'user_id' => $user->id,
+          'episode_id' => $episode->id
+        ]);
         Review::where([
           'user_id' => $user->id,
           'item_id' => $found->id
         ])->touch();
-        $episode->update([
-          'seen' => true,
-        ]);
       }
     }
   }

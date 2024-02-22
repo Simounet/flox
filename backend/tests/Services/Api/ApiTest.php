@@ -2,9 +2,10 @@
 
 namespace Tests\Services\Api;
 
-use App\Models\Episode;
+use App\Models\EpisodeUser;
 use App\Models\Item;
 use App\Models\Review;
+use App\Models\User;
 use App\Services\Api\Plex;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -23,10 +24,14 @@ class ApiTest extends TestCase
   use Fixtures;
 
   public $apiClass;
+  private User $user;
 
   public function setUp(): void
   {
     parent::setUp();
+
+    $this->user = $this->createUser(['api_key' => Str::random(24)]);
+    $this->be($this->user);
 
     $this->createStorageDownloadsMock();
     $this->createImdbRatingMock();
@@ -70,8 +75,6 @@ class ApiTest extends TestCase
 
   public function it_should_create_a_new_movie($fixture)
   {
-    $this->actingAsUser();
-
     $this->createGuzzleMock(
       $this->tmdbFixtures('movie/movie'),
       $this->tmdbFixtures('movie/details'),
@@ -92,7 +95,6 @@ class ApiTest extends TestCase
 
   public function it_should_not_create_a_new_movie_if_it_exists($fixture)
   {
-    $this->actingAsUser();
     $this->createMovie();
 
     $api = app($this->apiClass);
@@ -109,8 +111,6 @@ class ApiTest extends TestCase
 
   public function it_should_create_a_new_tv_show($fixture)
   {
-    $this->actingAsUser();
-
     $this->createGuzzleMock(
       $this->tmdbFixtures('tv/tv'),
       $this->tmdbFixtures('tv/details'),
@@ -133,7 +133,6 @@ class ApiTest extends TestCase
 
   public function it_should_not_create_a_new_tv_show_if_it_exists($fixture)
   {
-    $this->actingAsUser();
     $this->createTv();
 
     $api = app($this->apiClass);
@@ -150,7 +149,6 @@ class ApiTest extends TestCase
 
   public function it_should_rate_a_movie($fixture, $shouldHaveRating)
   {
-    $this->actingAsUser();
     $this->createMovie();
     $this->createReview();
 
@@ -168,7 +166,6 @@ class ApiTest extends TestCase
 
   public function it_should_rate_a_tv_show($fixture, $shouldHaveRating)
   {
-    $this->actingAsUser();
     $this->createTv();
     $this->createReview();
 
@@ -186,24 +183,23 @@ class ApiTest extends TestCase
 
   public function it_should_mark_an_episode_as_seen($fixture)
   {
-    $this->actingAsUser();
     $this->createTv();
+    $episodeId = 2;
 
     $api = app($this->apiClass);
 
-    $seenEpisodesBefore = Episode::where('seen', true)->get();
+    $seenEpisodesBefore = EpisodeUser::isSeen($this->user->id, $episodeId);
 
     $api->handle($this->apiFixtures($fixture));
 
-    $seenEpisodesAfter = Episode::where('seen', true)->get();
+    $seenEpisodesAfter = EpisodeUser::isSeen($this->user->id, $episodeId);
 
-    $this->assertCount(0, $seenEpisodesBefore);
-    $this->assertCount(1, $seenEpisodesAfter);
+    $this->assertFalse($seenEpisodesBefore);
+    $this->assertTrue($seenEpisodesAfter);
   }
 
   public function it_should_updated_review_updated_at($fixture)
   {
-    $this->actingAsUser();
     $this->createTv();
     $this->createReview();
 
@@ -219,11 +215,5 @@ class ApiTest extends TestCase
     $updatedAtUpdated = Review::first()->updated_at;
 
     $this->assertNotEquals($updatedAt, $updatedAtUpdated);
-  }
-
-  private function actingAsUser(): void
-  {
-    $user = $this->createUser(['api_key' => Str::random(24)]);
-    $this->be($user);
   }
 }
