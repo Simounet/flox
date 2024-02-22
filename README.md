@@ -20,7 +20,7 @@ The rating based on an 3-Point system for `good`, `medium` and `bad`.
 ```bash
 git clone https://github.com/devfake/flox
 cd flox/backend
-composer install
+composer install --no-dev -o --prefer-dist
 php artisan flox:init # Enter here your database credentials
 ```
 
@@ -182,6 +182,7 @@ There is an option to enable or disable spoiler protection for episode names.
 
 ## Development
 
+* Run `composer install` in your `/backend` folder.
 * Run `npm install` or `yarn` in your `/client` folder.
 * Run `npm run dev`.
 
