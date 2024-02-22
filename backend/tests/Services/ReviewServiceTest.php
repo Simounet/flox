@@ -60,29 +60,27 @@ class ReviewServiceTest extends TestCase
     {
       $item = $this->createMovie();
       $review = $this->createReview(['item_id' => $item->id]);
-      $reviewId = $review->id;
 
-      $itemBefore = $this->review->find($reviewId);
-      $this->reviewService->changeRating($reviewId, 3);
-      $itemAfter = $this->review->find($reviewId);
+      $review = $this->review->find($review->id);
+      $this->reviewService->changeRating($review->id, 3);
+      $reviewUpdated = $this->review->find($review->id);
 
-      $this->assertEquals(1, $itemBefore->rating);
-      $this->assertEquals(3, $itemAfter->rating);
-      $this->assertEquals($itemBefore->last_seen_at, $itemAfter->last_seen_at);
+      $this->assertEquals(1, $review->rating);
+      $this->assertEquals(3, $reviewUpdated->rating);
+      $this->assertEquals($review->updated_at, $reviewUpdated->updated_at);
     }
 
     /** @test */
-    // @TODO move last_seen_at to the Review model
-    public function it_should_change_last_seen_if_rating_was_neutral()
+    public function it_should_change_review_updated_at_if_rating_was_neutral()
     {
       $item = $this->createMovie();
       $review = $this->createReview(['item_id' => $item->id, 'rating' => 0]);
 
-      $itemOrignal = $item->find($item->id);
+      $review = $this->review->find($review->id);
       sleep(1);
       $this->reviewService->changeRating($review->id, 1);
-      $itemRated = $item->find($item->id);
+      $reviewUpdated = $this->review->find($review->id);
 
-      $this->assertNotEquals($itemOrignal->last_seen_at, $itemRated->last_seen_at);
+      $this->assertNotEquals($review->updated_at, $reviewUpdated->updated_at);
     }
 }

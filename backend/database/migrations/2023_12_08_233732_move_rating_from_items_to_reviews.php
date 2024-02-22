@@ -33,7 +33,8 @@ return new class extends Migration
                     'user_id' => $user->id,
                     'item_id' => $row->id,
                     'rating' => $row->rating,
-                    'watchlist' => $row->watchlist
+                    'watchlist' => $row->watchlist,
+                    'updated_at' => $row->last_seen_at
                 ];
             }
             Review::upsert(
@@ -44,12 +45,13 @@ return new class extends Migration
                 ],
                 [
                     'rating',
+                    'updated_at',
                     'watchlist'
                 ]
             );
         });
         Schema::table('items', function(Blueprint $table) {
-            $table->dropColumn('rating', 'watchlist');
+            $table->dropColumn('last_seen_at', 'rating', 'watchlist');
         });
     }
 
@@ -61,11 +63,13 @@ return new class extends Migration
         Schema::table('items', function(Blueprint $table) {
             $table->string('rating')->after('media_type');
             $table->boolean('watchlist')->default(false)->after('imdb_rating');
+            $table->timestamp('last_seen_at')->nullable()->after('updated_at');
         });
         Review::query()->orderBy('id')->chunk('1000', function($rows) {
             foreach($rows as $row) {
                 Item::where('id', $row->item_id)
                     ->update([
+                        'last_seen_at' => $row->updated_at,
                         'rating' => $row->rating,
                         'watchlist' => $row->watchlist
                     ]);

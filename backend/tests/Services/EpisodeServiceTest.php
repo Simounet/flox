@@ -2,6 +2,7 @@
 
   namespace Tests\Services;
 
+  use App\Models\Review;
   use Illuminate\Foundation\Testing\RefreshDatabase;
   use Tests\TestCase;
   use App\Models\Episode;
@@ -21,6 +22,7 @@
     private $episode;
     private $episodeService;
     private $item;
+    private Review $review;
 
     public function setUp(): void
     {
@@ -29,6 +31,7 @@
       $this->episode = app(Episode::class);
       $this->episodeService = app(EpisodeService::class);
       $this->item = app(Item::class);
+      $this->review = app(Review::class);
     }
 
     /** @test */
@@ -142,53 +145,61 @@
     /** @test */
     public function it_should_update_items_from_one_episode()
     {
+      $this->createUser();
       $this->createTv();
+      $this->createReview();
 
-      $item = $this->item->find(1);
+      $review = $this->review->first();
       sleep(1);
       $this->episodeService->toggleSeen(1);
-      $itemUpdated = $this->item->find(1);
+      $reviewUpdated = $this->review->first();
 
-      $this->assertNotEquals($itemUpdated->last_seen_at, $item->last_seen_at);
+      $this->assertNotEquals($reviewUpdated->updated_at, $review->updated_at);
     }
 
     /** @test */
     public function it_should_update_items_only_on_seen_from_one_episode()
     {
+      $this->createUser();
       $this->createTv();
+      $this->createReview();
 
       $this->episodeService->toggleSeen(1);
-      $item = $this->item->find(1);
+      $review = $this->review->first();
       sleep(1);
       $this->episodeService->toggleSeen(1);
-      $itemUpdated = $this->item->find(1);
+      $reviewUpdated = $this->review->first();
 
-      $this->assertEquals($itemUpdated->last_seen_at, $item->last_seen_at);
+      $this->assertEquals($reviewUpdated->updated_at, $review->updated_at);
     }
 
     /** @test */
     public function it_should_update_items_from_all_episodes()
     {
+      $this->createUser();
       $this->createTv();
+      $this->createReview();
 
-      $item = $this->item->find(1);
+      $review = $this->review->first();
       sleep(1);
       $this->episodeService->toggleSeason(1399, 1, 1);
-      $itemUpdated = $this->item->find(1);
+      $reviewUpdated = $this->review->first();
 
-      $this->assertNotEquals($itemUpdated->last_seen_at, $item->last_seen_at);
+      $this->assertNotEquals($reviewUpdated->updated_at, $review->updated_at);
     }
 
     /** @test */
     public function it_should_update_items_only_on_seen_from_all_episodes()
     {
+      $this->createUser();
       $this->createTv();
+      $this->createReview();
 
-      $item = $this->item->find(1);
+      $review = $this->review->first();
       sleep(1);
       $this->episodeService->toggleSeason(1399, 1, 0);
-      $itemUpdated = $this->item->find(1);
+      $reviewUpdated = $this->review->first();
 
-      $this->assertEquals($itemUpdated->last_seen_at, $item->last_seen_at);
+      $this->assertEquals($reviewUpdated->updated_at, $review->updated_at);
     }
   }

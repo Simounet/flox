@@ -102,7 +102,10 @@ abstract class Api
 
       // Mark the episode as seen and update the last_seen_at attribute of the item
       if ($episode) {
-        $found->updateLastSeenAt($found->tmdb_id);
+        Review::where([
+          'user_id' => $user->id,
+          'item_id' => $found->id
+        ])->touch();
         $episode->update([
           'seen' => true,
         ]);

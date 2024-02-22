@@ -29,7 +29,6 @@
       //'genre' => '',
       'released' => time(),
       'released_timestamp' => now(),
-      'last_seen_at' => now(),
       'src' => null,
     ];
   });

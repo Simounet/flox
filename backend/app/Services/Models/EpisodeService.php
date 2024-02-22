@@ -4,6 +4,7 @@
 
   use App\Models\Episode;
   use App\Models\Item;
+  use App\Models\Review;
   use App\Services\TMDB;
   use App\Models\Setting;
   use Carbon\Carbon;
@@ -12,18 +13,18 @@
 
     private $episode;
     private $tmdb;
-    private $item;
+    private $review;
 
     /**
      * @param Episode $episode
      * @param TMDB  $tmdb
      * @param Item  $item
      */
-    public function __construct(Episode $episode, TMDB $tmdb, Item $item)
+    public function __construct(Episode $episode, TMDB $tmdb, Review $review)
     {
       $this->episode = $episode;
       $this->tmdb = $tmdb;
-      $this->item = $item;
+      $this->review = $review;
     }
 
     /**
@@ -106,7 +107,7 @@
       if($episode) {
         // Update the parent relation only if we mark the episode as seen.
         if( ! $episode->seen) {
-          $this->item->updateLastSeenAt($episode->tmdb_id);
+          $this->review->updateLastActivityAt($episode->tmdb_id);
         }
 
         return $episode->update([
@@ -128,7 +129,7 @@
 
       // Update the parent relation only if we mark the episode as seen.
       if($seen) {
-        $this->item->updateLastSeenAt($episodes[0]->tmdb_id);
+        $this->review->updateLastActivityAt($episodes[0]->tmdb_id);
       }
 
       $episodes->each(function($episode) use ($seen) {

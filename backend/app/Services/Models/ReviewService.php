@@ -32,15 +32,18 @@ class ReviewService {
 
       // Update the parent relation only if we change rating from neutral.
       if($review->rating === 0) {
-        // @TODO last_seen_at column should be moved from the item table to review table
-        $item = Item::where('id', $review->item_id)->get()->first();
-        $item->updateLastSeenAt($item->tmdb_id);
+          $updatedReview = $review->update([
+            'rating' => $rating,
+            'watchlist' => false,
+          ]);
+      } else {
+          $updatedReview = Review::withoutTimestamps(function () use($review, $rating) {
+              return $review->update([
+                'rating' => $rating,
+                'watchlist' => false,
+              ]);
+          });
       }
-
-      $updatedReview = $review->update([
-        'rating' => $rating,
-        'watchlist' => false,
-      ]);
 
       if($updatedReview === false) {
           return response('Review not updated: ' . $reviewId, Response::HTTP_INTERNAL_SERVER_ERROR);

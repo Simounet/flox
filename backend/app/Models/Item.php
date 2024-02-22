@@ -21,7 +21,9 @@
      * @var array
      */
     protected $casts = [
-      'last_seen_at' => 'datetime', 'refreshed_at' => 'datetime', 'created_at' => 'datetime', 'updated_at' => 'datetime',
+      'created_at' => 'datetime',
+      'refreshed_at' => 'datetime',
+      'updated_at' => 'datetime',
     ];
     
     /**
@@ -70,7 +72,6 @@
         'imdb_id' => $data['imdb_id'],
         'imdb_rating' => $data['imdb_rating'],
         'youtube_key' => $data['youtube_key'],
-        'last_seen_at' => now(),
         'slug' => $data['slug'],
         'homepage' => $data['homepage'] ?? null,
       ]);
@@ -99,21 +100,9 @@
         'imdb_id' => '',
         'imdb_rating' => '',
         'youtube_key' => '',
-        'last_seen_at' => now(),
         'src' => $data['src'],
         'subtitles' => $data['subtitles'],
         'homepage' => null,
-      ]);
-    }
-
-    /**
-     * @param $tmdbId
-     * @return mixed
-     */
-    public function updateLastSeenAt($tmdbId)
-    {
-      return $this->where('tmdb_id', $tmdbId)->update([
-        'last_seen_at' => now(),
       ]);
     }
 

@@ -28,7 +28,6 @@
       $this->assertTrue(Schema::hasColumn('episodes', 'fp_name'));
       $this->assertTrue(Schema::hasColumn('episodes', 'created_at'));
       $this->assertTrue(Schema::hasColumn('episodes', 'updated_at'));
-      $this->assertTrue(Schema::hasColumn('items', 'last_seen_at'));
       $this->assertTrue(Schema::hasColumn('episodes', 'release_episode'));
       $this->assertTrue(Schema::hasColumn('episodes', 'release_season'));
     }
