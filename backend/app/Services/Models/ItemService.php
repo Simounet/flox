@@ -328,13 +328,9 @@
 
       $items = Item::orderBy($filter, $sortDirection)
         ->with('latestEpisode', 'review', 'userReview')
-        ->withCount('episodesWithSrc');
-
-        if(Auth::check()) {
-          $items->whereHas('review', function($query) {
-            $query->where('user_id', Auth::id());
-          });
-        }
+        ->withCount('episodesWithSrc')
+        ->where('user_id', Auth::id())
+        ->whereHas('userReview');
 
       if($type == 'watchlist') {
         $items->findByReviewWatchlist(1);

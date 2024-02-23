@@ -7,6 +7,7 @@
   use Illuminate\Database\Eloquent\Builder;
   use Illuminate\Database\Eloquent\Model;
   use Illuminate\Database\Query\JoinClause;
+  use Illuminate\Support\Facades\Auth;
 
   class Item extends Model {
 
@@ -158,9 +159,8 @@
 
     public function userReview()
     {
-      // @TODO multi users handling
       return $this->hasOne(Review::class)
-        ->oldest();
+        ->where('user_id', Auth::id());
     }
 
     /**

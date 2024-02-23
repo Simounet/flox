@@ -115,7 +115,8 @@
         $this->tmdbFixtures('movie/trending')
       );
 
-      $this->createUser();
+      $user = $this->createUser();
+      $this->actingAs($user);
       $movie = $this->createMovie();
       $this->createReview(['item_id' => $movie->id]);
       $tv = $this->createTv();
@@ -137,7 +138,8 @@
         $this->tmdbFixtures('movie/upcoming')
       );
 
-      $this->createUser();
+      $user = $this->createUser();
+      $this->actingAs($user);
       $this->createMovie();
       $this->createReview();
 

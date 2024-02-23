@@ -37,7 +37,11 @@ class ReviewController extends Controller
       $user = Auth::user();
       abort_if(!$user, 403);
 
-      return $this->reviewService->changeRating($reviewId, Request::input('rating'));
+      return $this->reviewService->changeRating(
+        $reviewId,
+        Request::input('rating'),
+        $user->id
+    );
     }
 
     /**

@@ -62,7 +62,7 @@ class ReviewServiceTest extends TestCase
       $review = $this->createReview(['item_id' => $item->id]);
 
       $review = $this->review->find($review->id);
-      $this->reviewService->changeRating($review->id, 3);
+      $this->reviewService->changeRating($review->id, 3, $this->user->id);
       $reviewUpdated = $this->review->find($review->id);
 
       $this->assertEquals(1, $review->rating);
@@ -78,7 +78,7 @@ class ReviewServiceTest extends TestCase
 
       $review = $this->review->find($review->id);
       sleep(1);
-      $this->reviewService->changeRating($review->id, 1);
+      $this->reviewService->changeRating($review->id, 1, $this->user->id);
       $reviewUpdated = $this->review->find($review->id);
 
       $this->assertNotEquals($review->updated_at, $reviewUpdated->updated_at);

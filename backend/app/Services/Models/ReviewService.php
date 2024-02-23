@@ -22,9 +22,16 @@ class ReviewService {
         }
     }
 
-    public function changeRating(int $reviewId, int $rating): Response
+    public function changeRating(
+        int $reviewId,
+        int $rating,
+        int $userId
+    ): Response
     {
-      $review = Review::find($reviewId);
+      $review = Review::where([
+        'user_id' => $userId,
+        'id' => $reviewId
+      ])->first();
 
       if(! $review) {
         return response('Not Found', Response::HTTP_NOT_FOUND);
