@@ -326,20 +326,15 @@
     {
       $filter = $this->getSortFilter($orderBy);
 
-      $user = Auth::user();
-      $reviews = Review::select('item_id')
-        ->when($user, function(Builder $query, $user) {
-          $query->where('user_id', $user->id);
-        })
-        ->get()
-        ->map(function($item) {
-          return $item->item_id;
-        });
-      $items = $this->item
-        ->whereIn('items.id', $reviews)
-        ->orderBy($filter, $sortDirection)
+      $items = Item::orderBy($filter, $sortDirection)
         ->with('latestEpisode', 'review', 'userReview')
         ->withCount('episodesWithSrc');
+
+        if(Auth::check()) {
+          $items->whereHas('review', function($query) {
+            $query->where('user_id', Auth::id());
+          });
+        }
 
       if($type == 'watchlist') {
         $items->findByReviewWatchlist(1);
