@@ -50,7 +50,7 @@
         'password' => 'Igarashi'
       ]);
 
-      $this->assertTrue(Hash::check('Igarashi', $this->user->password));
+      $this->assertTrue(Hash::check('Igarashi', User::first()->password));
     }
 
     /** @test */

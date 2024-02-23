@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Models;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserService
@@ -23,6 +24,19 @@ class UserService
         $user->password = Hash::make($password);
         $user->save();
         return $user;
+    }
+
+    public function changePassword(
+        string $newPassword
+    ): bool
+    {
+        if(!Auth::check()) {
+            return false;
+        }
+
+        return (bool) User::whereId(Auth::id())->update([
+            'password' => Hash::make($newPassword)
+        ]);
     }
 
     private function userExists(

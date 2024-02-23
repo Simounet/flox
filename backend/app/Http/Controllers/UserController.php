@@ -2,12 +2,20 @@
 
   namespace App\Http\Controllers;
 
+  use App\Services\Models\UserService;
   use Illuminate\Http\RedirectResponse;
   use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\Request;
   use Symfony\Component\HttpFoundation\Response;
 
   class UserController {
+
+    private UserService $userService;
+
+    public function __construct(UserService $userService)
+    {
+      $this->userService = $userService;
+    }
 
     public function login(): Response
     {
@@ -40,12 +48,13 @@
       $username = Request::input('username');
       $password = Request::input('password');
 
+
+      if(is_string($password) && $password !== '') {
+        $this->userService->changePassword($password);
+      }
+
       $user = Auth::user();
       $user->username = $username;
-
-      if($password != '') {
-        $user->password = bcrypt($password);
-      }
 
       if($user->save()) {
         return response('Success', Response::HTTP_OK);

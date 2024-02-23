@@ -44,8 +44,29 @@ class UserServiceTest extends TestCase
     public function it_should_fail_at_creating_user_with_existing_username(): void
     {
         $username = 'user1';
+
         $this->userService->create($username, 'test');
         $existingUsernameCreated = $this->userService->create($username, 'test');
+
         $this->assertFalse($existingUsernameCreated);
+    }
+
+    /** @test */
+    public function it_should_verify_password_change_success(): void
+    {
+        $user = $this->userService->create('user1', 'password');
+        $this->actingAs($user);
+        $passwordChanged = $this->userService->changePassword('newPassword');
+
+        $this->assertTrue($passwordChanged);
+    }
+
+    /** @test */
+    public function it_should_fail_changing_password_not_logged_in(): void
+    {
+        $this->userService->create('user1', 'password');
+        $passwordChanged = $this->userService->changePassword('newPassword');
+
+        $this->assertFalse($passwordChanged);
     }
 }
