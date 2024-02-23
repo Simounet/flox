@@ -55,6 +55,9 @@
         LaravelDB::table('users')->delete();
       }
       
-      $this->userService->create($username, $password);
+      $this->call('user:create', [
+        '--username' => $username,
+        '--password' => $password
+      ]);
     }
   }

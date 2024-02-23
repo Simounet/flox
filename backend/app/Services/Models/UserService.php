@@ -10,14 +10,15 @@ use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
+    public const PASSWORD_MIN_LENGTH = 6;
+
     public function create(
         string $username,
         string $password
-    ): User|false
+    ): User
     {
-        if($this->userExists($username)) {
-            return false;
-        }
+        $this->isUsernameValid($username);
+        $this->isPasswordValid($password);
 
         $user = new User();
         $user->username = $username;
@@ -39,11 +40,29 @@ class UserService
         ]);
     }
 
-    private function userExists(
-        string $username
-    ): bool
+    public function isUsernameValid(string $username): true
     {
-        $existingUsersCount = User::where('username', $username)->count();
-        return 0 < $existingUsersCount;
+        if(empty($username)) {
+            throw new \Exception('Username cannot be empty');
+        }
+
+        if(User::where('username', $username)->exists()) {
+            throw new \Exception('Pick another username');
+        }
+
+        return true;
+    }
+
+    public function isPasswordValid(string $password): true
+    {
+        if(empty($password)) {
+            throw new \Exception('Password cannot be empty');
+        }
+
+        if(strlen($password) < self::PASSWORD_MIN_LENGTH) {
+            throw new \Exception('Password should be composed by at least ' . self::PASSWORD_MIN_LENGTH. ' characters');
+        }
+
+        return true;
     }
 }

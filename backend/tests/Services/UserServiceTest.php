@@ -27,28 +27,17 @@ class UserServiceTest extends TestCase
     /** @test */
     public function it_should_create_a_user(): void
     {
-        $newUser = $this->userService->create('user1', 'test');
+        $newUser = $this->userService->create('user1', '0123456789');
         $this->assertTrue($newUser instanceof User);
     }
 
     /** @test */
     public function it_should_create_multiple_users_with_different_usernames(): void
     {
-        $newUser1 = $this->userService->create('user1', 'test');
-        $newUser2 = $this->userService->create('user2', 'test');
+        $newUser1 = $this->userService->create('user1', '0123456789');
+        $newUser2 = $this->userService->create('user2', '0123456789');
         $this->assertTrue($newUser1 instanceof User);
         $this->assertTrue($newUser2 instanceof User);
-    }
-
-    /** @test */
-    public function it_should_fail_at_creating_user_with_existing_username(): void
-    {
-        $username = 'user1';
-
-        $this->userService->create($username, 'test');
-        $existingUsernameCreated = $this->userService->create($username, 'test');
-
-        $this->assertFalse($existingUsernameCreated);
     }
 
     /** @test */
@@ -68,5 +57,51 @@ class UserServiceTest extends TestCase
         $passwordChanged = $this->userService->changePassword('newPassword');
 
         $this->assertFalse($passwordChanged);
+    }
+
+    /** @test */
+    public function it_should_valid_username(): void
+    {
+        $isUsernameValid = $this->userService->isUsernameValid('username');
+        $this->assertTrue($isUsernameValid);
+    }
+
+    /** @test */
+    public function it_should_fail_creating_user_with_existing_username(): void
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Pick another username');
+
+        $username = 'user1';
+
+        $this->userService->create($username, '0123456798');
+        $this->userService->isUsernameValid($username);
+    }
+
+    /** @test */
+    public function it_should_fail_creating_user_with_empty_username(): void
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Username cannot be empty');
+
+        $this->userService->isUsernameValid('');
+    }
+
+    /** @test */
+    public function it_should_fail_creating_user_without_enough_characters(): void
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Password should be composed by at least ' . UserService::PASSWORD_MIN_LENGTH. ' characters');
+
+        $this->userService->isPasswordValid('pass');
+    }
+
+    /** @test */
+    public function it_should_fail_creating_user_with_empty_password(): void
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Password cannot be empty');
+
+        $this->userService->isPasswordValid('');
     }
 }
