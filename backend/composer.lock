@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "da32dcd93933a8b9f4af694a1a60559e",
+    "content-hash": "45082596069a2af82ddc4955d683981d",
     "packages": [
         {
             "name": "brianium/paratest",
@@ -8371,6 +8371,63 @@
     ],
     "packages-dev": [
         {
+            "name": "balping/artisan-bash-completion",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "git@gitlab.com:balping/artisan-bash-completion.git",
+                "reference": "8f6dd7d4738154041e60345545378e68aec7072d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/balping%2Fartisan-bash-completion/repository/archive.zip?sha=8f6dd7d4738154041e60345545378e68aec7072d",
+                "reference": "8f6dd7d4738154041e60345545378e68aec7072d",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "^9.0|^10.0",
+                "illuminate/support": "^9.0|^10.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Balping\\ArtisanBashCompletion\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Balping\\ArtisanBashCompletion\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Balázs Dura-Kovács"
+                },
+                {
+                    "name": "Russel Waters",
+                    "homepage": "https://github.com/argakiig"
+                },
+                {
+                    "name": "Jan Hansen",
+                    "homepage": "https://github.com/janka"
+                }
+            ],
+            "description": "Adds bash completion for Laravel 9+ artisan CLI.",
+            "keywords": [
+                "artisan",
+                "bash",
+                "completion",
+                "laravel"
+            ],
+            "time": "2023-02-19T21:25:55+00:00"
+        },
+        {
             "name": "fakerphp/faker",
             "version": "v1.23.1",
             "source": {
@@ -9354,7 +9411,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-json": "*"
     },
     "platform-dev": [],
