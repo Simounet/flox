@@ -13,19 +13,6 @@ use Illuminate\Support\Facades\Schema;
 class Kernel extends ConsoleKernel
 {
     /**
-     * The Artisan commands provided by your application.
-     *
-     * @var array
-     */
-    protected $commands = [
-      Commands\Init::class,
-      Commands\DB::class,
-      Refresh::class,
-      Daily::class,
-      Weekly::class,
-    ];
-
-    /**
      * Define the application's command schedule.
      */
     protected function schedule(Schedule $schedule): void
@@ -52,10 +39,12 @@ class Kernel extends ConsoleKernel
     }
 
     /**
-     * Register the Closure based commands for the application.
+     * Register the commands for the application.
      */
     protected function commands(): void
     {
+        $this->load(__DIR__.'/Commands');
+
         require base_path('routes/console.php');
     }
 }
