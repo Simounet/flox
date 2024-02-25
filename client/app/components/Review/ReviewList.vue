@@ -24,7 +24,7 @@
 
     computed: {
       reviewsWithContent() {
-        return this.reviews.filter(review => review.content !== null);
+        return this.reviews.filter(review => review.content !== '');
       }
     },
 
