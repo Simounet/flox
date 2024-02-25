@@ -22,7 +22,7 @@
         </ul>
 
         <ul class="site-nav-second">
-          <li>
+          <li v-if="auth">
             <router-link to="/calendar" @click.native="refresh('calendar')">{{ lang('calendar') }}</router-link>
           </li>
           <li>
@@ -54,6 +54,7 @@
 
     data() {
       return {
+        auth: config.auth,
         sticky: false,
         displayHeader: true,
         enableStickyOn: 100,

@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Route;
     Route::get('/items/{type}/{orderBy}/{sortDirection}', 'ItemController@items');
     Route::get('/search-items', 'ItemController@search');
 
-    Route::get('/calendar', 'CalendarController@items');
-
     Route::get('/item/{tmdbId}/{mediaType}', 'SubpageController@item');
     Route::get('/imdb-rating/{imdbId}', 'SubpageController@imdbRating');
 
@@ -31,6 +29,7 @@ use Illuminate\Support\Facades\Route;
     });
 
     Route::middleware('auth')->group(function() {
+      Route::get('/calendar', 'CalendarController@items');
       Route::get('/check-update', 'SettingController@checkForUpdate');
       Route::get('/version', 'SettingController@getVersion');
       Route::get('/api-key', 'SettingController@getApiKey');
