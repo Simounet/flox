@@ -83,4 +83,23 @@ class ReviewServiceTest extends TestCase
 
       $this->assertNotEquals($review->updated_at, $reviewUpdated->updated_at);
     }
+
+    /** @test */
+    public function it_should_only_change_target_user_rating(): void
+    {
+      $item = $this->createMovie();
+      $user1InitialRating = 0;
+      $reviewUser1 = $this->createReview(['item_id' => $item->id, 'rating' => $user1InitialRating]);
+
+      $user2 = $this->createUser();
+      $reviewUser2 = $this->createReview(['user_id' => $user2->id, 'item_id' => $item->id, 'rating' => 1]);
+      $user2ModifiedRating = 1;
+      $this->reviewService->changeRating($reviewUser2->id, $user2ModifiedRating, $user2->id);
+
+      $reviewUser2Fresh = Review::select('rating')->where('id', $reviewUser1->id)->first();
+      $this->assertEquals($user1InitialRating, $reviewUser2Fresh->rating);
+
+      $reviewUser2Fresh = Review::select('rating')->where('id', $reviewUser2->id)->first();
+      $this->assertEquals($user2ModifiedRating, $reviewUser2Fresh->rating);
+    }
 }

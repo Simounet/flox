@@ -2,7 +2,6 @@
 
 namespace Tests\Api;
 
-use App\Jobs\ReviewSendActivity;
 use App\Jobs\ReviewSendActivities;
 use App\Models\Profile;
 use App\Services\Fediverse\HttpSignature;
@@ -13,12 +12,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
+use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
 use Tests\Traits\Mocks;
 
 class ReviewTest extends TestCase {
 
     use RefreshDatabase;
+    use Factories;
     use Fixtures;
     use Mocks;
 
@@ -99,6 +100,18 @@ class ReviewTest extends TestCase {
         'item_id' => 1,
         'content' => 'Lorem ipsum dolor.',
       ]);
+    }
+
+    /** @test */
+    public function itShouldFailAtChangingOtherUserRating(): void
+    {
+      $this->createMovie();
+      $review = $this->createReview();
+      $user2 = $this->createUser();
+
+      $this->actingAs($user2)->patchJson('api/review/change-rating/' . $review->id, [
+        'rating' => 2
+      ])->assertStatus(404);
     }
 
     private function mockItem()
