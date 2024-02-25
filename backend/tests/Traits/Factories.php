@@ -36,13 +36,7 @@
 
     public function createReview(array $custom = []): Review
     {
-        $data = [
-            'user_id' => 1,
-            'item_id' => 1,
-            'rating' => 1
-        ];
-
-        return factory(Review::class)->create(array_merge($data, $custom));
+        return factory(Review::class)->create($custom);
     }
 
     public function createTv($custom = [], $withEpisodes = true)
