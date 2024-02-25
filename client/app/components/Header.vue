@@ -21,8 +21,8 @@
           </li>
         </ul>
 
-        <ul class="site-nav-second">
-          <li v-if="auth">
+        <ul v-if="auth" class="site-nav-second">
+          <li>
             <router-link to="/calendar" @click.native="refresh('calendar')">{{ lang('calendar') }}</router-link>
           </li>
           <li>
