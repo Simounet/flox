@@ -24,8 +24,9 @@
   export default {
     mixins: [MiscHelper],
 
+    props: ['user'],
+
     created() {
-      this.fetchUserData();
       this.clearSuccessMessage = debounce(this.clearSuccessMessage, debounceMilliseconds);
     },
 
@@ -34,7 +35,6 @@
         config: window.config,
         error: false,
         password: '',
-        passwordMinLength: 4,
         success: false
       }
     },
@@ -42,21 +42,14 @@
     computed: {
       ...mapState({
         loading: state => state.loading
-      })
+      }),
+
+      passwordMinLength() {
+        return this.user.password_min_length || 4;
+      }
     },
 
     methods: {
-      ...mapMutations([ 'SET_LOADING' ]),
-
-      fetchUserData() {
-        this.SET_LOADING(true);
-
-        http(`${config.api}/settings`).then(response => {
-          this.SET_LOADING(false);
-          this.passwordMinLength = response.data.password_min_length;
-        });
-      },
-
       editUser() {
         const password = this.password;
 

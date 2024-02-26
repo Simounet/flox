@@ -37,8 +37,10 @@
   export default {
     mixins: [MiscHelper],
 
+    props: ['user'],
+
     created() {
-      this.fetchOptions();
+      this.setOptionsFromUser(this.user);
     },
 
     data() {
@@ -61,29 +63,18 @@
     methods: {
       ...mapMutations([ 'SET_LOADING' ]),
 
-      fetchOptions() {
-        this.SET_LOADING(true);
-        http(`${config.api}/settings`).then(response => {
-          const data = response.data;
-
-          this.SET_LOADING(false);
-
-          this.genre = data.genre;
-          this.date = data.date;
-          this.spoiler = data.spoiler;
-          this.watchlist = data.watchlist;
-          this.ratings = data.ratings;
-        });
+      setOptionsFromUser(user) {
+        this.genre = user.genre;
+        this.date = user.date;
+        this.spoiler = user.spoiler;
+        this.watchlist = user.watchlist;
+        this.ratings = user.ratings;
       },
 
       updateOptions() {
         this.SET_LOADING(true);
 
-        const date = this.date;
-        const genre = this.genre;
-        const spoiler = this.spoiler;
-        const watchlist = this.watchlist;
-        const ratings = this.ratings;
+        const {date, genre, ratings, spoiler, watchlist} = this;
 
         http.patch(`${config.api}/settings`, {date, genre, spoiler, watchlist, ratings}).then(response => {
           this.SET_LOADING(false);

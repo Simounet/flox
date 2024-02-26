@@ -14,19 +14,21 @@
 
       <span class="loader fullsize-loader" v-if="loading"><i></i></span>
 
-      <user v-if="activeTab == 'user'"></user>
-      <options v-if="activeTab == 'options'"></options>
-      <backup v-if="activeTab == 'backup'"></backup>
-      <misc v-if="activeTab == 'misc'"></misc>
-      <refresh v-if="activeTab == 'refresh'"></refresh>
-      <reminders v-if="activeTab == 'reminders'"></reminders>
-      <api v-if="activeTab == 'api_key'"></api>
+      <User v-if="activeTab == 'user'" :user="user" />
+      <Options v-if="activeTab == 'options'" :user="user" />
+      <Backup v-if="activeTab == 'backup'" />
+      <Misc v-if="activeTab == 'misc'" />
+      <Refresh v-if="activeTab == 'refresh'" :initial-refresh="user.refresh" />
+      <Reminders v-if="activeTab == 'reminders'" :user="user" />
+      <Api v-if="activeTab == 'api_key'" />
 
     </div>
   </main>
 </template>
 
 <script>
+  import http from 'axios';
+
   import User from './User.vue';
   import Options from './Options.vue';
   import Backup from './Backup.vue';
@@ -35,7 +37,7 @@
   import Reminders from './Reminders.vue';
   import Api from './Api.vue';
 
-  import { mapState, mapActions } from 'vuex';
+  import { mapState, mapMutations, mapActions } from 'vuex';
   import MiscHelper from '../../../helpers/misc';
 
   export default {
@@ -43,6 +45,7 @@
 
     created() {
       this.setPageTitle(this.lang('settings'));
+      this.fetchUserData();
     },
 
     components: {
@@ -51,7 +54,8 @@
 
     data() {
       return {
-        activeTab: 'misc'
+        activeTab: 'misc',
+        user: {}
       }
     },
 
@@ -64,8 +68,19 @@
     methods: {
       ...mapActions([ 'setPageTitle' ]),
 
+      ...mapMutations([ 'SET_LOADING' ]),
+
       changeActiveTab(tab) {
         this.activeTab = tab;
+      },
+
+      fetchUserData() {
+        this.SET_LOADING(true);
+
+        http(`${config.api}/settings`).then(response => {
+          this.user = response.data;
+          this.SET_LOADING(false);
+        });
       }
     }
   }

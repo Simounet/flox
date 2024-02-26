@@ -25,14 +25,12 @@
   export default {
     mixins: [MiscHelper],
 
-    created() {
-      this.fetchOptions();
-    },
+    props: ['initial-refresh'],
 
     data() {
       return {
         config: window.config,
-        refresh: false,
+        refresh: this.initialRefresh || false,
         refreshAllClicked: false,
         showRefreshAllMessage: false,
       }
@@ -46,15 +44,6 @@
 
     methods: {
       ...mapMutations([ 'SET_LOADING' ]),
-
-      fetchOptions() {
-        this.SET_LOADING(true);
-        http(`${config.api}/settings`).then(response => {
-          this.refresh = response.data.refresh;
-
-          this.SET_LOADING(false);
-        });
-      },
 
       updateRefresh() {
         this.SET_LOADING(true);

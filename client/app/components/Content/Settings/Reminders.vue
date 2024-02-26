@@ -33,8 +33,10 @@
   export default {
     mixins: [MiscHelper],
 
+    props: ['user'],
+
     created() {
-      this.fetchUserData();
+      this.setOptionsFromUser(this.user);
       this.clearSuccessMessage = debounce(this.clearSuccessMessage, debounceMilliseconds);
     },
 
@@ -57,18 +59,10 @@
     methods: {
       ...mapMutations([ 'SET_LOADING' ]),
 
-      fetchUserData() {
-        this.SET_LOADING(true);
-
-        http(`${config.api}/settings`).then(response => {
-          const data = response.data;
-
-          this.reminders_send_to = data.reminders_send_to;
-          this.daily = data.daily;
-          this.weekly = data.weekly;
-
-          this.SET_LOADING(false);
-        });
+      setOptionsFromUser(user) {
+        this.reminders_send_to = user.reminders_send_to;
+        this.daily = user.daily;
+        this.weekly = user.weekly;
       },
 
       editSetting() {
