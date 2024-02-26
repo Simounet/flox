@@ -13,7 +13,7 @@ class UserCreate extends Command
 {
     use CommandInputValidator;
 
-    protected $signature = 'user:create {--username=} {--password=}';
+    protected $signature = 'user:create {--username=} {--password=} {--is-admin=no}';
     protected $description = 'Create a new user';
 
     private UserService $userService;
@@ -65,16 +65,32 @@ class UserCreate extends Command
             'secret'
         );
 
-        if($this->confirm('Are you sure you want to create this user?')) {
-            $userCreated = $this->userService->create($username, $password);
-            if($userCreated) {
-                return true;
-            }
+        $isAdmin = (string) $this->anticipate(
+            'Should this user be an administrator? (yes/no)',
+            ['yes', 'no']
+        );
 
-            return false;
+        if($this->confirm('Are you sure you want to create this user?')) {
+            $this->userService->create($username, $password);
+            $this->shouldBeAdmin($isAdmin, $username);
+            return true;
         }
 
-        $this->warning('Missing or empty arguments.');
+        $this->warn('Missing or empty arguments.');
+        return false;
+    }
+
+    private function shouldBeAdmin(
+        string $username,
+        string $isAdmin
+    ): bool
+    {
+        if($isAdmin === 'yes') {
+            $this->userService->grantAdminPrivileges($username);
+
+            return true;
+        }
+
         return false;
     }
 
@@ -87,7 +103,9 @@ class UserCreate extends Command
             && $options['password']
         ) {
             try {
-                return $this->userService->create($options['username'], $options['password']) instanceof User;
+                $this->userService->create($options['username'], $options['password']);
+                $this->shouldBeAdmin($options['username'], $options['is-admin']);
+                return true;
             } catch(\Exception $e) {
                 $this->error($e->getMessage());
                 exit;

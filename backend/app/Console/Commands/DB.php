@@ -57,7 +57,8 @@
       
       $this->call('user:create', [
         '--username' => $username,
-        '--password' => $password
+        '--password' => $password,
+        '--is-admin' => 'yes'
       ]);
     }
   }

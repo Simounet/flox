@@ -3,11 +3,11 @@
     <div class="wrap-content">
 
       <div class="navigation-tab no-select">
-        <span :class="{active: activeTab == 'misc'}" @click="changeActiveTab('misc')">{{ lang('tab misc') }}</span>
-        <span :class="{active: activeTab == 'user'}" @click="changeActiveTab('user')">{{ lang('tab user') }}</span>
+        <span v-if="user.is_admin" :class="{active: activeTab == 'misc'}" @click="changeActiveTab('misc')">{{ lang('tab misc') }}</span>
         <span :class="{active: activeTab == 'options'}" @click="changeActiveTab('options')">{{ lang('tab options') }}</span>
-        <span :class="{active: activeTab == 'backup'}" @click="changeActiveTab('backup')">{{ lang('tab backup') }}</span>
-        <span :class="{active: activeTab == 'refresh'}" @click="changeActiveTab('refresh')">{{ lang('refresh') }}</span>
+        <span :class="{active: activeTab == 'user'}" @click="changeActiveTab('user')">{{ lang('tab user') }}</span>
+        <span v-if="user.is_admin" :class="{active: activeTab == 'backup'}" @click="changeActiveTab('backup')">{{ lang('tab backup') }}</span>
+        <span v-if="user.is_admin" :class="{active: activeTab == 'refresh'}" @click="changeActiveTab('refresh')">{{ lang('refresh') }}</span>
         <span :class="{active: activeTab == 'reminders'}" @click="changeActiveTab('reminders')">{{ lang('reminders') }}</span>
         <span :class="{active: activeTab == 'api_key'}" @click="changeActiveTab('api_key')">API</span>
       </div>
@@ -44,6 +44,7 @@
     mixins: [MiscHelper],
 
     created() {
+      this.SET_LOADING(true);
       this.setPageTitle(this.lang('settings'));
       this.fetchUserData();
     },
@@ -54,7 +55,7 @@
 
     data() {
       return {
-        activeTab: 'misc',
+        activeTab: '',
         user: {}
       }
     },
@@ -75,10 +76,11 @@
       },
 
       fetchUserData() {
-        this.SET_LOADING(true);
-
         http(`${config.api}/settings`).then(response => {
           this.user = response.data;
+          this.activeTab = this.user.is_admin === true
+            ? 'misc'
+            : 'options';
           this.SET_LOADING(false);
         });
       }

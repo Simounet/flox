@@ -54,9 +54,10 @@
     public function settings()
     {
       $settings = $this->setting->first();
+      $user = Auth::user();
 
       return [
-        'username' => Auth::check() ? Auth::user()->username : '',
+        'username' => $user ? $user->username : '',
         'genre' => $settings->show_genre,
         'date' => $settings->show_date,
         'spoiler' => $settings->episode_spoiler_protection,
@@ -68,6 +69,7 @@
         'daily' => $settings->daily_reminder,
         'weekly' => $settings->weekly_reminder,
         'password_min_length' => UserService::PASSWORD_MIN_LENGTH,
+        'is_admin' => $user && $user->is_admin,
       ];
     }
 

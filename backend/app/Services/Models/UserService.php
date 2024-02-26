@@ -73,4 +73,9 @@ class UserService
 
         return true;
     }
+
+    public function grantAdminPrivileges(string $username): bool
+    {
+        return (bool) User::where('username', $username)->update(['is_admin' => 1]);
+    }
 }
