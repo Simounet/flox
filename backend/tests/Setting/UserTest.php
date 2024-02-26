@@ -24,29 +24,14 @@
     public function change_user_data_only_if_user_is_logged_in()
     {
       $this->patchJson('api/userdata', [
-        'username' => 'Ganta',
         'password' => 'Igarashi',
       ])->assertStatus(401);
-    }
-
-    /** @test */
-    public function save_new_username()
-    {
-      $this->assertNotEquals('Ganta', $this->user->username);
-
-      $this->actingAs($this->user)->patchJson('api/userdata', [
-        'username' => 'Ganta',
-        'password' => 'Igarashi',
-      ]);
-
-      $this->assertEquals('Ganta', $this->user->username);
     }
 
     /** @test */
     public function save_new_password()
     {
       $this->actingAs($this->user)->patchJson('api/userdata', [
-        'username' => 'Ganta',
         'password' => 'Igarashi'
       ]);
 
@@ -59,7 +44,6 @@
       $oldPassword = $this->user->password;
 
       $this->actingAs($this->user)->patchJson('api/userdata', [
-        'username' => 'Ganta',
         'password' => ''
       ]);
 

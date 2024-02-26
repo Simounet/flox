@@ -3,10 +3,9 @@
   <div class="settings-box" v-if=" ! loading">
     <div class="login-error" v-if="config.env === 'demo'"><span>Data cannot be changed in the demo</span></div>
     <form class="settings-form" @submit.prevent="editUser()">
-      <input type="text" :placeholder="lang('username')" v-model="username">
-      <input type="password" :placeholder="lang('password')" v-model="password" autocomplete="off">
-      <span class="userdata-info">{{ lang('password message') }}</span>
+      <input type="password" :placeholder="lang('password')" v-model="password" :minlength="passwordMinLength" autocomplete="off" required>
       <div v-if="success" class="userdata-changed">{{ lang('success message') }}</div>
+      <div v-if="error" class="userdata-changed userdata-changed--error">{{ error }}</div>
       <input type="submit" :value="lang('save button')">
     </form>
   </div>
@@ -33,8 +32,9 @@
     data() {
       return {
         config: window.config,
-        username: '',
+        error: false,
         password: '',
+        passwordMinLength: 4,
         success: false
       }
     },
@@ -53,20 +53,21 @@
 
         http(`${config.api}/settings`).then(response => {
           this.SET_LOADING(false);
-          this.username = response.data.username;
+          this.passwordMinLength = response.data.password_min_length;
         });
       },
 
       editUser() {
-        const username = this.username;
         const password = this.password;
 
-        if(username != '') {
-          http.patch(`${config.api}/userdata`, {username, password}).then(() => {
-            this.success = true;
-            this.clearSuccessMessage();
-          });
-        }
+        http.patch(`${config.api}/userdata`, {password}).then(() => {
+          this.success = true;
+          this.error = false;
+          this.clearSuccessMessage();
+        }).catch(error => {
+          // @TODO translate error messages
+          this.error = error.response.data.message;
+        });
       },
 
       clearSuccessMessage() {

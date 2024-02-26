@@ -45,22 +45,14 @@
         return response('Success', Response::HTTP_OK);
       }
 
-      $username = Request::input('username');
-      $password = Request::input('password');
+      Request::validate([
+        'password' => 'required|min:' . UserService::PASSWORD_MIN_LENGTH
+      ]);
 
+      $password = (string) Request::input('password');
+      $this->userService->changePassword($password);
 
-      if(is_string($password) && $password !== '') {
-        $this->userService->changePassword($password);
-      }
-
-      $user = Auth::user();
-      $user->username = $username;
-
-      if($user->save()) {
-        return response('Success', Response::HTTP_OK);
-      }
-
-      return response('Server Error', Response::HTTP_INTERNAL_SERVER_ERROR);
+      return response('Success', Response::HTTP_OK);
     }
 
     public function logout(): RedirectResponse

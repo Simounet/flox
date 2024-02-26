@@ -6,6 +6,7 @@
   use App\Models\Episode;
   use App\Models\Item;
   use App\Models\Setting;
+  use App\Services\Models\UserService;
   use GuzzleHttp\Client;
   use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\Cache;
@@ -66,6 +67,7 @@
         'reminders_send_to' => $settings->reminders_send_to,
         'daily' => $settings->daily_reminder,
         'weekly' => $settings->weekly_reminder,
+        'password_min_length' => UserService::PASSWORD_MIN_LENGTH,
       ];
     }
 

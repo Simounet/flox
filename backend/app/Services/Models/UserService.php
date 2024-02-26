@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
+    public const EXCEPTION_AUTHENTICATED_USER_ONLY = 'Authenticated user only';
+    public const EXCEPTION_USERNAME_EMPTY = 'Username cannot be empty';
+    public const EXCEPTION_USERNAME_EXISTS = 'Pick another username';
+    public const EXCEPTION_PASSWORD_EMPTY = 'Password cannot be empty';
+    public const EXCEPTION_PASSWORD_MIN_LENGTH = 'Password should be composed by at least ' . self::PASSWORD_MIN_LENGTH. ' characters';
+
     public const PASSWORD_MIN_LENGTH = 6;
 
     public function create(
@@ -32,8 +38,10 @@ class UserService
     ): bool
     {
         if(!Auth::check()) {
-            return false;
+            throw new \Exception(self::EXCEPTION_AUTHENTICATED_USER_ONLY);
         }
+
+        $this->isPasswordValid($newPassword);
 
         return (bool) User::whereId(Auth::id())->update([
             'password' => Hash::make($newPassword)
@@ -43,11 +51,11 @@ class UserService
     public function isUsernameValid(string $username): true
     {
         if(empty($username)) {
-            throw new \Exception('Username cannot be empty');
+            throw new \Exception(self::EXCEPTION_USERNAME_EMPTY);
         }
 
         if(User::where('username', $username)->exists()) {
-            throw new \Exception('Pick another username');
+            throw new \Exception(self::EXCEPTION_USERNAME_EXISTS);
         }
 
         return true;
@@ -56,11 +64,11 @@ class UserService
     public function isPasswordValid(string $password): true
     {
         if(empty($password)) {
-            throw new \Exception('Password cannot be empty');
+            throw new \Exception(self::EXCEPTION_PASSWORD_EMPTY);
         }
 
         if(strlen($password) < self::PASSWORD_MIN_LENGTH) {
-            throw new \Exception('Password should be composed by at least ' . self::PASSWORD_MIN_LENGTH. ' characters');
+            throw new \Exception(self::EXCEPTION_PASSWORD_MIN_LENGTH);
         }
 
         return true;

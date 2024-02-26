@@ -53,10 +53,11 @@ class UserServiceTest extends TestCase
     /** @test */
     public function it_should_fail_changing_password_not_logged_in(): void
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Authenticated user only');
+
         $this->userService->create('user1', 'password');
         $passwordChanged = $this->userService->changePassword('newPassword');
-
-        $this->assertFalse($passwordChanged);
     }
 
     /** @test */
