@@ -9,6 +9,7 @@
   use App\Models\Setting;
   use GuzzleHttp\Client;
   use Illuminate\Database\Eloquent\ModelNotFoundException;
+  use Illuminate\Http\JsonResponse;
   use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\DB;
   use Symfony\Component\HttpFoundation\Response;
@@ -65,16 +66,13 @@
 
     /**
      * Loop over all local files.
-     *
-     * @param $files
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function updateDatabase($files)
+    public function updateDatabase(int $userId, object $files): JsonResponse
     {
       logInfo("FileParser.updateDatabase");
       DB::beginTransaction();
 
-      $this->updateLastFetched();
+      $this->updateLastFetched($userId);
 
       foreach((array) $files as $type => $items) {
         $this->itemCategory = $type;
@@ -93,6 +91,7 @@
 
       logInfo("Updating data: Done!");
       DB::commit();
+      return response()->json('', Response::HTTP_OK);
     }
 
     /**
@@ -375,9 +374,9 @@
     /**
      * Update last time we fetched flox-file-parser.
      */
-    private function updateLastFetched()
+    private function updateLastFetched(int $userId)
     {
-      Setting::first()->update([
+      Setting::where('user_id', $userId)->update([
         'last_fetch_to_file_parser' => now(),
       ]);
     }

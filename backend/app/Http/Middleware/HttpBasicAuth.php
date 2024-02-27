@@ -16,7 +16,7 @@ class HttpBasicAuth
      */
     public function handle($request, $next)
     {
-      if(Auth::check() || Auth::validate(['username' => $request->getUser(), 'password' => $request->getPassword()])) {
+      if(Auth::check() || Auth::once(['username' => $request->getUser(), 'password' => $request->getPassword()])) {
         return $next($request);
       }
 

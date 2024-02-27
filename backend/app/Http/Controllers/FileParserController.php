@@ -4,6 +4,8 @@
 
   use App\Services\FileParser;
   use GuzzleHttp\Exception\ConnectException;
+  use Illuminate\Http\JsonResponse;
+  use Illuminate\Support\Facades\Auth;
   use Symfony\Component\HttpFoundation\Request;
   use Symfony\Component\HttpFoundation\Response;
 
@@ -36,16 +38,27 @@
 
     /**
      * Will be called from flox-file-parser itself.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function receive(Request $request)
+    public function receive(Request $request): JsonResponse
     {
       logInfo("FileParserController.receive called");
-      $content = json_decode($request->getContent());
 
-      return $this->updateDatabase($content);
+      $user = Auth::user();
+
+      if(!$user) {
+        throw new \Exception('User should be logged');
+      }
+
+      $content = json_decode($request->getContent());
+      if(!$content) {
+        return response()->json('', Response::HTTP_NO_CONTENT);
+      }
+
+      try {
+        return $this->parser->updateDatabase($user->id, $content);
+      } catch(\Exception $e) {
+        return response()->json($e->getMessage(), Response::HTTP_UNAUTHORIZED);
+      }
     }
 
     /**
@@ -54,14 +67,5 @@
     public function lastFetched()
     {
       return $this->parser->lastFetched();
-    }
-
-    /**
-     * @param $files
-     * @return \Illuminate\Http\JsonResponse
-     */
-    private function updateDatabase($files)
-    {
-      return $this->parser->updateDatabase($files);
     }
   }
