@@ -10,14 +10,16 @@
 
   trait Factories {
 
-    public function createUser($custom = [])
+    public function createUser(array $custom = []): User
     {
-      return factory(User::class)->create($custom);
+      $user = factory(User::class)->create($custom);
+      $this->createSetting(['user_id' => $user->id]);
+      return $user;
     }
 
-    public function createSetting()
+    public function createSetting(array $custom): Setting
     {
-      return factory(Setting::class)->create();
+      return factory(Setting::class)->create($custom);
     }
 
     public function createMovie($custom = [])

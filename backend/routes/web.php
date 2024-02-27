@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Route;
     Route::get('/logout', 'UserController@logout');
     Route::post('/login', 'UserController@login');
 
-    Route::get('/episodes/{tmdbId}', 'ItemController@episodes');
     Route::get('/items/{type}/{orderBy}/{sortDirection}', 'ItemController@items');
     Route::get('/search-items', 'ItemController@search');
 
@@ -31,6 +30,7 @@ use Illuminate\Support\Facades\Route;
     Route::middleware('auth')->group(function() {
       Route::get('/calendar', 'CalendarController@items');
       Route::get('/check-update', 'SettingController@checkForUpdate');
+      Route::get('/episodes/{tmdbId}', 'ItemController@episodes');
       Route::get('/version', 'SettingController@getVersion');
       Route::get('/api-key', 'SettingController@getApiKey');
       Route::patch('/settings/refresh', 'SettingController@updateRefresh');

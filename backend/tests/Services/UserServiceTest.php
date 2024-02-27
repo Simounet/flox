@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Services;
 
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\Models\UserService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -104,5 +105,17 @@ class UserServiceTest extends TestCase
         $this->expectExceptionMessage('Password cannot be empty');
 
         $this->userService->isPasswordValid('');
+    }
+
+    /** @test */
+    public function it_should_verify_settings_created(): void
+    {
+        $initialSettingsCount = Setting::count();
+
+        $this->userService->create('user', '0123456798');
+        $settingsCount = Setting::count();
+
+        $this->assertEquals(0, $initialSettingsCount);
+        $this->assertEquals(1, $settingsCount);
     }
 }

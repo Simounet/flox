@@ -80,7 +80,7 @@
      * the data for the next unseen episode, which will be used in the modal as an indicator,
      * and the setting option to check if spoiler protection is enabled.
      */
-    public function getAllByTmdbId(int $tmdbId): array
+    public function getAllByTmdbId(int $userId, int $tmdbId): array
     {
       Carbon::setLocale(config('app.TRANSLATION'));
 
@@ -91,7 +91,7 @@
       return [
         'episodes' => $episodes,
         'next_episode' => $nextEpisode,
-        'spoiler' => Setting::first()->episode_spoiler_protection,
+        'spoiler' => Setting::where('user_id', $userId)->first()->episode_spoiler_protection,
       ];
     }
 

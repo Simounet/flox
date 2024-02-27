@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Models;
 
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -30,6 +31,9 @@ class UserService
         $user->username = $username;
         $user->password = Hash::make($password);
         $user->save();
+
+        Setting::create(['user_id' => $user->id]);
+
         return $user;
     }
 

@@ -17,8 +17,8 @@
   $factory->define(App\Models\Setting::class, function(Faker\Generator $faker) {
     return [
       'show_date' => 1,
-      'show_genre' => 1,
-      'episode_spoiler_protection' => '',
+      'show_genre' => 0,
+      'episode_spoiler_protection' => 1,
       'last_fetch_to_file_parser' => null,
     ];
   });

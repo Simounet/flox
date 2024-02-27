@@ -53,8 +53,8 @@
      */
     public function settings()
     {
-      $settings = $this->setting->first();
       $user = Auth::user();
+      $settings = $this->setting->where('user_id', $user->id)->first();
 
       return [
         'username' => $user ? $user->username : '',
@@ -120,7 +120,7 @@
 
       Cache::flush();
 
-      $this->setting->first()->update([
+      $this->setting->where('user_id', Auth::id())->update([
         'show_genre' => Request::input('genre'),
         'show_date' => Request::input('date'),
         'episode_spoiler_protection' => Request::input('spoiler'),
@@ -138,7 +138,7 @@
         return response('Success', Response::HTTP_OK);
       }
 
-      $this->setting->first()->update([
+      $this->setting->where('user_id', Auth::id())->update([
         'refresh_automatically' => Request::input('refresh'),
       ]);
     }
@@ -152,7 +152,7 @@
         return response('Success', Response::HTTP_OK);
       }
 
-      $this->setting->first()->update([
+      $this->setting->where('user_id', Auth::id())->update([
         'reminders_send_to' => Request::input('reminders_send_to'),
       ]);
     }
@@ -166,7 +166,7 @@
         return response('Success', Response::HTTP_OK);
       }
 
-      $this->setting->first()->update([
+      $this->setting->where('user_id', Auth::id())->update([
         'daily_reminder' => Request::input('daily'),
         'weekly_reminder' => Request::input('weekly'),
       ]);

@@ -30,7 +30,7 @@
 
     public function episodes($tmdbId)
     {
-      return $this->episodeService->getAllByTmdbId($tmdbId);
+      return $this->episodeService->getAllByTmdbId(Auth::id(), $tmdbId);
     }
 
     public function search()
