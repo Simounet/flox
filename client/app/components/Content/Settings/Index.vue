@@ -8,7 +8,7 @@
         <span :class="{active: activeTab == 'user'}" @click="changeActiveTab('user')">{{ lang('tab user') }}</span>
         <span v-if="user.is_admin" :class="{active: activeTab == 'backup'}" @click="changeActiveTab('backup')">{{ lang('tab backup') }}</span>
         <span v-if="user.is_admin" :class="{active: activeTab == 'refresh'}" @click="changeActiveTab('refresh')">{{ lang('refresh') }}</span>
-        <span :class="{active: activeTab == 'reminders'}" @click="changeActiveTab('reminders')">{{ lang('reminders') }}</span>
+        <span v-if="user.is_admin" :class="{active: activeTab == 'reminders'}" @click="changeActiveTab('reminders')">{{ lang('reminders') }}</span>
         <span :class="{active: activeTab == 'api_key'}" @click="changeActiveTab('api_key')">API</span>
       </div>
 
