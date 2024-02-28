@@ -17,6 +17,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if(empty(env('APP_DOMAIN'))) {
+            throw new \Exception('APP_DOMAIN parameter is missing in the .env file. Look at the .env.example file.');
+        }
         Schema::create('profiles', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedInteger('user_id')->nullable()->index();
