@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Services;
 
+use App\Models\Profile;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\Models\UserService;
@@ -117,5 +118,17 @@ class UserServiceTest extends TestCase
 
         $this->assertEquals(0, $initialSettingsCount);
         $this->assertEquals(1, $settingsCount);
+    }
+
+    /** @test */
+    public function it_should_verify_profile_created(): void
+    {
+        $serverProfileCount = Profile::count();
+
+        $this->userService->create('user', '0123456798');
+        $profileCount = Profile::count();
+
+        $this->assertEquals(1, $serverProfileCount);
+        $this->assertEquals(2, $profileCount);
     }
 }

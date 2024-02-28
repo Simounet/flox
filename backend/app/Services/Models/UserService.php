@@ -19,6 +19,13 @@ class UserService
 
     public const PASSWORD_MIN_LENGTH = 6;
 
+    private ProfileService $profileService;
+
+    public function __construct(ProfileService $profileService)
+    {
+        $this->profileService = $profileService;
+    }
+
     public function create(
         string $username,
         string $password
@@ -33,6 +40,7 @@ class UserService
         $user->save();
 
         Setting::create(['user_id' => $user->id]);
+        $this->profileService->storeLocal($user);
 
         return $user;
     }
