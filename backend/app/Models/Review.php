@@ -41,13 +41,11 @@ class Review extends Model
      *
      * @return Review
      */
-    public function store(int $userId, int $itemId, string $content)
+    public function store(int $userId, int $itemId, array $reviewData)
     {
         return $this->updateOrCreate(
             ['user_id' => $userId, 'item_id' => $itemId],
-            [
-                'content' => $content,
-            ]
+            $reviewData
         );
     }
 

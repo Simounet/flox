@@ -58,7 +58,13 @@ class ReviewController extends Controller
 
       if(Auth::check() || $request->validate(['content' => 'required|unique:content|max:255'])) {
         $reviewModel = new Review();
-        $storedReview = $reviewModel->store(Auth::user()->id, $itemId, $content);
+        $storedReview = $reviewModel->store(
+            Auth::user()->id,
+            $itemId,
+            [
+                'content' => $content
+            ]
+        );
         $activityType = $storedReview->wasRecentlyCreated ?
             Verbs::CREATE : Verbs::UPDATE;
         ReviewSendActivities::dispatch(

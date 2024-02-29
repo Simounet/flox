@@ -65,7 +65,14 @@ class ReviewService {
     ): Review
     {
         $reviewModel = new Review();
-        $storedReview = $reviewModel->store($userId, $item->id, '');
+        $storedReview = $reviewModel->store(
+            $userId,
+            $item->id,
+            [
+                'content' => '',
+                'rating' => 0
+            ],
+        );
         return $storedReview;
     }
 }
