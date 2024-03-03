@@ -2,21 +2,21 @@
   <main class="calendar-main no-select" v-hotkey="keymap">
     <transition mode="out-in" name="fade">
       <div class="wrap-content calendar-wrap" v-if=" ! loading">
-        <calendar-view
+        <CalendarView
           :show-date="showDate"
           :items="filteredItems"
           @click-item="navigateToItem"
           :starting-day-of-week="1"
           class="theme-default">
-          <calendar-view-header
+          <CalendarViewHeader
             title="You can also use the arrow keys"
             slot="header"
             slot-scope="t"
             :header-props="t.headerProps"
             @input="setShowDate"
           >
-          </calendar-view-header>
-        </calendar-view>
+          </CalendarViewHeader>
+        </CalendarView>
       </div>
     </transition>
 
@@ -32,7 +32,8 @@
   import {mapState, mapMutations, mapActions} from 'vuex';
   import MiscHelper from '../../helpers/misc';
 
-  import 'vue-simple-calendar/static/css/default.css';
+  import 'vue-simple-calendar/dist/style.css';
+  import 'vue-simple-calendar/dist/css/default.css';
 
   dayjs.extend(isBetween);
   
