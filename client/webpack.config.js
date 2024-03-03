@@ -25,14 +25,21 @@ module.exports = {
   },
   resolve: {
     alias: {
-      vue$: "vue/dist/vue.common",
+      vue: "@vue/compat",
     },
   },
   module: {
     rules: [
       {
         test: /\.vue$/,
-        use: "vue-loader",
+        loader: "vue-loader",
+        options: {
+          compilerOptions: {
+            compatConfig: {
+              MODE: 2,
+            },
+          },
+        },
       },
       {
         test: /\.js$/,

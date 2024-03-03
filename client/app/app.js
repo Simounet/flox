@@ -4,9 +4,10 @@ import Vue from 'vue';
 import { mapState, mapActions, mapMutations } from 'vuex'
 import VueHotkey from 'v-hotkey';
 
-import { Checkbox } from 'element-ui';
+import { ElCheckbox } from "element-plus";
+import 'element-plus/dist/index.css'
 
-Vue.use(Checkbox);
+Vue.use(ElCheckbox);
 Vue.use(VueHotkey);
 
 import SiteHeader from './components/Header.vue';
