@@ -10,30 +10,30 @@
 
         <ul class="site-nav site-nav-first">
           <li>
-            <router-link to="/trending" @click.native="refresh('trending')">{{ lang('trending') }}</router-link>
+            <router-link to="/trending" @click="refresh('trending')">{{ lang('trending') }}</router-link>
           </li>
           <li>
-            <router-link to="/now-playing" @click.native="refresh('now-playing')">{{ lang('now-playing') }}
+            <router-link to="/now-playing" @click="refresh('now-playing')">{{ lang('now-playing') }}
             </router-link>
           </li>
           <li>
-            <router-link to="/upcoming" @click.native="refresh('upcoming')">{{ lang('upcoming') }}</router-link>
+            <router-link to="/upcoming" @click="refresh('upcoming')">{{ lang('upcoming') }}</router-link>
           </li>
         </ul>
 
         <ul v-if="auth" class="site-nav-second">
           <li>
-            <router-link to="/calendar" @click.native="refresh('calendar')">{{ lang('calendar') }}</router-link>
+            <router-link to="/calendar" @click="refresh('calendar')">{{ lang('calendar') }}</router-link>
           </li>
           <li>
-            <router-link to="/watchlist" @click.native="refresh('watchlist')" exact>{{ lang('watchlist') }}
+            <router-link to="/watchlist" @click="refresh('watchlist')" exact>{{ lang('watchlist') }}
             </router-link>
           </li>
           <li>
-            <router-link to="/tv" @click.native="refresh('tv')" exact>{{ lang('tv') }}</router-link>
+            <router-link to="/tv" @click="refresh('tv')" exact>{{ lang('tv') }}</router-link>
           </li>
           <li>
-            <router-link to="/movies" @click.native="refresh('movie')" exact>{{ lang('movies') }}</router-link>
+            <router-link to="/movies" @click="refresh('movie')" exact>{{ lang('movies') }}</router-link>
           </li>
         </ul>
       </div>
