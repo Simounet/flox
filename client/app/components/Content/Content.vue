@@ -9,7 +9,7 @@
         <div class="filter-wrap">
           <span class="current-filter" @click="toggleShowFilters()">{{ lang(userFilter) }} <span class="arrow-down"></span></span>
           <ul class="all-filters" :class="{active: showFilters}">
-            <li v-if="filter !== userFilter" v-for="filter in filters" @click="setUserFilter(filter)">{{ lang(filter) }}</li>
+            <li v-for="filter in notUserFilters" @click="setUserFilter(filter)">{{ lang(filter) }}</li>
           </ul>
         </div>
       </div>
@@ -68,7 +68,11 @@
         userSortDirection: state => state.userSortDirection,
         clickedMoreLoading: state => state.clickedMoreLoading,
         paginator: state => state.paginator
-      })
+      }),
+
+      notUserFilters() {
+        return this.filters.filter(filter => filter !== this.userFilter);
+      }
     },
 
     methods: {
