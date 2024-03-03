@@ -25,12 +25,12 @@
   export default {
     mixins: [MiscHelper],
 
-    created() {
-      this.fetchData();
+    unmounted() {
+      this.SET_ITEM_LOADED_SUBPAGE(false);
     },
 
-    destroyed() {
-      this.SET_ITEM_LOADED_SUBPAGE(false);
+    created() {
+      this.fetchData();
     },
 
     data() {
