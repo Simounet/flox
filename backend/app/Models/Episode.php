@@ -4,6 +4,7 @@
 
   use Carbon\Carbon;
   use Illuminate\Database\Eloquent\Model;
+  use Illuminate\Support\Facades\Auth;
 
   class Episode extends Model {
 
@@ -14,6 +15,7 @@
      */
     protected $appends = [
       'release_episode_human_format',
+      'seen',
       'startDate',
     ];
 
@@ -22,17 +24,26 @@
      *
      * @var array
      */
-    protected $guarded = ['release_episode_human_format', 'startDate'];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected $casts = [
-      'seen' => 'boolean',
+    protected $guarded = [
+      'release_episode_human_format',
+      'seen',
+      'startDate',
     ];
-    
+
+    public function users() {
+      return $this->belongsToMany(User::class);
+    }
+
+    public function episodesUsers()
+    {
+      return $this->hasMany(EpisodeUser::class);
+    }
+
+    public function getSeenAttribute()
+    {
+      return $this->episodesUsers()->where('user_id', Auth::id())->count() > 0;
+    }
+
     /**
      * Accessor for human formatted release date.
      */
@@ -71,7 +82,11 @@
     public function calendarItem()
     {
       return $this->belongsTo(Item::class, 'tmdb_id', 'tmdb_id')
-        ->select(['tmdb_id', 'title', 'watchlist']);
+        ->with(['userReview' => function($e) {
+          $e->select('item_id', 'watchlist');
+        }])
+        ->without(['review', 'user'])
+        ->select(['tmdb_id', 'title', 'id']);
     }
 
     /**

@@ -4,7 +4,10 @@
 
   use App\Services\Storage;
   use Carbon\Carbon;
+  use Illuminate\Database\Eloquent\Builder;
   use Illuminate\Database\Eloquent\Model;
+  use Illuminate\Database\Query\JoinClause;
+  use Illuminate\Support\Facades\Auth;
 
   class Item extends Model {
 
@@ -19,7 +22,9 @@
      * @var array
      */
     protected $casts = [
-      'watchlist' => 'boolean', 'last_seen_at' => 'datetime', 'refreshed_at' => 'datetime', 'created_at' => 'datetime', 'updated_at' => 'datetime',
+      'created_at' => 'datetime',
+      'refreshed_at' => 'datetime',
+      'updated_at' => 'datetime',
     ];
     
     /**
@@ -36,7 +41,7 @@
      *
      * @var array
      */
-    protected $with = ['genre'];
+    protected $with = ['genre', 'review', 'userReview'];
 
     /**
      * Guard accessors from import.
@@ -60,7 +65,6 @@
         'title' => $data['title'],
         'original_title' => $data['original_title'],
         'poster' => $data['poster'] ?? '',
-        'rating' => 0,
         'released' => $data['released'],
         'released_timestamp' => Carbon::parse($data['released']),
         'overview' => $data['overview'],
@@ -69,7 +73,6 @@
         'imdb_id' => $data['imdb_id'],
         'imdb_rating' => $data['imdb_rating'],
         'youtube_key' => $data['youtube_key'],
-        'last_seen_at' => now(),
         'slug' => $data['slug'],
         'homepage' => $data['homepage'] ?? null,
       ]);
@@ -90,7 +93,6 @@
         'title' => $data['name'],
         'media_type' => $mediaType,
         'poster' => '',
-        'rating' => 0,
         'released' => time(),
         'released_timestamp' => now(),
         'overview' => '',
@@ -99,21 +101,9 @@
         'imdb_id' => '',
         'imdb_rating' => '',
         'youtube_key' => '',
-        'last_seen_at' => now(),
         'src' => $data['src'],
         'subtitles' => $data['subtitles'],
         'homepage' => null,
-      ]);
-    }
-
-    /**
-     * @param $tmdbId
-     * @return mixed
-     */
-    public function updateLastSeenAt($tmdbId)
-    {
-      return $this->where('tmdb_id', $tmdbId)->update([
-        'last_seen_at' => now(),
       ]);
     }
 
@@ -167,6 +157,12 @@
       return $this->hasMany(Review::class);
     }
 
+    public function userReview()
+    {
+      return $this->hasOne(Review::class)
+        ->where('user_id', Auth::id());
+    }
+
     /**
      * Can have many alternative titles.
      */
@@ -180,10 +176,12 @@
      */
     public function latestEpisode()
     {
+      $episodeUserSeen = EpisodeUser::select('episode_id')->from('episode_user');
+
       return $this->hasOne(Episode::class, 'tmdb_id', 'tmdb_id')
         ->orderBy('season_number', 'asc')
         ->orderBy('episode_number', 'asc')
-        ->where('seen', false)
+        ->whereNotIn('id', $episodeUserSeen)
         ->latest();
     }
 
@@ -229,6 +227,14 @@
     public function scopeFindByTmdbIdStrict($query, $tmdbId, $mediaType)
     {
       return $query->where('tmdb_id', $tmdbId)->where('media_type', $mediaType);
+    }
+
+    public function scopeFindByReviewWatchlist(Builder $query, int $watchlistValue): Builder
+    {
+        return $query->join('reviews', function(JoinClause $join) use ($watchlistValue) {
+          $join->on('items.id', '=', 'reviews.item_id')
+            ->where('reviews.watchlist', '=', $watchlistValue);
+        });
     }
 
     /**

@@ -31,6 +31,13 @@
       $this->createImdbRatingMock();
     }
 
+    private function createItem(array $data): void {
+      $userId = 1;
+      $this->createReviewServiceMock();
+      $itemService = app(ItemService::class);
+      $itemService->create($data, $userId);
+    }
+
     /** @test */
     public function it_should_create_a_new_movie()
     {
@@ -39,10 +46,8 @@
         $this->tmdbFixtures('movie/alternative_titles')
       );
 
-      $itemService = app(ItemService::class);
-
       $item1 = $this->item->all();
-      $itemService->create($this->floxFixtures('movie'));
+      $this->createItem($this->floxFixtures('movie'));
       $item2 = $this->item->all();
 
       $this->assertCount(0, $item1);
@@ -62,10 +67,8 @@
 
       $this->createTmdbEpisodeMock();
 
-      $itemService = app(ItemService::class);
-
       $item1 = $this->item->all();
-      $itemService->create($this->floxFixtures('tv'));
+      $this->createItem($this->floxFixtures('tv'));
       $item2 = $this->item->all();
 
       $this->assertCount(0, $item1);
@@ -121,33 +124,6 @@
 
       $this->assertNull($notFound);
       $this->assertEquals(68735, $found->tmdb_id);
-    }
-
-    /** @test */
-    public function it_should_change_rating()
-    {
-      $this->createMovie();
-
-      $item1 = $this->item->find(1);
-      $this->itemService->changeRating(1, 3);
-      $item2 = $this->item->find(1);
-
-      $this->assertEquals(1, $item1->rating);
-      $this->assertEquals(3, $item2->rating);
-      $this->assertEquals($item1->last_seen_at, $item2->last_seen_at);
-    }
-
-    /** @test */
-    public function it_should_change_last_seen_if_rating_was_neutral()
-    {
-      $this->createMovie(['rating' => 0]);
-
-      $itemOrignal = $this->item->find(1);
-      sleep(1);
-      $this->itemService->changeRating(1, 1);
-      $itemRated = $this->item->find(1);
-
-      $this->assertNotEquals($itemOrignal->last_seen_at, $itemRated->last_seen_at);
     }
 
     /** @test */

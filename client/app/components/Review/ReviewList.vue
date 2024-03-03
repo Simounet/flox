@@ -1,10 +1,11 @@
 <template>
   <ol
+    v-if="reviewsWithContent.length"
     class="reviews"
   >
     <li
       :key="'review-' + index"
-      v-for="(review, index) in reviews"
+      v-for="(review, index) in reviewsWithContent"
       class="review-item">
       <p v-html="contentFilter(review.content)"></p>
       <ReviewLink
@@ -20,6 +21,12 @@
 
   export default {
     props: ['reviews'],
+
+    computed: {
+      reviewsWithContent() {
+        return this.reviews.filter(review => review.content !== '');
+      }
+    },
 
     methods: {
       contentFilter(content) {

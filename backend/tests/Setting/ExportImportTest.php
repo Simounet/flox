@@ -104,6 +104,9 @@
 
       if(isset($data->items)) {
         foreach($data->items as $item) {
+          // @TODO add credit_cast and credit_crew to fixture's files
+          $item->credit_cast = [];
+          $item->credit_crew = [];
           $itemService->import($item);
         }
       }

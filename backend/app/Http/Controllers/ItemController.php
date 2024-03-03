@@ -5,6 +5,7 @@
   use App\Services\Models\AlternativeTitleService;
   use App\Services\Models\EpisodeService;
   use App\Services\Models\ItemService;
+  use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\Request;
   use Symfony\Component\HttpFoundation\Response;
 
@@ -13,7 +14,10 @@
     private $itemService;
     private $episodeService;
 
-    public function __construct(ItemService $itemService, EpisodeService $episodeService)
+    public function __construct(
+      ItemService $itemService,
+      EpisodeService $episodeService
+    )
     {
       $this->itemService = $itemService;
       $this->episodeService = $episodeService;
@@ -26,7 +30,7 @@
 
     public function episodes($tmdbId)
     {
-      return $this->episodeService->getAllByTmdbId($tmdbId);
+      return $this->episodeService->getAllByTmdbId(Auth::id(), $tmdbId);
     }
 
     public function search()
@@ -34,28 +38,24 @@
       return $this->itemService->search(Request::input('q'));
     }
 
-    public function changeRating($itemId)
-    {
-      return $this->itemService->changeRating($itemId, Request::input('rating'));
-    }
-
     public function add()
     {
-      return $this->itemService->create(Request::input('item'));
+      $user = Auth::user();
+      abort_if(!$user, 403);
+
+      $item = Request::input('item');
+      abort_if(!$item, 403);
+
+      return $this->itemService->create($item, $user->id);
     }
 
     public function watchlist()
     {
       $item = $this->add();
 
-      $item->update(['watchlist' => true]);
+      $item->userReview->update(['watchlist' => true]);
 
       return $item;
-    }
-
-    public function remove($itemId)
-    {
-      return $this->itemService->remove($itemId);
     }
 
     public function refresh($itemId)

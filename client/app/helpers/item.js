@@ -8,6 +8,7 @@ export default {
 
         http.post(`${config.api}/watchlist`, {item}).then(response => {
           this.setItem(response.data);
+          this.isLocalContent = true;
           this.rated = false;
         }, error => {
           alert(error.message);
@@ -29,7 +30,7 @@ export default {
     },
 
     displaySeason(item) {
-      return item.media_type == 'tv' && item.rating != null && item.tmdb_id && ! item.watchlist;
+      return item.media_type == 'tv' && item.user_review !== null && item.tmdb_id && ! item.user_review.watchlist;
     },
 
     openSeasonModal(item) {

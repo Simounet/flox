@@ -6,6 +6,7 @@
   use App\Models\Episode;
   use App\Models\Item;
   use App\Models\Setting;
+  use App\Services\Models\UserService;
   use GuzzleHttp\Client;
   use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\Cache;
@@ -52,10 +53,11 @@
      */
     public function settings()
     {
-      $settings = $this->setting->first();
+      $user = Auth::user();
+      $settings = $this->setting->where('user_id', $user->id)->first();
 
       return [
-        'username' => Auth::check() ? Auth::user()->username : '',
+        'username' => $user ? $user->username : '',
         'genre' => $settings->show_genre,
         'date' => $settings->show_date,
         'spoiler' => $settings->episode_spoiler_protection,
@@ -66,6 +68,8 @@
         'reminders_send_to' => $settings->reminders_send_to,
         'daily' => $settings->daily_reminder,
         'weekly' => $settings->weekly_reminder,
+        'password_min_length' => UserService::PASSWORD_MIN_LENGTH,
+        'is_admin' => $user && $user->is_admin,
       ];
     }
 
@@ -116,7 +120,7 @@
 
       Cache::flush();
 
-      $this->setting->first()->update([
+      $this->setting->where('user_id', Auth::id())->update([
         'show_genre' => Request::input('genre'),
         'show_date' => Request::input('date'),
         'episode_spoiler_protection' => Request::input('spoiler'),
@@ -134,7 +138,7 @@
         return response('Success', Response::HTTP_OK);
       }
 
-      $this->setting->first()->update([
+      $this->setting->where('user_id', Auth::id())->update([
         'refresh_automatically' => Request::input('refresh'),
       ]);
     }
@@ -148,7 +152,7 @@
         return response('Success', Response::HTTP_OK);
       }
 
-      $this->setting->first()->update([
+      $this->setting->where('user_id', Auth::id())->update([
         'reminders_send_to' => Request::input('reminders_send_to'),
       ]);
     }
@@ -162,7 +166,7 @@
         return response('Success', Response::HTTP_OK);
       }
 
-      $this->setting->first()->update([
+      $this->setting->where('user_id', Auth::id())->update([
         'daily_reminder' => Request::input('daily'),
         'weekly_reminder' => Request::input('weekly'),
       ]);

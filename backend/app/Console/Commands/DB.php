@@ -2,23 +2,17 @@
 
   namespace App\Console\Commands;
 
-  use App\Services\Models\GenreService;
-  use App\Models\User;
   use Illuminate\Console\Command;
   use Illuminate\Support\Facades\DB as LaravelDB;
 
   class DB extends Command {
 
-    private $genreService;
-    
     protected $signature = 'flox:db {--fresh : Whether all data should be reset} {username?} {password?}';
     protected $description = 'Create database migrations and admin account';
 
-    public function __construct(GenreService $genreService)
+    public function __construct()
     {
       parent::__construct();
-
-      $this->genreService = $genreService;
     }
 
     public function handle()
@@ -52,7 +46,7 @@
       $this->info('MIGRATION COMPLETED');
     }
 
-    private function createUser()
+    private function createUser(): void
     {
       $username = $this->ask('Enter your admin username', $this->argument("username"));
       $password = $this->ask('Enter your admin password', $this->argument("password"));
@@ -61,9 +55,10 @@
         LaravelDB::table('users')->delete();
       }
       
-      $user = new User();
-      $user->username = $username;
-      $user->password = bcrypt($password);
-      $user->save();
+      $this->call('user:create', [
+        '--username' => $username,
+        '--password' => $password,
+        '--is-admin' => 'yes'
+      ]);
     }
   }

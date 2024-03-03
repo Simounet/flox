@@ -2,9 +2,10 @@
 
 namespace Tests\Api;
 
-use App\Jobs\ReviewSendActivity;
 use App\Jobs\ReviewSendActivities;
+use App\Models\Item;
 use App\Models\Profile;
+use App\Models\Review;
 use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ItemService;
 use App\Services\Models\ProfileService;
@@ -13,12 +14,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
+use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
 use Tests\Traits\Mocks;
 
 class ReviewTest extends TestCase {
 
     use RefreshDatabase;
+    use Factories;
     use Fixtures;
     use Mocks;
 
@@ -101,14 +104,58 @@ class ReviewTest extends TestCase {
       ]);
     }
 
-    private function mockItem()
+    /** @test */
+    public function itShouldFailAtChangingOtherUserRating(): void
+    {
+      $this->createMovie();
+      $review = $this->createReview();
+      $user2 = $this->createUser();
+
+      $this->actingAs($user2)->patchJson('api/review/change-rating/' . $review->id, [
+        'rating' => 2
+      ])->assertStatus(404);
+    }
+
+    /** @test */
+    public function itShouldNotChangeRatingOnReviewPost(): void
+    {
+      $this->actingAs($this->user);
+      $item = $this->mockItem();
+      $this->postJson('api/review', [
+        'itemId' => $item->id,
+        'content' => 'Lorem ipsum.'
+      ]);
+      $reviews = Review::query()->get();
+      $this->assertEquals(1, $reviews->count());
+      $review = $reviews->first();
+      echo 'Base rating: ' . $review->rating . PHP_EOL;
+
+      $updatedRating = 1;
+
+      $this->patchJson('api/review/change-rating/' . $review->id, [
+        'rating' => $updatedRating
+      ]);
+      $changedRatingReview = Review::find($review->id);
+      echo 'Updated rating: ' . $changedRatingReview->rating . PHP_EOL;
+      $this->postJson('api/review', [
+        'itemId' => $item->id,
+        'content' => 'Lorem ipsum.'
+      ]);
+
+      $updatedReview = Review::find($review->id);
+      echo 'After post rating: ' . $updatedReview->rating . PHP_EOL;
+
+      $this->assertEquals($updatedRating, $updatedReview->rating);
+    }
+
+    private function mockItem(): Item
     {
         $this->createGuzzleMock(
             $this->tmdbFixtures('movie/details'),
             $this->tmdbFixtures('movie/alternative_titles')
         );
         $itemService = app(ItemService::class);
-        $itemService->create($this->floxFixtures('movie'));
+        return $itemService->create($this->floxFixtures('movie'), $this->user->id);
     }
 
     private function getHeaders(string $dataStr): array

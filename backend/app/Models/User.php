@@ -6,6 +6,10 @@
 
   class User extends Authenticatable {
 
+    protected $casts = [
+      'is_admin' => 'boolean'
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -14,6 +18,7 @@
     protected $fillable = [
       'username',
       'password',
+      'is_admin',
       'api_key',
     ];
 
@@ -26,6 +31,10 @@
       'password',
       'remember_token',
     ];
+
+    public function episodes() {
+      return $this->belongsToMany(Episode::class)->using(EpisodeUser::class);
+    }
 
     /**
      * Scope to find a user by an api key.

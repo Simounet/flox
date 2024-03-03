@@ -9,6 +9,8 @@
   use App\Models\Setting;
   use GuzzleHttp\Client;
   use Illuminate\Database\Eloquent\ModelNotFoundException;
+  use Illuminate\Http\JsonResponse;
+  use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\DB;
   use Symfony\Component\HttpFoundation\Response;
 
@@ -64,16 +66,13 @@
 
     /**
      * Loop over all local files.
-     *
-     * @param $files
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function updateDatabase($files)
+    public function updateDatabase(int $userId, object $files): JsonResponse
     {
       logInfo("FileParser.updateDatabase");
       DB::beginTransaction();
 
-      $this->updateLastFetched();
+      $this->updateLastFetched($userId);
 
       foreach((array) $files as $type => $items) {
         $this->itemCategory = $type;
@@ -92,6 +91,7 @@
 
       logInfo("Updating data: Done!");
       DB::commit();
+      return response()->json('', Response::HTTP_OK);
     }
 
     /**
@@ -184,7 +184,7 @@
       }
 
       // Create a new item with TMDb specific values.
-      $created = $this->itemService->create($found);
+      $created = $this->itemService->create($found, Auth::user()->id);
 
       // We are searching for the changed name (if available) in the next iteration.
       if($this->itemCategory == 'tv') {
@@ -241,7 +241,7 @@
       }
 
       // Otherwise create a new item from the result.
-      $created = $this->itemService->create($firstResult);
+      $created = $this->itemService->create($firstResult, Auth::user()->id);
       
       return $this->store($item, $created->tmdb_id);
     }
@@ -374,9 +374,9 @@
     /**
      * Update last time we fetched flox-file-parser.
      */
-    private function updateLastFetched()
+    private function updateLastFetched(int $userId)
     {
-      Setting::first()->update([
+      Setting::where('user_id', $userId)->update([
         'last_fetch_to_file_parser' => now(),
       ]);
     }

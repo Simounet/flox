@@ -7,11 +7,8 @@ use Illuminate\Support\Facades\Route;
     Route::get('/logout', 'UserController@logout');
     Route::post('/login', 'UserController@login');
 
-    Route::get('/episodes/{tmdbId}', 'ItemController@episodes');
     Route::get('/items/{type}/{orderBy}/{sortDirection}', 'ItemController@items');
     Route::get('/search-items', 'ItemController@search');
-
-    Route::get('/calendar', 'CalendarController@items');
 
     Route::get('/item/{tmdbId}/{mediaType}', 'SubpageController@item');
     Route::get('/imdb-rating/{imdbId}', 'SubpageController@imdbRating');
@@ -31,7 +28,9 @@ use Illuminate\Support\Facades\Route;
     });
 
     Route::middleware('auth')->group(function() {
+      Route::get('/calendar', 'CalendarController@items');
       Route::get('/check-update', 'SettingController@checkForUpdate');
+      Route::get('/episodes/{tmdbId}', 'ItemController@episodes');
       Route::get('/version', 'SettingController@getVersion');
       Route::get('/api-key', 'SettingController@getApiKey');
       Route::patch('/settings/refresh', 'SettingController@updateRefresh');
@@ -46,13 +45,12 @@ use Illuminate\Support\Facades\Route;
       Route::patch('/update-genre', 'ItemController@updateGenre');
       Route::patch('/toggle-episode/{id}', 'ItemController@toggleEpisode');
       Route::patch('/toggle-season', 'ItemController@toggleSeason');
-      Route::patch('/change-rating/{itemId}', 'ItemController@changeRating');
       Route::patch('/refresh/{itemId}', 'ItemController@refresh');
-      Route::delete('/remove/{itemId}', 'ItemController@remove')->middleware('csrf');
 
       Route::get('/userdata', 'UserController@getUserData');
       Route::patch('/userdata', 'UserController@changeUserData')->middleware('csrf');
 
+      Route::patch('/review/change-rating/{reviewId}', 'ReviewController@changeRating');
       Route::delete('/review/{id}', 'ReviewController@delete')->middleware('csrf');
       Route::post('/review', 'ReviewController@store')->middleware('csrf');
 

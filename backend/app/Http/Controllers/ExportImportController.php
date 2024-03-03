@@ -129,6 +129,8 @@
         $this->settings->truncate();
 
         foreach($data->settings as $setting) {
+          $setting->user_id = $setting->id;
+          unset($setting->id);
           $setting = collect($setting)->except('id')->toArray();
 
           $this->settings->create($setting);

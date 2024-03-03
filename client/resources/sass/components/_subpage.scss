@@ -564,7 +564,10 @@
 }
 
 .reviews {
+    display: flex;
     margin-bottom: 30px;
+    flex-direction: column;
+    gap: 30px;
 }
 
 .review-item {

@@ -9,7 +9,6 @@
   use App\Models\Episode;
   use App\Models\Item;
   use App\Models\Setting;
-  use App\Models\User;
   use App\Services\FileParser;
   use Tests\Traits\Factories;
   use Tests\Traits\Fixtures;
@@ -34,7 +33,7 @@
           ThrottleRequests::class
       );
 
-      $this->user = User::create(['username' => 'jon', 'password' => Hash::make('snow')]);
+      $this->user = $this->createUser(['username' => 'jon', 'password' => Hash::make('snow')]);
       $this->item = app(Item::class);
       $this->episode = app(Episode::class);
       $this->parser = app(FileParser::class);
@@ -47,14 +46,13 @@
     public function it_should_make_a_rollback_if_status_for_movie_is_unknown()
     {
       $items = $this->item->get();
-      $setting = Setting::first()->last_fetch_to_file_parser;
+      $setting = Setting::select('last_fetch_to_file_parser')->where('user_id', $this->user->id)->first()->last_fetch_to_file_parser;
 
       $this->createGuzzleMock($this->tmdbFixtures('movie/movie'), $this->tmdbFixtures('movie/alternative_titles'));
-      $parser = app(FileParser::class);
-      $parser->updateDatabase($this->fpFixtures('movie/unknown'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('movie/unknown'));
 
       $itemsAfterRollback = $this->item->get();
-      $settingAfterRollback = Setting::first()->last_fetch_to_file_parser;
+      $settingAfterRollback = Setting::where('user_id', $this->user->id)->first()->last_fetch_to_file_parser;
 
       $this->assertCount(0, $items);
       $this->assertNull($setting);
@@ -66,14 +64,13 @@
     public function it_should_make_a_rollback_if_status_for_tv_episode_is_unknown()
     {
       $episodes = $this->episode->get();
-      $setting = Setting::first()->last_fetch_to_file_parser;
+      $setting = Setting::select('last_fetch_to_file_parser')->where('user_id', $this->user->id)->first()->last_fetch_to_file_parser;
 
       $this->createGuzzleMock($this->tmdbFixtures('tv/tv'), $this->tmdbFixtures('tv/alternative_titles'));
-      $parser = app(FileParser::class);
-      $parser->updateDatabase($this->fpFixtures('tv/unknown'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('tv/unknown'));
 
       $episodesAfterRollback = $this->episode->get();
-      $settingAfterRollback = Setting::first()->last_fetch_to_file_parser;
+      $settingAfterRollback = Setting::select('last_fetch_to_file_parser')->where('user_id', $this->user->id)->first()->last_fetch_to_file_parser;
 
       $this->assertCount(0, $episodes);
       $this->assertNull($setting);
@@ -87,7 +84,7 @@
       $this->createMovie(['fp_name' => 'warcraft', 'src' => $this->getMovieSrc(), 'subtitles' => 'SUB']);
 
       $item = $this->item->first();
-      $this->parser->updateDatabase($this->fpFixtures('movie/updated_is_empty'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('movie/updated_is_empty'));
       $updatedItem = $this->item->first();
 
       $this->assertEquals($this->getMovieSrc(), $item->src);
@@ -108,7 +105,7 @@
       });
 
       $episodes = $this->episode->get();
-      $this->parser->updateDatabase($this->fpFixtures('tv/updated_is_empty'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('tv/updated_is_empty'));
       $updatedEpisodes = $this->episode->get();
 
       $episodes->each(function($episode) {
@@ -130,7 +127,7 @@
       $this->createMovie(['fp_name' => 'warcraft']);
 
       $item1 = $this->item->first();
-      $this->parser->updateDatabase($this->fpFixtures('movie/added'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('movie/added'));
       $item2 = $this->item->first();
 
       $this->assertNull($item1->src);
@@ -145,7 +142,7 @@
       $this->createTv();
 
       $episodes1 = $this->item->with('episodes')->first()->episodes;
-      $this->parser->updateDatabase($this->fpFixtures('tv/added'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('tv/added'));
       $episodes2 = $this->item->with('episodes')->first()->episodes;
 
       $episodes1->each(function($episode) {
@@ -164,6 +161,7 @@
     /** @test */
     public function it_should_create_movie_and_store_fields_if_not_found_in_database()
     {
+      $this->be($this->user);
       $items = $this->item->get();
 
       $this->createGuzzleMock(
@@ -173,7 +171,7 @@
       );
 
       $parser = app(FileParser::class);
-      $parser->updateDatabase($this->fpFixtures('movie/added'));
+      $parser->updateDatabase($this->user->id, $this->fpFixtures('movie/added'));
 
       $item = $this->item->first();
 
@@ -189,6 +187,7 @@
     /** @test */
     public function it_should_create_tv_with_episodes_and_store_fields_if_not_found_in_database()
     {
+      $this->be($this->user);
       $items = $this->item->get();
       $episodes1 = $this->episode->get();
 
@@ -200,7 +199,7 @@
       $this->createTmdbEpisodeMock();
 
       $parser = app(FileParser::class);
-      $parser->updateDatabase($this->fpFixtures('tv/added'));
+      $parser->updateDatabase($this->user->id, $this->fpFixtures('tv/added'));
 
       $episodes2 = $this->episode->get();
 
@@ -224,14 +223,13 @@
       $this->createMovie();
 
       $this->createGuzzleMock($this->tmdbFixtures('movie/movie'), $this->tmdbFixtures('movie/alternative_titles'));
-      $parser = app(FileParser::class);
 
-      $setting1 = Setting::first();
-      $parser->updateDatabase($this->fpFixtures('movie/added'));
-      $setting2 = Setting::first();
+      $setting1 = Setting::where('user_id', $this->user->id)->first();
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('movie/added'));
+      $setting2 = Setting::where('user_id', $this->user->id)->first();
       sleep(1);
-      $parser->updateDatabase($this->fpFixtures('movie/added'));
-      $setting3 = Setting::first();
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('movie/added'));
+      $setting3 = Setting::where('user_id', $this->user->id)->first();
 
       $this->assertNull($setting1->last_fetch_to_file_parser);
       $this->assertNotNull($setting2->last_fetch_to_file_parser);
@@ -242,10 +240,10 @@
     public function it_should_remove_fields_from_movie()
     {
       $this->createMovie(['fp_name' => 'warcraft']);
-      $this->parser->updateDatabase($this->fpFixtures('movie/added'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('movie/added'));
 
       $withData = $this->item->first();
-      $this->parser->updateDatabase($this->fpFixtures('movie/removed'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('movie/removed'));
       $withoutData = $this->item->first();
 
       $this->assertNotNull($withData->src);
@@ -260,10 +258,10 @@
     public function it_should_remove_fields_from_tv_episode()
     {
       $this->createTv();
-      $this->parser->updateDatabase($this->fpFixtures('tv/added'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('tv/added'));
 
       $withData = $this->item->with('episodes')->first()->episodes;
-      $this->parser->updateDatabase($this->fpFixtures('tv/removed'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('tv/removed'));
       $withoutData = $this->item->with('episodes')->first()->episodes;
 
       $withData->each(function($episode) {
@@ -283,7 +281,7 @@
       $this->createMovie(['fp_name' => 'warcraft', 'src' => $this->getMovieSrc()]);
 
       $item = $this->item->first();
-      $this->parser->updateDatabase($this->fpFixtures('movie/updated'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('movie/updated'));
       $updatedItem = $this->item->first();
 
       $this->assertEquals($this->getMovieSrc(), $item->src);
@@ -304,7 +302,7 @@
       });
 
       $episodes = $this->episode->get();
-      $this->parser->updateDatabase($this->fpFixtures('tv/updated'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('tv/updated'));
       $updatedEpisodes = $this->episode->get();
 
       $episodes->each(function($episode) {
@@ -329,7 +327,7 @@
       });
 
       $episodes = $this->episode->get();
-      $this->parser->updateDatabase($this->fpFixtures('tv/updated_one'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('tv/updated_one'));
       $updatedEpisodes = $this->episode->get();
 
       $this->assertNotNull($episodes[0]->src);
@@ -348,6 +346,7 @@
     /** @test */
     public function it_should_update_empty_movie_if_found_in_tmdb()
     {
+      $this->be($this->user);
       $this->createMovie(['title' => 'NOT EXISTS MOVIE', 'tmdb_id' => null, 'fp_name' => 'NOT EXISTS MOVIE']);
 
       $empty = $this->item->first();
@@ -359,7 +358,7 @@
       );
 
       $parser = app(FileParser::class);
-      $parser->updateDatabase($this->fpFixtures('movie/updated_found'));
+      $parser->updateDatabase($this->user->id, $this->fpFixtures('movie/updated_found'));
 
       $updated = $this->item->first();
 
@@ -374,6 +373,7 @@
     /** @test */
     public function it_should_update_empty_tv_and_episodes_if_found_in_tmdb()
     {
+      $this->be($this->user);
       $this->createTv(['title' => 'NOT EXISTS TV', 'tmdb_id' => null, 'fp_name' => 'NOT EXISTS TV'], false);
 
       $empty = $this->item->first();
@@ -386,7 +386,7 @@
       $this->createTmdbEpisodeMock();
 
       $parser = app(FileParser::class);
-      $parser->updateDatabase($this->fpFixtures('tv/updated_found'));
+      $parser->updateDatabase($this->user->id, $this->fpFixtures('tv/updated_found'));
 
       $updated = $this->item->first();
       $episodes = $this->episode->get();
@@ -407,8 +407,7 @@
     public function it_should_create_empty_movie_from_updated_if_not_found_in_tmdb()
     {
       $this->createGuzzleMock($this->tmdbFixtures('empty'), $this->tmdbFixtures('movie/alternative_titles'));
-      $parser = app(FileParser::class);
-      $parser->updateDatabase($this->fpFixtures('movie/updated_not_found'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('movie/updated_not_found'));
 
       $item = $this->item->first();
 
@@ -421,8 +420,7 @@
     public function it_should_create_empty_tv_without_episodes_from_updated_if_not_found_in_tmdb()
     {
       $this->createGuzzleMock($this->tmdbFixtures('empty'), $this->tmdbFixtures('tv/alternative_titles'));
-      $parser = app(FileParser::class);
-      $parser->updateDatabase($this->fpFixtures('tv/updated_not_found'));
+      $this->parser->updateDatabase($this->user->id, $this->fpFixtures('tv/updated_not_found'));
 
       $item = $this->item->first();
       $episodes = $this->episode->get();
@@ -437,7 +435,7 @@
     {
       $this->createGuzzleMock($this->tmdbFixtures('empty'), $this->tmdbFixtures('movie/alternative_titles'));
       $parser = app(FileParser::class);
-      $parser->updateDatabase($this->fpFixtures('movie/added_not_found'));
+      $parser->updateDatabase($this->user->id, $this->fpFixtures('movie/added_not_found'));
 
       $item = $this->item->first();
 
@@ -450,7 +448,7 @@
     {
       $this->createGuzzleMock($this->tmdbFixtures('empty'), $this->tmdbFixtures('tv/alternative_titles'));
       $parser = app(FileParser::class);
-      $parser->updateDatabase($this->fpFixtures('tv/added_not_found'));
+      $parser->updateDatabase($this->user->id, $this->fpFixtures('tv/added_not_found'));
 
       $item = $this->item->first();
       $episodes = $this->episode->get();
@@ -473,12 +471,13 @@
     /** @test */
     public function it_should_update_database_with_given_json_param()
     {
+      $this->be($this->user);
       $timestamp = 9999;
 
-      $settings = Setting::first();
+      $settings = Setting::where('user_id', $this->user->id)->first();
       $settings->last_fetch_to_file_parser = $timestamp;
       $settings->save();
-      $this->assertEquals($timestamp, Setting::first()->last_fetch_to_file_parser->timestamp);
+      $this->assertEquals($timestamp, Setting::select('last_fetch_to_file_parser')->where('user_id', $this->user->id)->first()->last_fetch_to_file_parser->timestamp);
 
       $this->createGuzzleMock(
         $this->tmdbFixtures('tv/tv'),
@@ -495,7 +494,7 @@
       $episodes = $this->episode->get();
 
       $this->assertCount(4, $episodes);
-      $this->assertGreaterThan($timestamp, Setting::first()->last_fetch_to_file_parser->timestamp);
+      $this->assertGreaterThan($timestamp, Setting::select('last_fetch_to_file_parser')->where('user_id', $this->user->id)->first()->last_fetch_to_file_parser->timestamp);
 
       $settings->last_fetch_to_file_parser = null;
       $settings->save();
@@ -506,7 +505,7 @@
       $episodes = $this->episode->get();
 
       $this->assertCount(4, $episodes);
-      $this->assertGreaterThan($timestamp, Setting::first()->last_fetch_to_file_parser->timestamp);
+      $this->assertGreaterThan($timestamp, Setting::select('last_fetch_to_file_parser')->where('user_id', $this->user->id)->first()->last_fetch_to_file_parser->timestamp);
     }
 
     /** @test */
@@ -514,7 +513,7 @@
     {
       $timestamp = 9999;
 
-      $settings = Setting::first();
+      $settings = Setting::where('user_id', $this->user->id)->first();
       $settings->last_fetch_to_file_parser = $timestamp;
       $settings->save();
 

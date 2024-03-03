@@ -4,19 +4,22 @@
 
   use App\Models\Episode;
   use App\Models\Item;
+  use App\Models\Review;
   use App\Models\Setting;
   use App\Models\User;
 
   trait Factories {
 
-    public function createUser($custom = [])
+    public function createUser(array $custom = []): User
     {
-      return factory(User::class)->create($custom);
+      $user = factory(User::class)->create($custom);
+      $this->createSetting(['user_id' => $user->id]);
+      return $user;
     }
 
-    public function createSetting()
+    public function createSetting(array $custom): Setting
     {
-      return factory(Setting::class)->create();
+      return factory(Setting::class)->create($custom);
     }
 
     public function createMovie($custom = [])
@@ -33,6 +36,11 @@
       return factory(Item::class)->create(array_merge($data, $custom));
     }
 
+    public function createReview(array $custom = []): Review
+    {
+        return factory(Review::class)->create($custom);
+    }
+
     public function createTv($custom = [], $withEpisodes = true)
     {
       $data = [
@@ -44,12 +52,13 @@
         'backdrop' => '',
       ];
 
-      factory(Item::class)->create(array_merge($data, $custom));
+      $item = factory(Item::class)->create(array_merge($data, $custom));
 
+      $episodes = [];
       if($withEpisodes) {
         foreach([1, 2] as $season) {
           foreach([1, 2] as $episode) {
-            factory(Episode::class)->create([
+            $episodes[] = factory(Episode::class)->create([
               'tmdb_id' => 1399,
               'season_number' => $season,
               'episode_number' => $episode,
@@ -57,6 +66,11 @@
           }
         }
       }
+
+      return [
+        'item' => $item,
+        'episodes' => $episodes
+      ];
     }
 
     public function getMovie($custom = [])

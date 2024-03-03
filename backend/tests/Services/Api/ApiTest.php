@@ -2,8 +2,10 @@
 
 namespace Tests\Services\Api;
 
-use App\Models\Episode;
+use App\Models\EpisodeUser;
 use App\Models\Item;
+use App\Models\Review;
+use App\Models\User;
 use App\Services\Api\Plex;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -22,10 +24,14 @@ class ApiTest extends TestCase
   use Fixtures;
 
   public $apiClass;
+  private User $user;
 
   public function setUp(): void
   {
     parent::setUp();
+
+    $this->user = $this->createUser(['api_key' => Str::random(24)]);
+    $this->be($this->user);
 
     $this->createStorageDownloadsMock();
     $this->createImdbRatingMock();
@@ -144,14 +150,15 @@ class ApiTest extends TestCase
   public function it_should_rate_a_movie($fixture, $shouldHaveRating)
   {
     $this->createMovie();
+    $this->createReview();
 
     $api = app($this->apiClass);
 
-    $movieBefore = Item::first();
+    $movieBefore = Review::first();
 
     $api->handle($this->apiFixtures($fixture));
 
-    $movieAfter = Item::first();
+    $movieAfter = Review::first();
 
     $this->assertEquals(1, $movieBefore->rating);
     $this->assertEquals($shouldHaveRating, $movieAfter->rating);
@@ -160,14 +167,15 @@ class ApiTest extends TestCase
   public function it_should_rate_a_tv_show($fixture, $shouldHaveRating)
   {
     $this->createTv();
+    $this->createReview();
 
     $api = app($this->apiClass);
 
-    $tvBefore = Item::first();
+    $tvBefore = Review::first();
 
     $api->handle($this->apiFixtures($fixture));
 
-    $tvAfter = Item::first();
+    $tvAfter = Review::first();
 
     $this->assertEquals(1, $tvBefore->rating);
     $this->assertEquals($shouldHaveRating, $tvAfter->rating);
@@ -176,34 +184,36 @@ class ApiTest extends TestCase
   public function it_should_mark_an_episode_as_seen($fixture)
   {
     $this->createTv();
+    $episodeId = 2;
 
     $api = app($this->apiClass);
 
-    $seenEpisodesBefore = Episode::where('seen', true)->get();
+    $seenEpisodesBefore = EpisodeUser::isSeen($this->user->id, $episodeId);
 
     $api->handle($this->apiFixtures($fixture));
 
-    $seenEpisodesAfter = Episode::where('seen', true)->get();
+    $seenEpisodesAfter = EpisodeUser::isSeen($this->user->id, $episodeId);
 
-    $this->assertCount(0, $seenEpisodesBefore);
-    $this->assertCount(1, $seenEpisodesAfter);
+    $this->assertFalse($seenEpisodesBefore);
+    $this->assertTrue($seenEpisodesAfter);
   }
 
-  public function it_should_update_last_seen_at($fixture)
+  public function it_should_updated_review_updated_at($fixture)
   {
     $this->createTv();
+    $this->createReview();
 
     $api = app($this->apiClass);
 
-    $lastSeenBefore = Item::first()->last_seen_at;
+    $updatedAt = Review::first()->updated_at;
 
     // sleep for 1 second so that Carbon::now() returns a different date
     sleep(1);
 
     $api->handle($this->apiFixtures($fixture));
 
-    $lastSeenAfter = Item::first()->last_seen_at;
+    $updatedAtUpdated = Review::first()->updated_at;
 
-    $this->assertNotEquals($lastSeenBefore, $lastSeenAfter);
+    $this->assertNotEquals($updatedAt, $updatedAtUpdated);
   }
 }

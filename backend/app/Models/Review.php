@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Kra8\Snowflake\HasShortflakePrimary;
 
 class Review extends Model
@@ -15,6 +16,12 @@ class Review extends Model
         'user_id',
         'item_id',
         'content',
+        'rating',
+        'watchlist',
+    ];
+
+    protected $casts = [
+      'watchlist' => 'boolean'
     ];
 
     protected $with = ['user'];
@@ -34,13 +41,18 @@ class Review extends Model
      *
      * @return Review
      */
-    public function store(int $userId, int $itemId, string $content)
+    public function store(int $userId, int $itemId, array $reviewData)
     {
         return $this->updateOrCreate(
             ['user_id' => $userId, 'item_id' => $itemId],
-            [
-                'content' => $content,
-            ]
+            $reviewData
         );
+    }
+
+    public function updateLastActivityAt(int $tmdbId): int
+    {
+      // @TODO Episode Model should have a item_id column to avoid this Item pivot query
+      $itemId = DB::table('items')->select('id')->where('tmdb_id', $tmdbId)->first()->id;
+      return $this->where('item_id', $itemId)->touch();
     }
 }

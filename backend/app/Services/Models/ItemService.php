@@ -3,12 +3,15 @@
   namespace App\Services\Models;
 
   use App\Models\Item;
+  use App\Models\Review;
   use App\Services\IMDB;
   use App\Services\Storage;
   use App\Services\Models\PersonService;
   use App\Services\TMDB;
   use App\Jobs\UpdateItem;
   use App\Models\Setting;
+  use Illuminate\Database\Eloquent\Builder;
+  use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\DB;
   use Symfony\Component\HttpFoundation\Response;
 
@@ -23,6 +26,7 @@
     private $setting;
     private $genreService;
     private $personService;
+    private $reviewService;
 
     /**
      * @param Item $item
@@ -44,7 +48,8 @@
       GenreService $genreService,
       IMDB $imdb,
       Setting $setting,
-      PersonService $personService
+      PersonService $personService,
+      ReviewService $reviewService
     ){
       $this->item = $item;
       $this->tmdb = $tmdb;
@@ -55,16 +60,37 @@
       $this->setting = $setting;
       $this->genreService = $genreService;
       $this->personService = $personService;
+      $this->reviewService = $reviewService;
     }
 
     /**
      * @param $data
      * @return Item
      */
-    public function create($data)
+    public function create(
+      array $data,
+      int $userId
+    ): Item
     {
       DB::beginTransaction();
+      $item = $this->createItemInfoIfNotExists($data);
+      $this->reviewService->create($item, $userId);
+      DB::commit();
 
+      return $item->fresh();
+    }
+
+    private function createItemInfoIfNotExists(array $data): Item
+    {
+      $existingItem = Item::where('tmdb_id', $data['tmdb_id'])
+        ->get()
+        ->first();
+
+      if($existingItem instanceof Item) {
+        return $existingItem;
+      }
+
+      // @TODO should use server fetched data instead of client data
       $data = $this->makeDataComplete($data);
 
       $item = $this->item->store($data);
@@ -78,12 +104,8 @@
       $this->episodeService->create($item);
       $this->genreService->sync($item, $data['genre_ids'] ?? []);
       $this->alternativeTitleService->create($item);
-
       $this->storage->downloadImages($item->poster, $item->backdrop);
-
-      DB::commit();
-
-      return $item->fresh();
+      return $item;
     }
 
     /**
@@ -95,7 +117,11 @@
      */
     public function makeDataComplete($data)
     {
-      if( ! isset($data['imdb_id'])) {
+      if(
+        ! isset($data['imdb_id'])
+        || ! isset($data['credit_cast'])
+        || ! isset($data['credit_crew'])
+      ) {
         $details = $this->tmdb->details($data['tmdb_id'], $data['media_type']);
         $title = $details->name ?? $details->title;
 
@@ -106,6 +132,8 @@
         $data['backdrop'] = $data['backdrop'] ?? $details->backdrop_path;
         $data['slug'] = $data['slug'] ?? getSlug($title);
         $data['homepage'] = $data['homepage'] ?? $details->homepage;
+        $data['credit_cast'] = $data['credit_cast'] ?? $this->personService->castFromTMDB($data['tmdb_id'], $details->credits->cast);
+        $data['credit_crew'] = $data['credit_crew'] ?? $this->personService->crewFromTMDB($data['tmdb_id'], $details->credits->crew);
       }
 
       $data['imdb_rating'] = $this->parseImdbRating($data);
@@ -298,12 +326,16 @@
     {
       $filter = $this->getSortFilter($orderBy);
 
-      $items = $this->item->orderBy($filter, $sortDirection)->with('latestEpisode')->withCount('episodesWithSrc');
+      $items = Item::orderBy($filter, $sortDirection)
+        ->with('latestEpisode', 'review', 'userReview')
+        ->withCount('episodesWithSrc')
+        ->where('user_id', Auth::id())
+        ->whereHas('userReview');
 
       if($type == 'watchlist') {
-        $items->where('watchlist', true);
+        $items->findByReviewWatchlist(1);
       } elseif( ! $this->setting->first()->show_watchlist_everywhere) {
-        $items->where('watchlist', false);
+        $items->findByReviewWatchlist(0);
       }
 
       if($type == 'tv' || $type == 'movie') {
@@ -311,32 +343,6 @@
       }
 
       return $items->simplePaginate(config('app.LOADING_ITEMS'));
-    }
-
-    /**
-     * Update rating.
-     *
-     * @param $itemId
-     * @param $rating
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
-     */
-    public function changeRating($itemId, $rating)
-    {
-      $item = $this->item->find($itemId);
-
-      if( ! $item) {
-        return response('Not Found', Response::HTTP_NOT_FOUND);
-      }
-
-      // Update the parent relation only if we change rating from neutral.
-      if($item->rating == 0) {
-        $this->item->updateLastSeenAt($item->tmdb_id);
-      }
-
-      $item->update([
-        'rating' => $rating,
-        'watchlist' => false,
-      ]);
     }
 
     /**
@@ -407,7 +413,7 @@
         case 'tmdb_id':
           return $this->item->findByTmdbId($value)->with('latestEpisode')->first();
         case 'tmdb_id_strict':
-          return $this->item->findByTmdbIdStrict($value, $mediaType)->with('creditCast', 'creditCrew', 'latestEpisode', 'review')->first();
+          return $this->item->findByTmdbIdStrict($value, $mediaType)->with('creditCast', 'creditCrew', 'latestEpisode', 'review', 'userReview')->first();
         case 'src':
           return $this->item->findBySrc($value)->first();
       }
@@ -425,9 +431,9 @@
     {
       switch($orderBy) {
         case 'last seen':
-          return 'last_seen_at';
+          return 'reviews.updated_at';
         case 'own rating':
-          return 'rating';
+          return 'review.rating';
         case 'title':
           return 'title';
         case 'release':

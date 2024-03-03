@@ -3,9 +3,12 @@
 namespace App\Services\Api;
 
 use App\Models\Episode;
+use App\Models\EpisodeUser;
 use App\Models\Item;
+use App\Models\Review;
 use App\Services\Models\ItemService;
 use App\Services\TMDB;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class Api
@@ -48,6 +51,10 @@ abstract class Api
   {
     logInfo('api data:', $data);
 
+    $user = Auth::user();
+    abort_if(!$user, 403);
+
+
     $this->data = $data;
 
     if ($this->abortRequest()) {
@@ -73,14 +80,18 @@ abstract class Api
       $found = $this->item->findByTmdbId($firstResult['tmdb_id'])->first();
 
       if (!$found) {
-        $found = $this->itemService->create($firstResult);
+        $found = $this->itemService->create($firstResult, $user->id);
       }
     }
 
     if ($this->shouldRateItem()) {
-      $found->update([
-        'rating' => $this->getRating(),
-      ]);
+      Review::where([
+        'user_id' => $user->id,
+        'item_id' => $found->id
+      ])
+        ->update([
+          'rating' => $this->getRating(),
+        ]);
     }
 
     if ($this->shouldEpisodeMarkedAsSeen()) {
@@ -90,12 +101,15 @@ abstract class Api
         ->findBySeasonNumber($this->getSeasonNumber())
         ->first();
 
-      // Mark the episode as seen and update the last_seen_at attribute of the item
       if ($episode) {
-        $found->updateLastSeenAt($found->tmdb_id);
-        $episode->update([
-          'seen' => true,
+        EpisodeUser::create([
+          'user_id' => $user->id,
+          'episode_id' => $episode->id
         ]);
+        Review::where([
+          'user_id' => $user->id,
+          'item_id' => $found->id
+        ])->touch();
       }
     }
   }

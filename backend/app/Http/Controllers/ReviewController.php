@@ -8,17 +8,40 @@ use App\Models\Profile;
 use App\Models\Review;
 use App\Services\Fediverse\Activity\ReviewActivity;
 use App\Services\Fediverse\Activity\Verbs;
+use App\Services\Models\ReviewService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ReviewController extends Controller
 {
+
+    private $reviewService;
+
+    public function __construct(
+        ReviewService $reviewService
+    )
+    {
+      $this->reviewService = $reviewService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+    }
+
+    public function changeRating(int $reviewId): Response
+    {
+      $user = Auth::user();
+      abort_if(!$user, 403);
+
+      return $this->reviewService->changeRating(
+        $reviewId,
+        Request::input('rating'),
+        $user->id
+    );
     }
 
     /**
@@ -35,7 +58,13 @@ class ReviewController extends Controller
 
       if(Auth::check() || $request->validate(['content' => 'required|unique:content|max:255'])) {
         $reviewModel = new Review();
-        $storedReview = $reviewModel->store(Auth::user()->id, $itemId, $content);
+        $storedReview = $reviewModel->store(
+            Auth::user()->id,
+            $itemId,
+            [
+                'content' => $content
+            ]
+        );
         $activityType = $storedReview->wasRecentlyCreated ?
             Verbs::CREATE : Verbs::UPDATE;
         ReviewSendActivities::dispatch(
@@ -83,11 +112,14 @@ class ReviewController extends Controller
             'user_id' => $userId
         ])->firstOrFail();
         $review->delete();
-        ReviewSendActivities::dispatch(
-            Verbs::DELETE,
-            $review->id,
-            $review->user->username
-        );
+
+        if($review->content !== '') {
+            ReviewSendActivities::dispatch(
+                Verbs::DELETE,
+                $review->id,
+                $review->user->username
+            );
+        }
 
         return response('Success', Response::HTTP_OK);
     }

@@ -2,41 +2,34 @@
 
   namespace App\Http\Controllers;
 
-  use Illuminate\Contracts\Auth\Guard;
+  use App\Services\Models\UserService;
+  use Illuminate\Http\RedirectResponse;
   use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\Request;
   use Symfony\Component\HttpFoundation\Response;
 
   class UserController {
 
-    private $auth;
+    private UserService $userService;
 
-    public function __construct(Guard $auth)
+    public function __construct(UserService $userService)
     {
-      $this->auth = $auth;
+      $this->userService = $userService;
     }
 
-    /**
-     * Login user and return correct response.
-     *
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
-     */
-    public function login()
+    public function login(): Response
     {
       $username = Request::input('username');
       $password = Request::input('password');
 
-      if($this->auth->attempt(['username' => $username, 'password' => $password], true)) {
+      if(Auth::attempt(['username' => $username, 'password' => $password], true)) {
         return response('Success', Response::HTTP_OK);
       }
 
       return response('Unauthorized', Response::HTTP_UNAUTHORIZED);
     }
 
-    /**
-     * @return array
-     */
-    public function getUserData()
+    public function getUserData(): array
     {
       return [
         'username' => Auth::user()->username,
@@ -45,40 +38,28 @@
 
     /**
      * Save new user credentials.
-     *
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    public function changeUserData()
+    public function changeUserData(): Response
     {
       if (isDemo()) {
         return response('Success', Response::HTTP_OK);
       }
 
-      $username = Request::input('username');
-      $password = Request::input('password');
+      Request::validate([
+        'password' => 'required|min:' . UserService::PASSWORD_MIN_LENGTH
+      ]);
 
-      $user = Auth::user();
-      $user->username = $username;
+      $password = (string) Request::input('password');
+      $this->userService->changePassword($password);
 
-      if($password != '') {
-        $user->password = bcrypt($password);
-      }
-
-      if($user->save()) {
-        return response('Success', Response::HTTP_OK);
-      }
-
-      return response('Server Error', Response::HTTP_INTERNAL_SERVER_ERROR);
+      return response('Success', Response::HTTP_OK);
     }
 
-    /**
-     * Logout user and redirect to home.
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function logout()
+    public function logout(): RedirectResponse
     {
-      $this->auth->logout();
+      Auth::logout();
+      Request::session()->invalidate();
+      Request::session()->regenerateToken();
 
       return redirect('/');
     }

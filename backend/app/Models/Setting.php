@@ -5,6 +5,8 @@
 
   class Setting extends Model {
 
+    protected $primaryKey = "user_id";
+
     /**
      * No timestamps needed.
      *
