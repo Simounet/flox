@@ -16,7 +16,7 @@
     "element-plus": "^2.6.0",
     "v-hotkey3": "^0.1.4",
     "vue": "^3.4.21",
-    "vue-router": "^3.6.5",
+    "vue-router": "^4.3.0",
     "vue-simple-calendar": "^5.0.1",
     "vuex": "^4.1.0"
   },
