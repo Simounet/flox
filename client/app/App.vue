@@ -1,5 +1,16 @@
+<template>
+  <ModalIndex />
+  <Header />
+  <router-view />
+  <Footer />
+</template>
+
 <script>
   import { mapActions, mapMutations, mapState } from 'vuex';
+
+  import ModalIndex from './components/Modal/Index.vue';
+  import Footer from './components/Footer.vue';
+  import Header from './components/Header.vue';
 
   export default {
     created() {
@@ -7,6 +18,7 @@
       this.checkForUserFilter();
       this.checkForUserSortDirection();
     },
+
     computed: {
       ...mapState({
         colorScheme: (state) => state.colorScheme,
@@ -14,6 +26,7 @@
         showFilters: (state) => state.showFilters,
       }),
     },
+
     methods: {
       ...mapActions(["setColorScheme"]),
       ...mapMutations([
@@ -48,5 +61,11 @@
         this.SET_USER_SORT_DIRECTION(localStorage.getItem("sort-direction"));
       },
     },
+
+    components: {
+      Footer,
+      Header,
+      ModalIndex
+    }
   }
 </script>

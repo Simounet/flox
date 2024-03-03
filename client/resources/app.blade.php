@@ -23,16 +23,7 @@
   class="{{ Auth::check() ? 'logged' : 'guest' }}"
 >
 
-  <div id="app">
-    @if(Request::is('login'))
-      <login></login>
-    @else
-      <modal></modal>
-      <site-header></site-header>
-      <router-view></router-view>
-      <site-footer></site-footer>
-    @endif
-  </div>
+  <div id="app"></div>
 
   <script src="{{ url('assets/vendor.js') }}"></script>
   <script src="{{ url('assets/app.js') }}"></script>
