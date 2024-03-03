@@ -1,8 +1,12 @@
 <template>
   <div class="all-modals">
-    <transition mode="out-in" name="fade">
-      <season v-if="modalType == 'season'"></season>
-      <trailer v-if="modalType == 'trailer'"></trailer>
+    <transition name="fade" mode="out-in" appear>
+      <template v-if="modalType === 'season'">
+        <season></season>
+      </template>
+      <template v-else-if="modalType === 'trailer'">
+        <trailer></trailer>
+      </template>
     </transition>
     <span class="overlay" v-if="overlay" @click="CLOSE_MODAL()"></span>
   </div>

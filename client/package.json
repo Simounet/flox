@@ -40,7 +40,7 @@
     "style-loader": "^3.3.3",
     "terser-webpack-plugin": "^5.3.9",
     "vue-html-loader": "^1.2.4",
-    "vue-loader": "^16.8.3",
+    "vue-loader": "^17.4.2",
     "webpack": "^5.88.0",
     "webpack-bundle-analyzer": "^4.10.1",
     "webpack-cli": "^5.1.4"
