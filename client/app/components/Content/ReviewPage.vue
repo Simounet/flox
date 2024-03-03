@@ -75,7 +75,7 @@
       },
 
       deleteReview() {
-        const confirmed = confirm('tintin');
+        const confirmed = confirm(this.lang('confirm delete'));
         if(confirmed === false) {
           return false;
         }
