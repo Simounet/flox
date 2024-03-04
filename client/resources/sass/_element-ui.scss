@@ -1,4 +1,8 @@
-@import '../../node_modules/element-ui/lib/theme-chalk/checkbox.css';
+@use '@element-plus/theme-chalk/index.scss';
+
+:root {
+  --el-checkbox-height: 20px;
+}
 
 .element-ui-checkbox {
   .el-checkbox__inner {

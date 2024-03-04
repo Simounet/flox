@@ -23,16 +23,11 @@ module.exports = {
     filename: "[name].js",
     assetModuleFilename: "img/[name][ext][query]",
   },
-  resolve: {
-    alias: {
-      vue$: "vue/dist/vue.common",
-    },
-  },
   module: {
     rules: [
       {
         test: /\.vue$/,
-        use: "vue-loader",
+        loader: "vue-loader",
       },
       {
         test: /\.js$/,

@@ -143,17 +143,17 @@
 
     props: ['mediaType'],
 
+    unmounted() {
+      document.body.classList.remove('subpage-open');
+      this.SET_ITEM_LOADED_SUBPAGE(false);
+      this.CLOSE_MODAL();
+    },
+
     created() {
       document.body.classList.add('subpage-open');
       window.scrollTo(0, 0);
       this.fetchSettings();
       this.fetchData();
-    },
-
-    destroyed() {
-      document.body.classList.remove('subpage-open');
-      this.SET_ITEM_LOADED_SUBPAGE(false);
-      this.CLOSE_MODAL();
     },
 
     data() {

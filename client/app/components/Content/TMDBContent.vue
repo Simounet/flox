@@ -5,7 +5,7 @@
         <div class="filter-wrap">
           <span class="current-filter" @click="toggleShowGenres()">{{ currentGenre }} <span class="arrow-down"></span></span>
           <ul class="all-filters" :class="{active: showFilters}">
-            <router-link :to="'/genre/' + genre.name" v-if="genre.name !== currentGenre" v-for="genre in genres" :key="genre.id">{{ genre.name }}</router-link>
+            <router-link :to="'/genre/' + genre.name" v-for="genre in notCurrentGenres" :key="genre.id">{{ genre.name }}</router-link>
           </ul>
         </div>
         <div class="show-watchlist-items element-ui-checkbox" @click="toggleWatchlistItems()">
@@ -16,8 +16,7 @@
     
     <div class="wrap-content" v-if=" ! loading">
       <div class="items-wrap">
-        <Item v-for="(item, index) in items"
-              v-if="item.user_review === null || (showWatchlistItems && item.user_review.watchlist)"
+        <Item v-for="(item, index) in filteredItems"
               :item="item"
               :key="index"
               :genre="true"
@@ -63,7 +62,15 @@
       ...mapState({
         loading: state => state.loading,
         showFilters: state => state.showFilters
-      })
+      }),
+
+      filteredItems() {
+        return this.items.filter(item => item.user_review === null || (this.showWatchlistItems && item.user_review.watchlist));
+      },
+
+      notCurrentGenres() {
+        return this.genres.filter(genre => genre !== this.currentGenre);
+      }
     },
 
     methods: {
