@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import config from "./config";
 
 import Content from "./components/Content/Content.vue";
+import Login from "./components/Login.vue";
 import SearchContent from "./components/Content/SearchContent.vue";
 import TMDBContent from "./components/Content/TMDBContent.vue";
 import Subpage from "./components/Content/Subpage.vue";
@@ -21,6 +22,7 @@ export default createRouter({
   history: createWebHistory(config.uri),
   routes: [
     { path: "/", component: Content, name: "home" },
+    { path: "/login", component: Login, name: "login" },
 
     // todo: use props for media type
     { path: "/movies", component: Content, name: "movie" },

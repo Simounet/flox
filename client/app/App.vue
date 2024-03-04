@@ -1,8 +1,8 @@
 <template>
-  <ModalIndex />
-  <Header />
+  <ModalIndex v-if="!isLoginRoute" />
+  <Header v-if="!isLoginRoute" />
   <router-view />
-  <Footer />
+  <Footer v-if="!isLoginRoute" />
 </template>
 
 <script>
@@ -14,9 +14,22 @@
 
   export default {
     created() {
+      this.isLoginRoute = this.checkIsLoginRoute();
       this.checkForUserColorScheme();
       this.checkForUserFilter();
       this.checkForUserSortDirection();
+    },
+
+    data() {
+      return {
+        isLoginRoute: null
+      };
+    },
+
+    watch: {
+      '$route'() {
+        this.isLoginRoute = this.checkIsLoginRoute();
+      }
     },
 
     computed: {
@@ -60,6 +73,10 @@
 
         this.SET_USER_SORT_DIRECTION(localStorage.getItem("sort-direction"));
       },
+
+      checkIsLoginRoute() {
+        return this.$route.path === '/login';
+      }
     },
 
     components: {
