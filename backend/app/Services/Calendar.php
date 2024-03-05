@@ -47,7 +47,10 @@
         'id' => $item->id,
         'tmdb_id' => $item->tmdb_id,
         'type' => $type,
-        'classes' => "$type watchlist-$watchlisted",
+        'classes' => [
+          $type,
+          'watchlist-' . $watchlisted
+        ],
         'title' => $this->buildTitle($item, $type),
       ];
     }

@@ -1,12 +1,3 @@
-$main1: #895bff;
-$main2: #f1309a;
-$dark: #484848;
-$lightGray: #838383;
-$rating1: #6bb01a;
-$rating2: #da9527;
-$rating3: #cd2727;
-$gradient: linear-gradient(to right, $main1, $main2);
-
 @mixin transition($type, $type2: '', $type3: '') {
   @if $type3 != '' {
     transition: $type .2s ease 0s, $type2 .2s ease 0s, $type3 .2s ease 0s;

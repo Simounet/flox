@@ -1,3 +1,5 @@
+@import 'colors';
+
 .calendar-main {
   padding: 100px 0 0 0;
 }
@@ -44,6 +46,8 @@
   }
   
   .cv-day-number {
+    margin-left: auto;
+    width: auto;
     
     .dark & {
       color: $lightGray !important;
@@ -137,6 +141,7 @@
     background: transparent;
     cursor: pointer;
     margin: 0 50px 0 0;
+    text-transform: none;
     outline: none;
     
     &:hover {

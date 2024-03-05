@@ -8,14 +8,13 @@
           @click-item="navigateToItem"
           :starting-day-of-week="1"
           class="theme-default">
-          <CalendarViewHeader
-            title="You can also use the arrow keys"
-            slot="header"
-            slot-scope="t"
-            :header-props="t.headerProps"
-            @input="setShowDate"
-          >
-          </CalendarViewHeader>
+          <template #header="{ headerProps }">
+            <CalendarViewHeader
+              title="You can also use the arrow keys"
+              :header-props="setHeaderProps(headerProps)"
+              @input="setShowDate"
+            />
+          </template>
         </CalendarView>
       </div>
     </transition>
@@ -34,6 +33,7 @@
 
   import 'vue-simple-calendar/dist/style.css';
   import 'vue-simple-calendar/dist/css/default.css';
+  import '../../../resources/sass/calendar.scss';
 
   dayjs.extend(isBetween);
   
@@ -113,6 +113,10 @@
         } else {
           this.showDate = new Date();
         }
+      },
+
+      setHeaderProps(headerProps) {
+        return {...headerProps, currentPeriodLabel: 'Today'};
       },
 
       setShowDate(date) {

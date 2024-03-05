@@ -46,7 +46,7 @@ class CalendarTest extends TestCase {
       $this->assertArrayHasKey('title', $item);
 
       $this->assertEquals('tv', $item['type']);
-      $this->assertEquals('tv watchlist-0', $item['classes']);
+      $this->assertEquals(['tv', 'watchlist-0'], $item['classes']);
     }
   }
 
@@ -63,7 +63,7 @@ class CalendarTest extends TestCase {
     $items = $this->calendar->items();
 
     foreach($items as $item) {
-      $this->assertEquals('tv watchlist-1', $item['classes']);
+      $this->assertEquals(['tv', 'watchlist-1'], $item['classes']);
     }
   }
 
@@ -88,7 +88,7 @@ class CalendarTest extends TestCase {
       $this->assertArrayHasKey('title', $item);
 
       $this->assertEquals('movies', $item['type']);
-      $this->assertEquals('movies watchlist-0', $item['classes']);
+      $this->assertEquals(['movies', 'watchlist-0'], $item['classes']);
     }
   }
 
@@ -105,7 +105,7 @@ class CalendarTest extends TestCase {
     $items = $this->calendar->items();
 
     foreach($items as $item) {
-      $this->assertEquals('movies watchlist-1', $item['classes']);
+      $this->assertEquals(['movies', 'watchlist-1'], $item['classes']);
     }
   }
 
@@ -127,10 +127,10 @@ class CalendarTest extends TestCase {
 
     $items = $this->calendar->items();
 
-    $this->assertEquals('movies watchlist-0', $items[0]['classes']);
-    $this->assertEquals('tv watchlist-1', $items[1]['classes']);
-    $this->assertEquals('tv watchlist-1', $items[2]['classes']);
-    $this->assertEquals('tv watchlist-1', $items[3]['classes']);
-    $this->assertEquals('tv watchlist-1', $items[4]['classes']);
+    $this->assertEquals(['movies', 'watchlist-0'], $items[0]['classes']);
+    $this->assertEquals(['tv', 'watchlist-1'], $items[1]['classes']);
+    $this->assertEquals(['tv', 'watchlist-1'], $items[2]['classes']);
+    $this->assertEquals(['tv', 'watchlist-1'], $items[3]['classes']);
+    $this->assertEquals(['tv', 'watchlist-1'], $items[4]['classes']);
   }
 }
