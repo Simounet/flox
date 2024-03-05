@@ -66,7 +66,8 @@
       search() {
         if(this.title !== '') {
           this.$router.push({
-            path: '/search?q=' + this.title
+            name: 'search',
+            query: {q: this.title}
           });
         }
       },
