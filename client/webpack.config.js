@@ -35,8 +35,15 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.(png|jpg|svg|woff|woff2|eot|ttf)$/,
+        test: /\.(png|jpg|svg)$/,
         type: "asset/resource",
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: 'fonts/[name][ext][query]'
+        }
       },
       {
         test: /\.(scss|css)$/,
