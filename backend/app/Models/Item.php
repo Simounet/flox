@@ -25,6 +25,7 @@
       'created_at' => 'datetime',
       'refreshed_at' => 'datetime',
       'updated_at' => 'datetime',
+      'released_datetime' => 'datetime',
     ];
     
     /**
@@ -66,7 +67,7 @@
         'original_title' => $data['original_title'],
         'poster' => $data['poster'] ?? '',
         'released' => $data['released'],
-        'released_timestamp' => Carbon::parse($data['released']),
+        'released_datetime' => Carbon::parse($data['released']),
         'overview' => $data['overview'],
         'backdrop' => $data['backdrop'],
         'tmdb_rating' => $data['tmdb_rating'],
@@ -94,7 +95,7 @@
         'media_type' => $mediaType,
         'poster' => '',
         'released' => time(),
-        'released_timestamp' => now(),
+        'released_datetime' => now(),
         'overview' => '',
         'backdrop' => '',
         'tmdb_rating' => '',
@@ -242,7 +243,7 @@
      */
     public function scopeFindByYear($query, $year)
     {
-      return $query->whereYear('released_timestamp', $year);
+      return $query->whereYear('released_datetime', $year);
     }
 
     /**

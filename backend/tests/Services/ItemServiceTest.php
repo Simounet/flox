@@ -31,11 +31,12 @@
       $this->createImdbRatingMock();
     }
 
-    private function createItem(array $data): void {
+    private function createItem(array $data): Item
+    {
       $userId = 1;
       $this->createReviewServiceMock();
       $itemService = app(ItemService::class);
-      $itemService->create($data, $userId);
+      return $itemService->create($data, $userId);
     }
 
     /** @test */
@@ -195,5 +196,19 @@
 
       $this->assertEquals('IGNORE ME', $item->title);
       $this->assertEquals('IGNORE ME', $updatedItem->title);
+    }
+
+    /** @test */
+    public function it_should_create_an_item_with_release_date_before_1970(): void
+    {
+      $this->createGuzzleMock(
+        $this->tmdbFixtures('movie/details'),
+        $this->tmdbFixtures('movie/alternative_titles')
+      );
+
+      $movie = $this->floxFixtures('movie');
+      $movie['released'] = -2077194094;
+      $item = $this->createItem($movie);
+      $this->assertEquals($item->released_datetime, '1904-03-06 09:38:26');
     }
   }

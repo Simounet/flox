@@ -283,7 +283,7 @@
         'poster' => $data->poster_path,
         'media_type' => $mediaType,
         'released' => $release->copy()->getTimestamp(),
-        'released_timestamp' => $release,
+        'released_datetime' => $release,
         'genre_ids' => $data->genre_ids,
         'credit_cast' => $data->credit_cast ?? [],
         'credit_crew' => $data->credit_crew ?? [],

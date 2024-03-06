@@ -28,7 +28,7 @@
       'poster' => '',
       //'genre' => '',
       'released' => time(),
-      'released_timestamp' => now(),
+      'released_datetime' => now(),
       'src' => null,
     ];
   });
