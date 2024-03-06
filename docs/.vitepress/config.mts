@@ -2,6 +2,7 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  base: '/flox/',
   title: "Flox Documentation",
   description: "A VitePress Site",
   themeConfig: {
