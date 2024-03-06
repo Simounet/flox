@@ -18,7 +18,7 @@ The rating based on an 3-Point system for `good`, `medium` and `bad`.
 ## Install
 
 ```bash
-git clone https://github.com/devfake/flox
+git clone https://github.com/simounet/flox
 cd flox/backend
 composer install --no-dev -o --prefer-dist
 php artisan flox:init # Enter here your database credentials
@@ -192,7 +192,7 @@ Like this project? Want to contribute? Awesome! Feel free to open some pull requ
 
 ## Changelog
 
-Detailed changes for each release are documented in the [release notes](https://github.com/devfake/flox/releases).
+Detailed changes for each release are documented in the [release notes](https://github.com/simounet/flox/releases).
 
 ## License
 
