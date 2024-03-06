@@ -16,3 +16,6 @@ Homestead.yaml
 /public/assets/poster/subpage/*.jpg
 /public/assets/backdrop/*.jpg
 /public/exports/*.json
+
+docs/.vitepress/dist
+docs/.vitepress/cache
