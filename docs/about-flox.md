@@ -15,7 +15,7 @@ This instance is not up-to-date with the latest features.
 
 ## Contribution
 
-Like this project? Want to contribute? Awesome! Feel free to [open some pull requests](https://github.com/Simounet/flox/pulls) or just open an issue.
+Like this project? Want to contribute? Awesome! Feel free to [open some pull requests](https://github.com/Simounet/flox/pulls) or just [open an issue](https://github.com/Simounet/flox/issues).
 
 ## Changelog
 

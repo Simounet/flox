@@ -7,6 +7,10 @@ export default defineConfig({
   description: "A VitePress Site",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
+    footer: {
+      message: 'Feel free to <a href="https://github.com/Simounet/flox/tree/master/docs">improve this doc</a>.'
+    },
+
     nav: [
       { text: 'Home', link: '/' }
     ],
