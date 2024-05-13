@@ -14,7 +14,7 @@ class ChangeReleasedTimestampToDatetime extends Migration
     public function up()
     {
         Schema::table('items', function (Blueprint $table) {
-            $table->dateTime('released_timestamp')->change();
+            $table->dateTime('released_timestamp')->nullable()->change();
         });
     }
 }

@@ -43,4 +43,9 @@
     {
       return $query->where('api_key', $key);
     }
+
+    public function getAuthPasswordName()
+    {
+      return 'password';
+    }
   }
