@@ -26,7 +26,7 @@ return new class extends Migration
         }
 
         Schema::table('failed_jobs', function (Blueprint $table) {
-            $table->string('uuid')->unique()->nullable(false)->change();
+            $table->string('uuid')->nullable(false)->change();
         });
     }
 
