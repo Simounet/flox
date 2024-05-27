@@ -2,7 +2,7 @@
   "name": "flox",
   "author": "Simounet",
   "devDependencies": {
-    "vitepress": "^1.1.4"
+    "vitepress": "^1.2.2"
   },
   "scripts": {
     "docs:dev": "vitepress dev docs",
