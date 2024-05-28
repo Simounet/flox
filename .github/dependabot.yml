@@ -24,7 +24,7 @@ updates:
     versions:
     - "> 3.6.2"
 - package-ecosystem: composer
-  directory: "/"
+  directory: "/backend"
   schedule:
     interval: daily
     time: "08:00"
