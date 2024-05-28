@@ -12,7 +12,7 @@ class CreatePersonsTable extends Migration
       $table->integer('id');
       $table->string('name');
       $table->string('profile_path')->nullable();
-      $table->unsignedDecimal('popularity');
+      $table->decimal('popularity')->unsigned();
     });
   }
 
