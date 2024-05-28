@@ -19,7 +19,7 @@
     "doctrine/dbal": "^3.0",
     "guzzlehttp/guzzle": "^7.0.1",
     "kra8/laravel-snowflake": "^2.2",
-    "landrok/activitypub": "^0.6.0",
+    "landrok/activitypub": "^0.7.2",
     "laravel/framework": "^10.0",
     "laravel/tinker": "^2.0"
   },
