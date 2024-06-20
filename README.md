@@ -11,7 +11,7 @@ The rating based on an 3-Point system for `good`, `medium` and `bad`.
 ## Requirements
 
 * PHP >=8.1
-* Database (MySQL or [other](https://laravel.com/docs/database))
+* Database (MariaDB/MySQL known issue with Postgres, let me know if you need it)
 * [Composer](https://getcomposer.org/)
 * The Movie Database Account for the free [API-Key](https://www.themoviedb.org/faq/api)
 
