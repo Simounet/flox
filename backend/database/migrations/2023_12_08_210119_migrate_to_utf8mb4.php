@@ -65,12 +65,12 @@ return new class extends Migration {
 
             if ($column->IS_NULLABLE == 'NO') {
                 if ($column->COLUMN_DEFAULT !== null) {
-                    $default = "DEFAULT $column->COLUMN_DEFAULT";
+                    $default = "DEFAULT '" . $column->COLUMN_DEFAULT . "'";
                 } else {
                     $default = 'NOT NULL';
                 }
             } elseif ($column->COLUMN_DEFAULT !== null) {
-                $default = "DEFAULT $column->COLUMN_DEFAULT";
+                $default = "DEFAULT '" . $column->COLUMN_DEFAULT . "'";
             } else {
                 $default = 'DEFAULT NULL';
             }
