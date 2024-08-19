@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@element-plus/theme-chalk": "^2.2.16",
-    "axios": "^1.4.0",
+    "axios": "^1.7.4",
     "babel-runtime": "^6.26.0",
     "dayjs": "^1.11.8",
     "debounce": "^2.0.0",
