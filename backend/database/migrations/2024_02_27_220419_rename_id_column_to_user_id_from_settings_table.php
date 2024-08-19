@@ -31,7 +31,6 @@ return new class extends Migration
 
         Schema::table('settings', function (Blueprint $table) {
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->dropColumn('id');
         });
     }
 
