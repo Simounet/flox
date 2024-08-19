@@ -29,17 +29,21 @@ return new class extends Migration
             DB::statement("UPDATE settings SET user_id = $firstUser->id");
         }
 
-        Schema::table('settings', function (Blueprint $table) {
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->dropColumn('id');
-        });
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            Schema::table('settings', function (Blueprint $table) {
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                $table->dropColumn('id');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('settings', function (Blueprint $table) {
-            $table->increments('id')->first();
-        });
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            Schema::table('settings', function (Blueprint $table) {
+                $table->increments('id')->first();
+            });
+        }
 
         DB::statement("UPDATE settings SET id = user_id");
 
