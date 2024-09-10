@@ -5,30 +5,24 @@
   use App\Models\Episode;
   use App\Models\EpisodeUser;
   use App\Models\Item;
-  use App\Models\Review;
   use App\Services\TMDB;
   use App\Models\Setting;
-  use App\ValueObjects\EpisodeUserValueObject;
   use Carbon\Carbon;
-  use Illuminate\Database\Eloquent\Collection;
-  use Illuminate\Support\Facades\Auth;
 
   class EpisodeService {
 
     private $episode;
     private $tmdb;
-    private $review;
 
     /**
      * @param Episode $episode
      * @param TMDB  $tmdb
      * @param Item  $item
      */
-    public function __construct(Episode $episode, TMDB $tmdb, Review $review)
+    public function __construct(Episode $episode, TMDB $tmdb)
     {
       $this->episode = $episode;
       $this->tmdb = $tmdb;
-      $this->review = $review;
     }
 
     /**
@@ -94,56 +88,6 @@
         'next_episode' => $nextEpisode,
         'spoiler' => Setting::where('user_id', $userId)->first()->episode_spoiler_protection,
       ];
-    }
-
-    /**
-     * Set an episode as seen / unseen.
-     */
-    public function toggleSeen(int $userId, int $id): bool
-    {
-      $episode = $this->episode->find($id);
-
-      if($episode) {
-        $episodeUserValueObject = new EpisodeUserValueObject($userId, $id);
-        $isEpisodeSeen = EpisodeUser::isSeen($episodeUserValueObject);
-
-        if(!$isEpisodeSeen) {
-          $this->review->updateLastActivityAt($episode->tmdb_id);
-          return EpisodeUser::create($episodeUserValueObject->get())->wasRecentlyCreated;
-        }
-
-        return EpisodeUser::where($episodeUserValueObject->get())->delete();
-      }
-    }
-
-    /**
-     * Toggle all episodes of a season as seen / unseen.
-     */
-    public function toggleSeason(
-      int $tmdbId,
-      int $season,
-      bool $seen
-    ): Collection
-    {
-      $userId = Auth::id();
-      $episodes = $this->episode->select('episodes.id', 'episodes.tmdb_id')->findSeason($tmdbId, $season)->get();
-
-      if($seen) {
-        $this->review->updateLastActivityAt($episodes[0]->tmdb_id);
-
-        return $episodes->each(function($episode) use ($userId) {
-          return EpisodeUser::updateOrCreate(
-            (new EpisodeUserValueObject($userId, $episode->id))->get()
-          );
-        });
-      }
-
-      return $episodes->each(function($episode) use ($userId) {
-        return EpisodeUser::where(
-            (new EpisodeUserValueObject($userId, $episode->id))->get()
-        )->delete();
-      });
-
     }
 
     /**

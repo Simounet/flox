@@ -4,6 +4,7 @@
 
   use App\Services\Models\AlternativeTitleService;
   use App\Services\Models\EpisodeService;
+  use App\Services\Models\EpisodeUserService;
   use App\Services\Models\ItemService;
   use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\Request;
@@ -13,14 +14,17 @@
 
     private $itemService;
     private $episodeService;
+    private $episodeUserService;
 
     public function __construct(
       ItemService $itemService,
-      EpisodeService $episodeService
+      EpisodeService $episodeService,
+      EpisodeUserService $episodeUserService,
     )
     {
       $this->itemService = $itemService;
       $this->episodeService = $episodeService;
+      $this->episodeUserService = $episodeUserService;
     }
 
     public function items($type, $orderBy, $sortDirection)
@@ -83,7 +87,7 @@
 
     public function toggleEpisode($id)
     {
-      if( ! $this->episodeService->toggleSeen($id)) {
+      if( ! $this->episodeUserService->toggleSeen($id)) {
         return response('Server Error', Response::HTTP_INTERNAL_SERVER_ERROR);
       }
 
@@ -96,6 +100,6 @@
       $season = Request::input('season');
       $seen = Request::input('seen');
 
-      $this->episodeService->toggleSeason($tmdbId, $season, $seen);
+      $this->episodeUserService->toggleSeason($tmdbId, $season, $seen);
     }
   }
