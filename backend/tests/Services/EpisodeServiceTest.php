@@ -4,6 +4,7 @@
 
   use App\Models\EpisodeUser;
   use App\Models\Review;
+  use App\ValueObjects\EpisodeUserValueObject;
   use Illuminate\Foundation\Testing\RefreshDatabase;
   use Tests\TestCase;
   use App\Models\Episode;
@@ -94,15 +95,17 @@
     /** @test */
     public function it_should_set_a_episode_as_seen_or_unseen()
     {
+      $episodeId = 1;
       $user = $this->createUser();
       $this->actingAs($user);
       $this->createTv();
+      $episodeUserValueObject = new EpisodeUserValueObject($user->id, $episodeId);
 
-      $isEpisodeSeen1 = $this->episodeUser->isSeen(1, 1);
-      $this->episodeService->toggleSeen(1);
-      $isEpisodeSeen2 = $this->episodeUser->isSeen(1, 1);
-      $this->episodeService->toggleSeen(1);
-      $isEpisodeSeen3 = $this->episodeUser->isSeen(1, 1);
+      $isEpisodeSeen1 = $this->episodeUser->isSeen($episodeUserValueObject);
+      $this->episodeService->toggleSeen($user->id, 1);
+      $isEpisodeSeen2 = $this->episodeUser->isSeen($episodeUserValueObject);
+      $this->episodeService->toggleSeen($user->id, 1);
+      $isEpisodeSeen3 = $this->episodeUser->isSeen($episodeUserValueObject);
 
       $this->assertEquals(0, $isEpisodeSeen1);
       $this->assertEquals(1, $isEpisodeSeen2);
@@ -126,13 +129,13 @@
       $episodes3 = $this->episode->select('id')->where('season_number', $season)->pluck('id');
 
       $episodes1->each(function($episodeId) use ($user) {
-        $this->assertEquals(0, EpisodeUser::isSeen($episodeId, $user->id));
+        $this->assertEquals(0, EpisodeUser::isSeen(new EpisodeUserValueObject($user->id, $episodeId)));
       });
       $episodes2->each(function($episodeId) use ($user) {
-        $this->assertEquals(0, EpisodeUser::isSeen($episodeId, $user->id));
+        $this->assertEquals(0, EpisodeUser::isSeen(new EpisodeUserValueObject($user->id, $episodeId)));
       });
       $episodes3->each(function($episodeId) use ($user) {
-        $this->assertEquals(0, EpisodeUser::isSeen($episodeId, $user->id));
+        $this->assertEquals(0, EpisodeUser::isSeen(new EpisodeUserValueObject($user->id, $episodeId)));
       });
     }
 
@@ -159,7 +162,7 @@
 
       $review = $this->review->first();
       sleep(1);
-      $this->episodeService->toggleSeen(1);
+      $this->episodeService->toggleSeen($user->id, 1);
       $reviewUpdated = $this->review->first();
 
       $this->assertNotEquals($reviewUpdated->updated_at, $review->updated_at);
@@ -173,10 +176,10 @@
       $this->createTv();
       $this->createReview();
 
-      $this->episodeService->toggleSeen(1);
+      $this->episodeService->toggleSeen($user->id, 1);
       $review = $this->review->first();
       sleep(1);
-      $this->episodeService->toggleSeen(1);
+      $this->episodeService->toggleSeen($user->id, 1);
       $reviewUpdated = $this->review->first();
 
       $this->assertEquals($reviewUpdated->updated_at, $review->updated_at);
@@ -201,7 +204,8 @@
     /** @test */
     public function it_should_update_items_only_on_seen_from_all_episodes()
     {
-      $this->createUser();
+      $user = $this->createUser();
+      $this->actingAs($user);
       $this->createTv();
       $this->createReview();
 
@@ -221,7 +225,7 @@
       $tv = $this->createTv();
       $this->createReview();
 
-      $this->episodeService->toggleSeen(1);
+      $this->episodeService->toggleSeen($user->id, 1);
       $this->episodeService->toggleSeason($tv['item']->tmdb_id, 1, true);
 
       $episodesSeenCount = EpisodeUser::count();

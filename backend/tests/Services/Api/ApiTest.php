@@ -8,6 +8,7 @@ use App\Models\Item;
 use App\Models\Review;
 use App\Models\User;
 use App\Services\Api\Plex;
+use App\ValueObjects\EpisodeUserValueObject;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -185,15 +186,16 @@ class ApiTest extends TestCase
   {
     $this->be($this->user);
     $this->createTv();
+    $userId = 1;
     $episodeId = 2;
 
     $api = app($this->apiClass);
 
-    $seenEpisodesBefore = EpisodeUser::isSeen($this->user->id, $episodeId);
+    $seenEpisodesBefore = EpisodeUser::isSeen(new EpisodeUserValueObject($userId, $episodeId));
 
     $api->handle($this->apiFixtures($fixture));
 
-    $seenEpisodesAfter = EpisodeUser::isSeen($this->user->id, $episodeId);
+    $seenEpisodesAfter = EpisodeUser::isSeen(new EpisodeUserValueObject($userId, $episodeId));
 
     $this->assertFalse($seenEpisodesBefore);
     $this->assertTrue($seenEpisodesAfter);
