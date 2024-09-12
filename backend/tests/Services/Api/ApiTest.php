@@ -216,4 +216,19 @@ class ApiTest extends TestCase
 
     $this->assertNotEquals($updatedAt, $updatedAtUpdated);
   }
+
+  public function it_should_add_a_review_to_existing_item($fixture)
+  {
+    $this->createTv();
+    $review = $this->createReview();
+
+    $this->assertEquals(1, Review::count());
+    $review->delete();
+    $this->assertEquals(0, Review::count());
+    $this->assertEquals(1, Item::count());
+
+    $api = app($this->apiClass);
+    $api->handle($this->apiFixtures($fixture));
+    $this->assertEquals(1, Review::count());
+  }
 }

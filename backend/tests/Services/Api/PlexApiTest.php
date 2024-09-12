@@ -76,4 +76,10 @@ class PlexApiTest extends TestCase implements ApiTestInterface
   {
     $this->apiTest->it_should_updated_review_updated_at('plex/episode_seen.json');
   }
+
+  /** @test */
+  public function it_should_add_a_review_to_existing_item()
+  {
+    $this->apiTest->it_should_add_a_review_to_existing_item('plex/episode_seen.json');
+  }
 }

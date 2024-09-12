@@ -83,4 +83,17 @@ class Plex extends Api
   {
     return $this->data['Metadata']['parentIndex'] ?? null;
   }
+
+  protected function getTmdbId(): int|false
+  {
+    $prefix = 'tmdb://';
+    $filteredGuid = array_filter($this->data['Metadata']['Guid'], function($guid) use ($prefix) {
+      return strpos($guid['id'], $prefix) === 0;
+    });
+    if(count($filteredGuid) !== 1) {
+        return false;
+    }
+    $tmdbGuid = array_pop($filteredGuid);
+    return str_replace($prefix, '', $tmdbGuid['id']);
+  }
 }

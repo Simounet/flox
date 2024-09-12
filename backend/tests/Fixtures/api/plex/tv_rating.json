@@ -37,6 +37,14 @@
     "Genre": [],
     "Role": [],
     "Similar": [],
-    "Location": []
+    "Location": [],
+    "Guid": [
+      {
+        "id": "imdb://tt123456"
+      },
+      {
+        "id": "tmdb://12345"
+      }
+    ]
   }
 }

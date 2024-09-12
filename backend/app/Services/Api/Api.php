@@ -61,27 +61,31 @@ abstract class Api
       abort(Response::HTTP_NOT_IMPLEMENTED);
     }
 
-    $found = $this->item
-      ->findByTitle($this->getTitle(), $this->getType())
-      ->first();
+    $tmdbId = $this->getTmdbId();
+    $found = $this->itemService->findByUser($user->id, $tmdbId);
 
-    // Nothing found in our database, so we search in TMDb.
     if (!$found) {
-      $foundFromTmdb = $this->tmdb->search($this->getTitle(), $this->getType());
+      $item = $this->item
+        ->findByTitle($this->getTitle(), $this->getType())
+        ->first();
 
-      if (!$foundFromTmdb) {
-        return false;
+      if(!$item) {
+        $foundFromTmdb = $this->tmdb->search($this->getTitle(), $this->getType());
+
+        if (!$foundFromTmdb) {
+          return false;
+        }
+
+        // The first result is mostly the one we need.
+        $firstResult = $foundFromTmdb[0];
+
+        // Search again in our database with the TMDb ID.
+        $found = $this->item->findByTmdbId($firstResult['tmdb_id'])->first();
+      } else {
+        $firstResult = $item->toArray();
       }
 
-      // The first result is mostly the one we need.
-      $firstResult = $foundFromTmdb[0];
-
-      // Search again in our database with the TMDb ID.
-      $found = $this->item->findByTmdbId($firstResult['tmdb_id'])->first();
-
-      if (!$found) {
-        $found = $this->itemService->create($firstResult, $user->id);
-      }
+      $found = $this->itemService->create($firstResult, $user->id);
     }
 
     if ($this->shouldRateItem()) {
@@ -173,4 +177,6 @@ abstract class Api
    * @return null|int
    */
   abstract protected function getSeasonNumber();
+
+  abstract protected function getTmdbId(): int|false;
 }

@@ -39,6 +39,14 @@
     "Producer": [],
     "Country": [],
     "Role": [],
-    "Similar": []
+    "Similar": [],
+    "Guid": [
+      {
+        "id": "imdb://tt123456"
+      },
+      {
+        "id": "tmdb://12345"
+      }
+    ]
   }
 }
