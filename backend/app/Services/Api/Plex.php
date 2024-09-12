@@ -65,7 +65,7 @@ class Plex extends Api
    */
   protected function shouldEpisodeMarkedAsSeen()
   {
-    return $this->data['event'] === 'media.scrobble' && $this->getType() === 'tv';
+    return in_array($this->data['event'], ['media.scrobble', 'media.stop']) && $this->getType() === 'tv';
   }
 
   /**
