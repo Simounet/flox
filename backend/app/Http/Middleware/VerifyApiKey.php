@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\User;
 use Closure;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class VerifyApiKey
@@ -32,9 +33,12 @@ class VerifyApiKey
       return response(['message' => 'No token provided'], Response::HTTP_UNAUTHORIZED);
     }
 
-    if (!$this->user->findByApiKey($request->token)->exists()) {
+    $user = $this->user->findByApiKey($request->token)->first();
+    if (!$user) {
       return response(['message' => 'No valid token provided'], Response::HTTP_UNAUTHORIZED);
     }
+
+    Auth::login($user);
 
     return $next($request);
   }

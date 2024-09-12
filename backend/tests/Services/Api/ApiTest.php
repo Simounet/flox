@@ -31,7 +31,6 @@ class ApiTest extends TestCase
     parent::setUp();
 
     $this->user = $this->createUser(['api_key' => Str::random(24)]);
-    $this->be($this->user);
 
     $this->createStorageDownloadsMock();
     $this->createImdbRatingMock();
@@ -75,6 +74,7 @@ class ApiTest extends TestCase
 
   public function it_should_create_a_new_movie($fixture)
   {
+    $this->be($this->user);
     $this->createGuzzleMock(
       $this->tmdbFixtures('movie/movie'),
       $this->tmdbFixtures('movie/details'),
@@ -95,6 +95,7 @@ class ApiTest extends TestCase
 
   public function it_should_not_create_a_new_movie_if_it_exists($fixture)
   {
+    $this->be($this->user);
     $this->createMovie();
 
     $api = app($this->apiClass);
@@ -111,6 +112,7 @@ class ApiTest extends TestCase
 
   public function it_should_create_a_new_tv_show($fixture)
   {
+    $this->be($this->user);
     $this->createGuzzleMock(
       $this->tmdbFixtures('tv/tv'),
       $this->tmdbFixtures('tv/details'),
@@ -133,6 +135,7 @@ class ApiTest extends TestCase
 
   public function it_should_not_create_a_new_tv_show_if_it_exists($fixture)
   {
+    $this->be($this->user);
     $this->createTv();
 
     $api = app($this->apiClass);
@@ -149,6 +152,7 @@ class ApiTest extends TestCase
 
   public function it_should_rate_a_movie($fixture, $shouldHaveRating)
   {
+    $this->be($this->user);
     $this->createMovie();
     $this->createReview();
 
@@ -166,6 +170,7 @@ class ApiTest extends TestCase
 
   public function it_should_rate_a_tv_show($fixture, $shouldHaveRating)
   {
+    $this->be($this->user);
     $this->createTv();
     $this->createReview();
 
@@ -183,6 +188,7 @@ class ApiTest extends TestCase
 
   public function it_should_mark_an_episode_as_seen($fixture)
   {
+    $this->be($this->user);
     $this->createTv();
     $episodeId = 2;
 
@@ -200,6 +206,7 @@ class ApiTest extends TestCase
 
   public function it_should_updated_review_updated_at($fixture)
   {
+    $this->be($this->user);
     $this->createTv();
     $this->createReview();
 
@@ -219,6 +226,7 @@ class ApiTest extends TestCase
 
   public function it_should_add_a_review_to_existing_item($fixture)
   {
+    $this->be($this->user);
     $this->createTv();
     $review = $this->createReview();
 
@@ -229,6 +237,22 @@ class ApiTest extends TestCase
 
     $api = app($this->apiClass);
     $api->handle($this->apiFixtures($fixture));
+    $this->assertEquals(1, Review::count());
+  }
+
+  public function add_a_movie_from_api($fixture)
+  {
+    $this->createGuzzleMock(
+      $this->tmdbFixtures('movie/search'),
+      $this->tmdbFixtures('movie/details'),
+      $this->tmdbFixtures('movie/alternative_titles')
+    );
+
+    $this->assertEquals(0, Review::count());
+    $user = $this->createUser(['api_key' => Str::random(24)]);
+
+    $response = $this->postJson('api/plex', ['token' => $user->api_key, 'payload' => json_encode($this->apiFixtures($fixture))]);
+    $response->assertStatus(200);
     $this->assertEquals(1, Review::count());
   }
 }
