@@ -2,6 +2,7 @@
 
 namespace App\Services\Api;
 
+use App\Enums\StatusEnum;
 use App\Models\Episode;
 use App\Models\EpisodeUser;
 use App\Models\Item;
@@ -47,18 +48,20 @@ abstract class Api
     $this->episode = $episode;
   }
 
-  public function handle(array $data)
+  public function handle(array $data): StatusEnum
   {
     logInfo('api data:', $data);
 
     $user = Auth::user();
-    abort_if(!$user, 403);
+    if(!$user) {
+      return StatusEnum::UNAUTHORIZED;
+    }
 
 
     $this->data = $data;
 
     if ($this->abortRequest()) {
-      abort(Response::HTTP_NOT_IMPLEMENTED);
+      return StatusEnum::NOT_IMPLEMENTED;
     }
 
     $tmdbId = $this->getTmdbId();
@@ -73,7 +76,7 @@ abstract class Api
         $foundFromTmdb = $this->tmdb->search($this->getTitle(), $this->getType());
 
         if (!$foundFromTmdb) {
-          return false;
+          return StatusEnum::NOT_FOUND;
         }
 
         // The first result is mostly the one we need.
@@ -116,6 +119,8 @@ abstract class Api
         ])->touch();
       }
     }
+
+    return StatusEnum::OK;
   }
 
   /**

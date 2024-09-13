@@ -2,6 +2,7 @@
 
 namespace Tests\Services\Api;
 
+use App\Enums\StatusEnum;
 use App\Models\EpisodeUser;
 use App\Models\Item;
 use App\Models\Review;
@@ -10,7 +11,6 @@ use App\Services\Api\Plex;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
@@ -49,7 +49,7 @@ class ApiTest extends TestCase
   public function valid_token_needs_to_be_provided()
   {
     $mock = $this->mock(Plex::class);
-    $mock->shouldReceive('handle')->once()->andReturn(null);
+    $mock->shouldReceive('handle')->once()->andReturn(StatusEnum::OK);
     $user = $this->createUser(['api_key' => Str::random(24)]);
 
     $responseBefore = $this->postJson('api/plex', ['token' => 'not-valid']);
@@ -64,12 +64,7 @@ class ApiTest extends TestCase
   public function it_should_abort_the_request($fixture)
   {
     $api = app($this->apiClass);
-
-    try {
-      $api->handle($this->apiFixtures($fixture));
-    } catch (HttpException $exception) {
-      $this->assertTrue(true);
-    }
+    $this->assertEquals(StatusEnum::UNAUTHORIZED, $api->handle($this->apiFixtures($fixture)));
   }
 
   public function it_should_create_a_new_movie($fixture)
