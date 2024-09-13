@@ -87,4 +87,9 @@ class PlexApiTest extends TestCase implements ApiTestInterface
   public function add_a_movie_from_api() {
       $this->apiTest->add_a_movie_from_api('plex/movie.json');
   }
+
+  /** @test */
+  public function mark_episode_seen_multiple_times_from_api() {
+      $this->apiTest->mark_episode_seen_multiple_times_from_api('plex/episode_seen.json');
+  }
 }

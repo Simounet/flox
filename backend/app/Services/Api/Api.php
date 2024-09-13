@@ -109,14 +109,16 @@ abstract class Api
         ->first();
 
       if ($episode) {
-        EpisodeUser::create([
+        $episodeUser = EpisodeUser::firstOrCreate([
           'user_id' => $user->id,
           'episode_id' => $episode->id
         ]);
-        Review::where([
-          'user_id' => $user->id,
-          'item_id' => $found->id
-        ])->touch();
+        if($episodeUser->wasRecentlyCreated === true) {
+          Review::where([
+            'user_id' => $user->id,
+            'item_id' => $found->id
+          ])->touch();
+        }
       }
     }
 

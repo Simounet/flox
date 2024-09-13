@@ -250,4 +250,25 @@ class ApiTest extends TestCase
     $response->assertStatus(200);
     $this->assertEquals(1, Review::count());
   }
+
+  public function mark_episode_seen_multiple_times_from_api($fixture)
+  {
+    $this->createGuzzleMock(
+      $this->tmdbFixtures('tv/tv'),
+      $this->tmdbFixtures('tv/details'),
+      $this->tmdbFixtures('tv/alternative_titles')
+    );
+    $this->createTmdbEpisodeMock();
+
+    $this->assertEquals(0, Review::count());
+    $user = $this->createUser(['api_key' => Str::random(24)]);
+
+    $response = $this->postJson('api/plex', ['token' => $user->api_key, 'payload' => json_encode($this->apiFixtures($fixture))]);
+    $response->assertStatus(200);
+    $this->assertEquals(1, Review::count());
+
+    $response = $this->postJson('api/plex', ['token' => $user->api_key, 'payload' => json_encode($this->apiFixtures($fixture))]);
+    $response->assertStatus(200);
+    $this->assertEquals(1, Review::count());
+  }
 }
