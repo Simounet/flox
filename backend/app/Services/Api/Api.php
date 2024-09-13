@@ -2,6 +2,7 @@
 
 namespace App\Services\Api;
 
+use App\Enums\StatusEnum;
 use App\Models\Episode;
 use App\Models\EpisodeUser;
 use App\Models\Item;
@@ -47,41 +48,47 @@ abstract class Api
     $this->episode = $episode;
   }
 
-  public function handle(array $data)
+  public function handle(array $data): StatusEnum
   {
     logInfo('api data:', $data);
 
     $user = Auth::user();
-    abort_if(!$user, 403);
+    if(!$user) {
+      return StatusEnum::UNAUTHORIZED;
+    }
 
 
     $this->data = $data;
 
     if ($this->abortRequest()) {
-      abort(Response::HTTP_NOT_IMPLEMENTED);
+      return StatusEnum::NOT_IMPLEMENTED;
     }
 
-    $found = $this->item
-      ->findByTitle($this->getTitle(), $this->getType())
-      ->first();
+    $tmdbId = $this->getTmdbId();
+    $found = $this->itemService->findByUser($user->id, $tmdbId);
 
-    // Nothing found in our database, so we search in TMDb.
     if (!$found) {
-      $foundFromTmdb = $this->tmdb->search($this->getTitle(), $this->getType());
+      $item = $this->item
+        ->findByTitle($this->getTitle(), $this->getType())
+        ->first();
 
-      if (!$foundFromTmdb) {
-        return false;
+      if(!$item) {
+        $foundFromTmdb = $this->tmdb->search($this->getTitle(), $this->getType());
+
+        if (!$foundFromTmdb) {
+          return StatusEnum::NOT_FOUND;
+        }
+
+        // The first result is mostly the one we need.
+        $firstResult = $foundFromTmdb[0];
+
+        // Search again in our database with the TMDb ID.
+        $found = $this->item->findByTmdbId($firstResult['tmdb_id'])->first();
+      } else {
+        $firstResult = $item->toArray();
       }
 
-      // The first result is mostly the one we need.
-      $firstResult = $foundFromTmdb[0];
-
-      // Search again in our database with the TMDb ID.
-      $found = $this->item->findByTmdbId($firstResult['tmdb_id'])->first();
-
-      if (!$found) {
-        $found = $this->itemService->create($firstResult, $user->id);
-      }
+      $found = $this->itemService->create($firstResult, $user->id);
     }
 
     if ($this->shouldRateItem()) {
@@ -102,16 +109,20 @@ abstract class Api
         ->first();
 
       if ($episode) {
-        EpisodeUser::create([
+        $episodeUser = EpisodeUser::firstOrCreate([
           'user_id' => $user->id,
           'episode_id' => $episode->id
         ]);
-        Review::where([
-          'user_id' => $user->id,
-          'item_id' => $found->id
-        ])->touch();
+        if($episodeUser->wasRecentlyCreated === true) {
+          Review::where([
+            'user_id' => $user->id,
+            'item_id' => $found->id
+          ])->touch();
+        }
       }
     }
+
+    return StatusEnum::OK;
   }
 
   /**
@@ -173,4 +184,6 @@ abstract class Api
    * @return null|int
    */
   abstract protected function getSeasonNumber();
+
+  abstract protected function getTmdbId(): int|false;
 }

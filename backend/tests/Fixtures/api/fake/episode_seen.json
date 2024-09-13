@@ -7,6 +7,7 @@
     "seen": true,
     "rating": null,
     "episode": 2,
-    "season": 1
+    "season": 1,
+    "tmdbid": 12345
   }
 }

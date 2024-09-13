@@ -108,6 +108,15 @@
       return $item;
     }
 
+    public function findByUser(int $userId, int $itemId): Item|null
+    {
+        $review = $this->reviewService->findBy($itemId, $userId);
+        if(!$review) {
+            return null;
+        }
+        return $this->item->whereId($itemId)->first();
+    }
+
     /**
      * Search against TMDb and IMDb for more informations.
      * We don't need to get more informations if we add the item from the subpage.

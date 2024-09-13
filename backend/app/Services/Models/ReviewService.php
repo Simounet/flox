@@ -75,4 +75,15 @@ class ReviewService {
         );
         return $storedReview;
     }
+
+    public function findBy(
+        int $itemId,
+        int $userId
+    ): Review|null
+    {
+        return Review::where([
+            'user_id' => $userId,
+            'item_id' => $itemId
+        ])->first();
+    }
 }

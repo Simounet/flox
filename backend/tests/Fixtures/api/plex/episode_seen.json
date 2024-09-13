@@ -40,6 +40,14 @@
     "originallyAvailableAt": "",
     "addedAt": null,
     "updatedAt": null,
-    "Writer": []
+    "Writer": [],
+    "Guid": [
+      {
+        "id": "imdb://tt123456"
+      },
+      {
+        "id": "tmdb://12345"
+      }
+    ]
   }
 }
