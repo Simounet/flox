@@ -108,13 +108,18 @@
       return $item;
     }
 
-    public function findByUser(int $userId, int $itemId): Item|null
+    public function findByUser(int $userId, int $tmdbId): Item|null
     {
-        $review = $this->reviewService->findBy($itemId, $userId);
-        if(!$review) {
-            return null;
+        $item = $this->item->where(['tmdb_id' => $tmdbId])->first();
+        if(!$item) {
+          return null;
         }
-        return $this->item->whereId($itemId)->first();
+
+        $reviews = $this->reviewService->count($item->id, $userId);
+        if($reviews === 0) {
+          return null;
+        }
+        return $item;
     }
 
     /**
