@@ -1,0 +1,9 @@
+{
+    "mediaType": "movie",
+    "ids": {
+        "imdbId": 1234,
+        "tmdbId": 68735
+    },
+    "duration": 451000,
+    "rating": ""
+}
