@@ -76,14 +76,14 @@ class ReviewService {
         return $storedReview;
     }
 
-    public function findBy(
+    public function count(
         int $itemId,
         int $userId
-    ): Review|null
+    ): int
     {
         return Review::where([
             'user_id' => $userId,
             'item_id' => $itemId
-        ])->first();
+        ])->count();
     }
 }

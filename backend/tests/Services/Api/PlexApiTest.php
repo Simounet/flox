@@ -4,13 +4,15 @@ namespace Tests\Services\Api;
 
 use App\Services\Api\Plex;
 use Tests\TestCase;
+use Tests\Traits\Fixtures;
 
 class PlexApiTest extends TestCase implements ApiTestInterface
 {
-  /**
-   * @var ApiTest
-   */
-  private $apiTest;
+  use Fixtures;
+
+  const API_URI = 'api/plex';
+
+  private ApiTest $apiTest;
 
   public function setUp(): void
   {
@@ -85,11 +87,18 @@ class PlexApiTest extends TestCase implements ApiTestInterface
 
   /** @test */
   public function add_a_movie_from_api() {
-      $this->apiTest->add_a_movie_from_api('plex/movie.json');
+    $fixture = 'plex/movie.json';
+    $this->apiTest->add_a_movie_from_api($fixture, self::API_URI, $this->getPayload(json_encode($this->apiFixtures($fixture))));
   }
 
   /** @test */
   public function mark_episode_seen_multiple_times_from_api() {
-      $this->apiTest->mark_episode_seen_multiple_times_from_api('plex/episode_seen.json');
+    $fixture = 'plex/episode_seen.json';
+    $this->apiTest->mark_episode_seen_multiple_times_from_api($fixture, self::API_URI, $this->getPayload(json_encode($this->apiFixtures($fixture))));
+  }
+
+  protected function getPayload(string $payload): array
+  {
+    return ['token' => $this->apiTest->user->api_key, 'payload' => $payload];
   }
 }

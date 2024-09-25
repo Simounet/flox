@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Route;
     Route::get('/settings', 'SettingController@settings');
 
     Route::middleware('api_key')->group(function() {
+      Route::post('kodi', 'ApiController@kodi');
       Route::post('plex', 'ApiController@plex');
     });
 

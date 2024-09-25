@@ -57,45 +57,27 @@ abstract class Api
       return StatusEnum::UNAUTHORIZED;
     }
 
-
     $this->data = $data;
 
     if ($this->abortRequest()) {
       return StatusEnum::NOT_IMPLEMENTED;
     }
 
-    $tmdbId = $this->getTmdbId();
-    $found = $this->itemService->findByUser($user->id, $tmdbId);
-
-    if (!$found) {
-      $item = $this->item
-        ->findByTitle($this->getTitle(), $this->getType())
-        ->first();
-
-      if(!$item) {
-        $foundFromTmdb = $this->tmdb->search($this->getTitle(), $this->getType());
-
-        if (!$foundFromTmdb) {
-          return StatusEnum::NOT_FOUND;
-        }
-
-        // The first result is mostly the one we need.
-        $firstResult = $foundFromTmdb[0];
-
-        // Search again in our database with the TMDb ID.
-        $found = $this->item->findByTmdbId($firstResult['tmdb_id'])->first();
-      } else {
-        $firstResult = $item->toArray();
+    $item = $this->getItem();
+    if(!$item) {
+      $item = $this->createItemWithTmdb();
+      if (!$item) {
+        return StatusEnum::NOT_FOUND;
       }
-
-      $found = $this->itemService->create($firstResult, $user->id);
     }
 
+    $review = Review::firstOrCreate([
+      'user_id' => $user->id,
+      'item_id' => $item->id
+    ], ['rating' => 0]);
+
     if ($this->shouldRateItem()) {
-      Review::where([
-        'user_id' => $user->id,
-        'item_id' => $found->id
-      ])
+      $review
         ->update([
           'rating' => $this->getRating(),
         ]);
@@ -103,7 +85,7 @@ abstract class Api
 
     if ($this->shouldEpisodeMarkedAsSeen()) {
       $episode = $this->episode
-        ->findByTmdbId($found->tmdb_id)
+        ->findByTmdbId($item->tmdb_id)
         ->findByEpisodeNumber($this->getEpisodeNumber())
         ->findBySeasonNumber($this->getSeasonNumber())
         ->first();
@@ -114,15 +96,76 @@ abstract class Api
           'episode_id' => $episode->id
         ]);
         if($episodeUser->wasRecentlyCreated === true) {
-          Review::where([
-            'user_id' => $user->id,
-            'item_id' => $found->id
-          ])->touch();
+          $review->touch();
         }
       }
     }
 
     return StatusEnum::OK;
+  }
+
+  private function createItemWithTmdb(): ?Item
+  {
+    $tmdbId = $this->getTmdbId();
+    if(!$tmdbId) {
+      $foundFromTmdb = $this->tmdb->search($this->getTitle(), $this->getType());
+      if (!$foundFromTmdb) {
+        return null;
+      }
+
+      // The first result is mostly the one we need.
+      $firstResult = $foundFromTmdb[0];
+
+      $item = $this->item->findByTmdbId($firstResult['tmdb_id'])->first();
+      if($item) {
+          return $item;
+      }
+    } else {
+      $firstResult = [
+        'tmdb_id' => $tmdbId,
+        'media_type' => $this->getType()
+      ];
+    }
+    return $this->itemService->createItemInfoIfNotExists($firstResult);
+  }
+
+  private function getItem(): ?Item
+  {
+    $foundItemByTmdbId = $this->getItemByTmdbId();
+    if($foundItemByTmdbId) {
+      return $foundItemByTmdbId;
+    }
+
+    $foundByTitle = $this->getItemByTitle();
+    if($foundByTitle) {
+      return $foundByTitle;
+    }
+
+    return null;
+  }
+
+  private function getItemByTmdbId(): ?Item
+  {
+    $tmdbId = $this->getTmdbId();
+    if(!$tmdbId) {
+      return null;
+    }
+    return $this->item->findByTmdbId($tmdbId)->first();
+  }
+
+
+  private function getItemByTitle(): ?Item
+  {
+    $title = $this->getTitle();
+    if(!$title) {
+      return null;
+    }
+
+    $item = $this->item
+      ->findByTitle($title, $this->getType())
+      ->first();
+
+    return $item;
   }
 
   /**

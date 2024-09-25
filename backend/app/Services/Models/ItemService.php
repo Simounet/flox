@@ -2,6 +2,7 @@
 
   namespace App\Services\Models;
 
+  use App\Models\Genre;
   use App\Models\Item;
   use App\Models\Review;
   use App\Services\IMDB;
@@ -10,6 +11,7 @@
   use App\Services\TMDB;
   use App\Jobs\UpdateItem;
   use App\Models\Setting;
+  use Carbon\Carbon;
   use Illuminate\Database\Eloquent\Builder;
   use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\DB;
@@ -80,7 +82,7 @@
       return $item->fresh();
     }
 
-    private function createItemInfoIfNotExists(array $data): Item
+    public function createItemInfoIfNotExists(array $data): Item
     {
       $existingItem = Item::where('tmdb_id', $data['tmdb_id'])
         ->get()
@@ -108,13 +110,18 @@
       return $item;
     }
 
-    public function findByUser(int $userId, int $itemId): Item|null
+    public function findByUser(int $userId, int $tmdbId): Item|null
     {
-        $review = $this->reviewService->findBy($itemId, $userId);
-        if(!$review) {
-            return null;
+        $item = $this->item->where(['tmdb_id' => $tmdbId])->first();
+        if(!$item) {
+          return null;
         }
-        return $this->item->whereId($itemId)->first();
+
+        $reviews = $this->reviewService->count($item->id, $userId);
+        if($reviews === 0) {
+          return null;
+        }
+        return $item;
     }
 
     /**
@@ -124,7 +131,7 @@
      * @param $data
      * @return array
      */
-    public function makeDataComplete($data)
+    public function makeDataComplete(array $data): array
     {
       if(
         ! isset($data['imdb_id'])
@@ -134,6 +141,18 @@
         $details = $this->tmdb->details($data['tmdb_id'], $data['media_type']);
         $title = $details->name ?? $details->title;
 
+        // @todo extract
+        try {
+          $release = Carbon::createFromFormat('Y-m-d',
+            isset($details->release_date) ? ($details->release_date ?: Item::FALLBACK_DATE) : ($details->first_air_date ?? Item::FALLBACK_DATE)
+          );
+        } catch (\Exception $exception) {
+          $release = Carbon::createFromFormat('Y-m-d', Item::FALLBACK_DATE);
+        }
+
+        $data['title'] = $data['title'] ?? $title;
+        // @todo facto
+        $data['original_title'] = $details->original_name ?? $details->original_title;
         $data['imdb_id'] = $data['imdb_id'] ?? $this->parseImdbId($details);
         $data['youtube_key'] = $data['youtube_key'] ?? $this->parseYoutubeKey($details, $data['media_type']);
         $data['overview'] = $data['overview'] ?? $details->overview;
@@ -143,6 +162,14 @@
         $data['homepage'] = $data['homepage'] ?? $details->homepage;
         $data['credit_cast'] = $data['credit_cast'] ?? $this->personService->castFromTMDB($data['tmdb_id'], $details->credits->cast);
         $data['credit_crew'] = $data['credit_crew'] ?? $this->personService->crewFromTMDB($data['tmdb_id'], $details->credits->crew);
+        // @todo extract
+        $data['released'] = $release->copy()->getTimestamp();
+        $data['released_datetime'] = $release;
+        $data['poster'] = $data['poster'] ?? $details->poster_path;
+        $genreIds = collect($details->genres)->pluck('id')->all();
+        $data['genre_ids'] = $data['genre_ids'] ?? $genreIds;
+        $data['genre'] = $data['genre'] ?? Genre::whereIn('id', $genreIds)->get();
+        $data['popularity'] = $data['popularity'] ?? ($details->popularity ?? 0);
       }
 
       $data['imdb_rating'] = $this->parseImdbRating($data);

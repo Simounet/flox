@@ -8,6 +8,7 @@ use App\Models\Item;
 use App\Models\Review;
 use App\Models\User;
 use App\Services\Api\Plex;
+use App\ValueObjects\EpisodeUserValueObject;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +25,7 @@ class ApiTest extends TestCase
   use Fixtures;
 
   public $apiClass;
-  private User $user;
+  public User $user;
 
   public function setUp(): void
   {
@@ -71,7 +72,6 @@ class ApiTest extends TestCase
   {
     $this->be($this->user);
     $this->createGuzzleMock(
-      $this->tmdbFixtures('movie/movie'),
       $this->tmdbFixtures('movie/details'),
       $this->tmdbFixtures('movie/alternative_titles')
     );
@@ -109,7 +109,6 @@ class ApiTest extends TestCase
   {
     $this->be($this->user);
     $this->createGuzzleMock(
-      $this->tmdbFixtures('tv/tv'),
       $this->tmdbFixtures('tv/details'),
       $this->tmdbFixtures('tv/alternative_titles')
     );
@@ -185,15 +184,16 @@ class ApiTest extends TestCase
   {
     $this->be($this->user);
     $this->createTv();
+    $userId = 1;
     $episodeId = 2;
 
     $api = app($this->apiClass);
 
-    $seenEpisodesBefore = EpisodeUser::isSeen($this->user->id, $episodeId);
+    $seenEpisodesBefore = EpisodeUser::isSeen(new EpisodeUserValueObject($userId, $episodeId));
 
     $api->handle($this->apiFixtures($fixture));
 
-    $seenEpisodesAfter = EpisodeUser::isSeen($this->user->id, $episodeId);
+    $seenEpisodesAfter = EpisodeUser::isSeen(new EpisodeUserValueObject($userId, $episodeId));
 
     $this->assertFalse($seenEpisodesBefore);
     $this->assertTrue($seenEpisodesAfter);
@@ -235,39 +235,35 @@ class ApiTest extends TestCase
     $this->assertEquals(1, Review::count());
   }
 
-  public function add_a_movie_from_api($fixture)
+  public function add_a_movie_from_api(string $fixture, string $apiUri, array $data)
   {
     $this->createGuzzleMock(
-      $this->tmdbFixtures('movie/search'),
       $this->tmdbFixtures('movie/details'),
       $this->tmdbFixtures('movie/alternative_titles')
     );
 
     $this->assertEquals(0, Review::count());
-    $user = $this->createUser(['api_key' => Str::random(24)]);
 
-    $response = $this->postJson('api/plex', ['token' => $user->api_key, 'payload' => json_encode($this->apiFixtures($fixture))]);
+    $response = $this->postJson($apiUri, $data);
     $response->assertStatus(200);
     $this->assertEquals(1, Review::count());
   }
 
-  public function mark_episode_seen_multiple_times_from_api($fixture)
+  public function mark_episode_seen_multiple_times_from_api(string $fixture, string $apiUri, array $data)
   {
     $this->createGuzzleMock(
-      $this->tmdbFixtures('tv/tv'),
       $this->tmdbFixtures('tv/details'),
       $this->tmdbFixtures('tv/alternative_titles')
     );
     $this->createTmdbEpisodeMock();
 
     $this->assertEquals(0, Review::count());
-    $user = $this->createUser(['api_key' => Str::random(24)]);
 
-    $response = $this->postJson('api/plex', ['token' => $user->api_key, 'payload' => json_encode($this->apiFixtures($fixture))]);
+    $response = $this->postJson($apiUri, $data);
     $response->assertStatus(200);
     $this->assertEquals(1, Review::count());
 
-    $response = $this->postJson('api/plex', ['token' => $user->api_key, 'payload' => json_encode($this->apiFixtures($fixture))]);
+    $response = $this->postJson($apiUri, $data);
     $response->assertStatus(200);
     $this->assertEquals(1, Review::count());
   }

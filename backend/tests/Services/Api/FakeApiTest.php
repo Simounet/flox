@@ -70,4 +70,26 @@ class FakeApiTest extends TestCase implements ApiTestInterface
   {
     $this->apiTest->it_should_mark_an_episode_as_seen('fake/episode_seen.json');
   }
+
+  /** @test */
+  public function it_should_updated_review_updated_at()
+  {
+    $this->apiTest->it_should_updated_review_updated_at('fake/episode_seen.json');
+  }
+
+  /** @test */
+  public function it_should_add_a_review_to_existing_item()
+  {
+    $this->apiTest->it_should_add_a_review_to_existing_item('fake/episode_seen.json');
+  }
+
+  /** @test */
+  public function add_a_movie_from_api() {
+    self::expectNotToPerformAssertions();
+  }
+
+  /** @test */
+  public function mark_episode_seen_multiple_times_from_api() {
+    self::expectNotToPerformAssertions();
+  }
 }
