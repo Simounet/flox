@@ -111,6 +111,7 @@ class ReviewController extends Controller
             'id' => $id,
             'user_id' => $userId
         ])->firstOrFail();
+        // @todo delete associated content (episodeUser)
         $review->delete();
 
         if($review->content !== '') {
