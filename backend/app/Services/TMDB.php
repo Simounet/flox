@@ -15,30 +15,17 @@
   use Symfony\Component\HttpFoundation\Response;
 
   class TMDB {
+    private const BASE = 'https://api.themoviedb.org';
 
-    private $client;
-    private $apiKey;
+    private string $apiKey;
 
-    /*
-     * @var PersonService
-     */
-    private $personService;
+    private string $translation;
 
-    private $translation;
 
-    private $base = 'https://api.themoviedb.org';
-
-    /**
-     * Get the API Key for TMDb and create an instance of Guzzle.
-     *
-     * @param Client $client
-     */
-    public function __construct(Client $client, PersonService $personService)
+    public function __construct(private Client $client)
     {
       $this->apiKey = config('services.tmdb.key');
       $this->translation = config('app.TRANSLATION');
-      $this->client = $client;
-      $this->personService = $personService;
     }
 
     /**
@@ -83,7 +70,7 @@
     }
 
     private function fetchSearch($title, $mediaType) {
-      return $this->requestTmdb($this->base . '/3/search/' . $mediaType, [
+      return $this->requestTmdb(self::BASE . '/3/search/' . $mediaType, [
         'query' => $title,
       ]);
     }
@@ -119,7 +106,7 @@
      */
     private function searchSuggestions($mediaType, $tmdbId, $type)
     {
-      $response = $this->requestTmdb($this->base . '/3/' . $mediaType . '/' . $tmdbId . '/' . $type);
+      $response = $this->requestTmdb(self::BASE . '/3/' . $mediaType . '/' . $tmdbId . '/' . $type);
 
       return collect($this->createItems($response, $mediaType));
     }
@@ -134,7 +121,7 @@
       $cache = Cache::remember('upcoming', $this->untilEndOfDay(), function() {
         $region = getRegion($this->translation);
 
-        $response = $this->requestTmdb($this->base . '/3/movie/upcoming', [
+        $response = $this->requestTmdb(self::BASE . '/3/movie/upcoming', [
           'region' => $region,
         ]);
 
@@ -154,7 +141,7 @@
       $cache = Cache::remember('current', $this->untilEndOfDay(), function() {
         $region = getRegion($this->translation);
 
-        $response = $this->requestTmdb($this->base . '/3/movie/now_playing', [
+        $response = $this->requestTmdb(self::BASE . '/3/movie/now_playing', [
           'region' => $region,
         ]);
 
@@ -196,8 +183,8 @@
 
       $cache = Cache::remember('genre-' . $genre, $this->untilEndOfDay(), function() use ($genreId) {
 
-        $responseMovies = $this->requestTmdb($this->base . '/3/discover/movie', ['with_genres' => $genreId]);
-        $responseTv = $this->requestTmdb($this->base . '/3/discover/tv', ['with_genres' => $genreId]);
+        $responseMovies = $this->requestTmdb(self::BASE . '/3/discover/movie', ['with_genres' => $genreId]);
+        $responseTv = $this->requestTmdb(self::BASE . '/3/discover/tv', ['with_genres' => $genreId]);
 
         $movies = collect($this->createItems($responseMovies, 'movie'));
         $tv = collect($this->createItems($responseTv, 'tv'));
@@ -243,7 +230,7 @@
 
     private function fetchPopular($mediaType)
     {
-      return $this->requestTmdb($this->base . '/3/' . $mediaType . '/popular');
+      return $this->requestTmdb(self::BASE . '/3/' . $mediaType . '/popular');
     }
 
     /**
@@ -263,7 +250,7 @@
       return $items;
     }
 
-    public function createItem($data, $mediaType)
+    public function createItem(object $data, string $mediaType): array
     {
       try {
         $release = Carbon::createFromFormat('Y-m-d',
@@ -338,7 +325,7 @@
      */
     public function details($tmdbId, $mediaType)
     {
-      $response = $this->requestTmdb($this->base . '/3/' . $mediaType . '/' . $tmdbId, [
+      $response = $this->requestTmdb(self::BASE . '/3/' . $mediaType . '/' . $tmdbId, [
         'append_to_response' => 'videos,external_ids,credits',
       ]);
 
@@ -352,7 +339,7 @@
 
     public function videos($tmdbId, $mediaType, $translation = null)
     {
-      $response = $this->requestTmdb($this->base . '/3/' . $mediaType . '/' . $tmdbId . '/videos', [
+      $response = $this->requestTmdb(self::BASE . '/3/' . $mediaType . '/' . $tmdbId . '/videos', [
         'language' => $translation ?? $this->translation,
       ]);
 
@@ -370,7 +357,7 @@
     private function tvSeasonsCount($id, $mediaType)
     {
       if($mediaType == 'tv') {
-        $response = $this->requestTmdb($this->base . '/3/tv/' . $id);
+        $response = $this->requestTmdb(self::BASE . '/3/tv/' . $id);
 
         $seasons = collect(json_decode($response->getBody())->seasons);
 
@@ -395,7 +382,7 @@
       $data = [];
 
       for($i = 1; $i <= $seasons; $i++) {
-        $response = $this->requestTmdb($this->base . '/3/tv/' . $tmdbId . '/season/' . $i);
+        $response = $this->requestTmdb(self::BASE . '/3/tv/' . $tmdbId . '/season/' . $i);
 
         $data[$i] = json_decode($response->getBody());
       }
@@ -424,7 +411,7 @@
 
     public function fetchAlternativeTitles($item)
     {
-      return $this->requestTmdb($this->base . '/3/' . $item['media_type'] . '/' . $item['tmdb_id'] . '/alternative_titles');
+      return $this->requestTmdb(self::BASE . '/3/' . $item['media_type'] . '/' . $item['tmdb_id'] . '/alternative_titles');
     }
 
     /**
@@ -432,8 +419,8 @@
      */
     public function getGenreLists()
     {
-      $movies = $this->requestTmdb($this->base . '/3/genre/movie/list');
-      $tv = $this->requestTmdb($this->base . '/3/genre/tv/list');
+      $movies = $this->requestTmdb(self::BASE . '/3/genre/movie/list');
+      $tv = $this->requestTmdb(self::BASE . '/3/genre/tv/list');
 
       return [
         'movies' => json_decode($movies->getBody()),
