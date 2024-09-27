@@ -26,10 +26,9 @@ class Kodi extends Api
   /**
    * @inheritDoc
    */
-  protected function getTitle()
+  protected function getTitle(): string|false
   {
-    // @todo not implemented in Flox addon for Kodi yet
-    return null;
+    return $this->data['title'];
   }
 
   /**
