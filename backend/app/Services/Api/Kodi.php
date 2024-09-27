@@ -76,6 +76,6 @@ class Kodi extends Api
 
   protected function getTmdbId(): int|false
   {
-    return $this->data['ids']['tmdbId'];
+    return $this->data['ids']['tmdbId'] ?? false;
   }
 }
