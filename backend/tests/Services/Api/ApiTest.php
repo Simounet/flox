@@ -7,11 +7,9 @@ use App\Models\EpisodeUser;
 use App\Models\Item;
 use App\Models\Review;
 use App\Models\User;
-use App\Services\Api\Plex;
 use App\ValueObjects\EpisodeUserValueObject;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
@@ -19,7 +17,7 @@ use Tests\Traits\Mocks;
 
 class ApiTest extends TestCase
 {
-  use RefreshDatabase;
+  use DatabaseMigrations;
   use Mocks;
   use Factories;
   use Fixtures;
@@ -35,31 +33,6 @@ class ApiTest extends TestCase
 
     $this->createStorageDownloadsMock();
     $this->createImdbRatingMock();
-  }
-
-  /** @test */
-  public function token_needs_to_be_provided()
-  {
-    $response = $this->postJson('/api/plex');
-
-    $response->assertJson(['message' => 'No token provided']);
-    $response->assertStatus(Response::HTTP_UNAUTHORIZED);
-  }
-
-  /** @test */
-  public function valid_token_needs_to_be_provided()
-  {
-    $mock = $this->mock(Plex::class);
-    $mock->shouldReceive('handle')->once()->andReturn(StatusEnum::OK);
-    $user = $this->createUser(['api_key' => Str::random(24)]);
-
-    $responseBefore = $this->postJson('api/plex', ['token' => 'not-valid']);
-    $responseAfter = $this->postJson('api/plex', ['token' => $user->api_key, 'payload' => '[]']);
-
-    $responseBefore->assertJson(['message' => 'No valid token provided']);
-    $responseBefore->assertStatus(Response::HTTP_UNAUTHORIZED);
-
-    $responseAfter->assertSuccessful();
   }
 
   public function it_should_abort_the_request($fixture)

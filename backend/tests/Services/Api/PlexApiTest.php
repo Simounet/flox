@@ -2,12 +2,17 @@
 
 namespace Tests\Services\Api;
 
+use App\Enums\StatusEnum;
 use App\Services\Api\Plex;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
+use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
 
 class PlexApiTest extends TestCase implements ApiTestInterface
 {
+  use Factories;
   use Fixtures;
 
   const API_URI = 'api/plex';
@@ -23,6 +28,31 @@ class PlexApiTest extends TestCase implements ApiTestInterface
     $this->apiTest->apiClass = Plex::class;
 
     $this->apiTest->setUp();
+  }
+
+  /** @test */
+  public function token_needs_to_be_provided()
+  {
+    $response = $this->postJson('/api/plex');
+
+    $response->assertJson(['message' => 'No token provided']);
+    $response->assertStatus(Response::HTTP_UNAUTHORIZED);
+  }
+
+  /** @test */
+  public function valid_token_needs_to_be_provided()
+  {
+    $mock = $this->mock(Plex::class);
+    $mock->shouldReceive('handle')->once()->andReturn(StatusEnum::OK);
+    $user = $this->createUser(['api_key' => Str::random(24)]);
+
+    $responseBefore = $this->postJson('api/plex', ['token' => 'not-valid']);
+    $responseAfter = $this->postJson('api/plex', ['token' => $user->api_key, 'payload' => '[]']);
+
+    $responseBefore->assertJson(['message' => 'No valid token provided']);
+    $responseBefore->assertStatus(Response::HTTP_UNAUTHORIZED);
+
+    $responseAfter->assertSuccessful();
   }
 
   /** @test */
