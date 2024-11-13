@@ -15,7 +15,7 @@ use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
 use Tests\Traits\Mocks;
 
-class ApiTest extends TestCase
+class ApiTestBase extends TestCase
 {
   use DatabaseMigrations;
   use Mocks;
