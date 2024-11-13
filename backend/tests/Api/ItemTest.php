@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Api;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
@@ -15,7 +15,7 @@ final class ItemTest extends TestCase {
     use Factories;
     use Fixtures;
     use Mocks;
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     public function setUp(): void
     {

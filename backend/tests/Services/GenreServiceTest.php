@@ -5,7 +5,7 @@
   use App\Models\Genre;
   use App\Models\Item;
   use App\Services\Models\GenreService;
-  use Illuminate\Foundation\Testing\RefreshDatabase;
+  use Illuminate\Foundation\Testing\DatabaseMigrations;
   use Illuminate\Support\Facades\DB;
   use Tests\TestCase;
   use Tests\Traits\Factories;
@@ -14,7 +14,7 @@
 
   class GenreServiceTest extends TestCase {
     
-    use RefreshDatabase;
+    use DatabaseMigrations;
     use Factories;
     use Fixtures;
     use Mocks;

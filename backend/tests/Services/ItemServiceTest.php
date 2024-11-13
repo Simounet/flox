@@ -2,7 +2,7 @@
 
   namespace Tests\Services;
 
-  use Illuminate\Foundation\Testing\RefreshDatabase;
+  use Illuminate\Foundation\Testing\DatabaseMigrations;
   use Tests\TestCase;
   use App\Models\Item;
   use App\Services\Models\ItemService;
@@ -12,7 +12,7 @@
 
   class ItemServiceTest extends TestCase {
 
-    use RefreshDatabase;
+    use DatabaseMigrations;
     use Factories;
     use Fixtures;
     use Mocks;

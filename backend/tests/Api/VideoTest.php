@@ -4,13 +4,13 @@
 
   use App\Models\Episode;
   use App\Models\Item;
-  use Illuminate\Foundation\Testing\RefreshDatabase;
+  use Illuminate\Foundation\Testing\DatabaseMigrations;
   use Tests\TestCase;
   use Tests\Traits\Factories;
 
   class VideoTest extends TestCase {
 
-    use RefreshDatabase;
+    use DatabaseMigrations;
     use Factories;
 
     private $user;

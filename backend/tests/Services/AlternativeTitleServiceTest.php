@@ -5,14 +5,14 @@
   use Tests\TestCase;
   use App\Models\AlternativeTitle;
   use App\Services\Models\AlternativeTitleService;
-  use Illuminate\Foundation\Testing\RefreshDatabase;
+  use Illuminate\Foundation\Testing\DatabaseMigrations;
   use Tests\Traits\Factories;
   use Tests\Traits\Fixtures;
   use Tests\Traits\Mocks;
 
   class AlternativeTitleServiceTest extends TestCase {
 
-    use RefreshDatabase;
+    use DatabaseMigrations;
     use Factories;
     use Fixtures;
     use Mocks;

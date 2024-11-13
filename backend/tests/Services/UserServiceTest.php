@@ -8,13 +8,13 @@ use App\Models\Profile;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\Models\UserService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use Tests\Traits\Factories;
 
 class UserServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
     use Factories;
 
     private UserService $userService;

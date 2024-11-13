@@ -2,7 +2,7 @@
 
   namespace Tests\Services;
 
-  use Illuminate\Foundation\Testing\RefreshDatabase;
+  use Illuminate\Foundation\Testing\DatabaseMigrations;
   use Illuminate\Routing\Middleware\ThrottleRequests;
   use Illuminate\Support\Facades\Hash;
   use Tests\TestCase;
@@ -16,7 +16,7 @@
 
   class FileParserTest extends TestCase {
 
-    use RefreshDatabase;
+    use DatabaseMigrations;
     use Factories;
     use Fixtures;
     use Mocks;

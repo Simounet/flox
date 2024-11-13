@@ -10,7 +10,7 @@ use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ItemService;
 use App\Services\Models\ProfileService;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -20,7 +20,7 @@ use Tests\Traits\Mocks;
 
 class ReviewTest extends TestCase {
 
-    use RefreshDatabase;
+    use DatabaseMigrations;
     use Factories;
     use Fixtures;
     use Mocks;
