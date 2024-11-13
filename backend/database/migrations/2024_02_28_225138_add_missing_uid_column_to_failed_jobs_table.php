@@ -33,6 +33,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('failed_jobs', function (Blueprint $table) {
+            $table->dropUnique(['uuid']);
             $table->dropColumn('uuid');
         });
     }
