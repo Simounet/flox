@@ -3,6 +3,7 @@
   namespace Tests\Services;
 
   use Illuminate\Foundation\Testing\DatabaseMigrations;
+  use Illuminate\Support\Facades\DB;
   use Tests\TestCase;
   use App\Models\Item;
   use App\Services\Models\ItemService;

@@ -26,7 +26,7 @@ class HttpSignatureTest extends TestCase
         parent::setUp();
 
         $this->host = parse_url(env('APP_URL'))['host'];
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $this->profileService = new ProfileService(new Profile());
         $this->profile = $this->profileService->storeLocal($user);
         $person = (new ActorActivity())->actorObject($this->profile);

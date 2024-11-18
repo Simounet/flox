@@ -38,7 +38,7 @@ class ReviewTest extends TestCase {
       $host = parse_url(env('APP_URL'))['host'];
       $this->withHeader('Host', $host);
       $profileService = new ProfileService(new Profile());
-      $this->user = factory(User::class)->create();
+      $this->user = User::factory()->create();
       $this->createStorageDownloadsMock();
       $this->profile = $profileService->storeLocal($this->user);
       $this->remoteProfile = json_decode(file_get_contents(__DIR__ . '/../_Fixtures/fediverse-fake-user/profile.json'));

@@ -23,7 +23,7 @@ class ActorTest extends TestCase
 
         $this->host = parse_url(env('APP_URL'))['host'];
         $this->withHeader('Host', $this->host);
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $this->profileService = new ProfileService(new Profile());
         $this->profile = $this->profileService->storeLocal($user);
     }

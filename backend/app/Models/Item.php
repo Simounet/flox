@@ -5,11 +5,14 @@
   use App\Services\Storage;
   use Carbon\Carbon;
   use Illuminate\Database\Eloquent\Builder;
+  use Illuminate\Database\Eloquent\Factories\HasFactory;
   use Illuminate\Database\Eloquent\Model;
   use Illuminate\Database\Query\JoinClause;
   use Illuminate\Support\Facades\Auth;
 
   class Item extends Model {
+
+    use HasFactory;
 
     /**
      * Fallback date string for a item.

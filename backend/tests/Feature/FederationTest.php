@@ -34,7 +34,7 @@ class FederationTest extends TestCase
         $this->host = parse_url(env('APP_URL'))['host'];
         $this->withHeader('Host', $this->host);
         $this->profileService = new ProfileService(new Profile());
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $this->profile = $this->profileService->storeLocal($user);
         $this->remoteProfile = json_decode(file_get_contents(__DIR__ . '/../_Fixtures/fediverse-fake-user/profile.json'));
 

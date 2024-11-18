@@ -12,14 +12,14 @@
 
     public function createUser(array $custom = []): User
     {
-      $user = factory(User::class)->create($custom);
+      $user = User::factory()->create($custom);
       $this->createSetting(['user_id' => $user->id]);
       return $user;
     }
 
     public function createSetting(array $custom): Setting
     {
-      return factory(Setting::class)->create($custom);
+      return Setting::factory()->create($custom);
     }
 
     public function createMovie($custom = [])
@@ -33,12 +33,12 @@
         'backdrop' => '',
       ];
 
-      return factory(Item::class)->create(array_merge($data, $custom));
+      return Item::factory()->create(array_merge($data, $custom));
     }
 
     public function createReview(array $custom = []): Review
     {
-        return factory(Review::class)->create($custom);
+        return Review::factory()->create($custom);
     }
 
     public function createTv($custom = [], $withEpisodes = true)
@@ -52,13 +52,13 @@
         'backdrop' => '',
       ];
 
-      $item = factory(Item::class)->create(array_merge($data, $custom));
+      $item = Item::factory()->create(array_merge($data, $custom));
 
       $episodes = [];
       if($withEpisodes) {
         foreach([1, 2] as $season) {
           foreach([1, 2] as $episode) {
-            $episodes[] = factory(Episode::class)->create([
+            $episodes[] = Episode::factory()->create([
               'tmdb_id' => 1399,
               'season_number' => $season,
               'episode_number' => $episode,
@@ -80,7 +80,7 @@
         'tmdb_id' => 68735,
       ];
 
-      return factory(Item::class)->states('movie')->make(array_merge($data, $custom));
+      return Item::factory()->movie()->make(array_merge($data, $custom));
     }
 
     public function getTv($custom = [])
@@ -90,6 +90,6 @@
         'tmdb_id' => 1399,
       ];
 
-      return factory(Item::class)->states('tv')->make(array_merge($data, $custom));
+      return Item::factory()->tv()->make(array_merge($data, $custom));
     }
   }

@@ -3,10 +3,12 @@
   namespace App\Models;
 
   use Carbon\Carbon;
+  use Illuminate\Database\Eloquent\Factories\HasFactory;
   use Illuminate\Database\Eloquent\Model;
   use Illuminate\Support\Facades\Auth;
 
   class Episode extends Model {
+    use HasFactory;
 
     /**
      * The accessors to append to the model's array form.

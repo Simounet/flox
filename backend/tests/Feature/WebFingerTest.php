@@ -20,7 +20,7 @@ class WebFingerTest extends TestCase
 
         $this->host = parse_url(env('APP_URL'))['host'];
         $this->withHeader('Host', $this->host);
-        $this->user = factory(User::class)->create();
+        $this->user = User::factory()->create();
     }
 
     /** @test */
