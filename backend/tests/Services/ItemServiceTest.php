@@ -2,7 +2,7 @@
 
   namespace Tests\Services;
 
-  use Illuminate\Foundation\Testing\RefreshDatabase;
+  use Illuminate\Foundation\Testing\DatabaseMigrations;
   use Tests\TestCase;
   use App\Models\Item;
   use App\Services\Models\ItemService;
@@ -12,7 +12,7 @@
 
   class ItemServiceTest extends TestCase {
 
-    use RefreshDatabase;
+    use DatabaseMigrations;
     use Factories;
     use Fixtures;
     use Mocks;
@@ -203,10 +203,10 @@
     {
       $this->createGuzzleMock(
         $this->tmdbFixtures('movie/details_release_date_before_1970'),
-        $this->tmdbFixtures('movie/alternative_titles')
+        $this->tmdbFixtures('movie/alternative_titles_before_1970')
       );
 
-      $movie = $this->floxFixtures('movie');
+      $movie = $this->floxFixtures('movie-1970');
       $movie['released'] = -2077194094;
       $item = $this->createItem($movie);
       $this->assertEquals($item->released_datetime->format('Y-m-d'), '1904-03-06');

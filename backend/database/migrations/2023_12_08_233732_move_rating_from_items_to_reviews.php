@@ -61,7 +61,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('items', function(Blueprint $table) {
-            $table->string('rating')->after('media_type');
+            $table->string('rating')->nullable()->after('media_type');
             $table->boolean('watchlist')->default(false)->after('imdb_rating');
             $table->timestamp('last_seen_at')->nullable()->after('updated_at');
         });

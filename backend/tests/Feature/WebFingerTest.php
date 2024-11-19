@@ -3,13 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class WebFingerTest extends TestCase
 {
 
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     private $host;
     private $user;

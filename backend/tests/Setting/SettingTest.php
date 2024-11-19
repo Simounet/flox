@@ -2,14 +2,14 @@
 
   namespace Tests\Setting;
 
-  use Illuminate\Foundation\Testing\RefreshDatabase;
+  use Illuminate\Foundation\Testing\DatabaseMigrations;
   use Tests\TestCase;
   use App\Models\Setting;
   use Tests\Traits\Factories;
 
   class SettingTest extends TestCase {
 
-    use RefreshDatabase;
+    use DatabaseMigrations;
     use Factories;
 
     protected $user1;

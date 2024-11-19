@@ -36,9 +36,10 @@
       return response('Ok', 200);
     }
 
-    public function plex(): Response
+    public function plex(Request $request): Response
     {
-      $payload = json_decode(request('payload'), true);
+      $inputPayload = $request->input('payload');
+      $payload = json_decode($inputPayload, true);
 
       $result = $this->plex->handle($payload);
 

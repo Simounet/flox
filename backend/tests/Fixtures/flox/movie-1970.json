@@ -1,0 +1,13 @@
+{
+  "tmdb_id": 1970,
+  "title": "1970 movie example",
+  "original_title": "1970 move example",
+  "poster": "\/jVT1MYp58SSzXc6BKetkGxVS3Ze.jpg",
+  "media_type": "movie",
+  "released": -2077194094,
+  "genre": "Adventure, Fantasy, Action",
+  "genre_ids": [1,2,3],
+  "episodes": [],
+  "credit_cast": [],
+  "credit_crew": []
+}

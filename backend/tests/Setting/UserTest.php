@@ -3,13 +3,13 @@
   namespace Tests\Setting;
 
   use App\Models\User;
-  use Illuminate\Foundation\Testing\RefreshDatabase;
+  use Illuminate\Foundation\Testing\DatabaseMigrations;
   use Tests\TestCase;
   use Illuminate\Support\Facades\Hash;
 
   class UserTest extends TestCase {
 
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     protected $user;
 
