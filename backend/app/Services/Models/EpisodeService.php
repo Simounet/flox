@@ -77,7 +77,7 @@
      */
     public function getAllByTmdbId(int $userId, int $tmdbId): array
     {
-      Carbon::setLocale(config('app.TRANSLATION'));
+      Carbon::setLocale(config('app.locale'));
 
       $episodes = $this->episode->findByTmdbId($tmdbId)->oldest('episode_number')->get()->groupBy('season_number');
       $episodeUserSeen = EpisodeUser::select('episode_id')->from('episode_user');

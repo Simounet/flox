@@ -25,7 +25,7 @@
     public function __construct(private Client $client)
     {
       $this->apiKey = config('services.tmdb.key');
-      $this->translation = config('app.TRANSLATION');
+      $this->translation = config('app.locale');
     }
 
     /**

@@ -7,7 +7,6 @@ use Illuminate\Support\ServiceProvider;
 
     'version' => '2.3.0',
 
-    'TRANSLATION' => env('TRANSLATION', 'EN'),
     'LOADING_ITEMS' => env('LOADING_ITEMS'),
     'CLIENT_URI' => env('CLIENT_URI'),
     'PHP_TIME_LIMIT' => env('PHP_TIME_LIMIT'),
