@@ -10,7 +10,7 @@ use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ItemService;
 use App\Services\Models\ProfileService;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -20,7 +20,7 @@ use Tests\Traits\Mocks;
 
 class ReviewTest extends TestCase {
 
-    use DatabaseMigrations;
+    use DatabaseTransactions;
     use Factories;
     use Fixtures;
     use Mocks;
@@ -71,14 +71,14 @@ class ReviewTest extends TestCase {
     {
       Queue::fake();
       $this->addFollower();
-      $this->mockItem();
+      $movie = $this->mockItem();
       $this->actingAs($this->user)->postJson('api/review', [
-        'itemId' => 1,
+        'itemId' => $movie->id,
         'content' => 'Lorem ipsum.'
       ])->assertStatus(200);
       Queue::assertPushed(ReviewSendActivities::class);
       $this->assertDatabaseHas('reviews', [
-        'item_id' => 1,
+        'item_id' => $movie->id,
         'content' => 'Lorem ipsum.',
       ]);
     }
@@ -88,18 +88,18 @@ class ReviewTest extends TestCase {
     {
       Queue::fake();
       $this->addFollower();
-      $this->mockItem();
+      $movie = $this->mockItem();
       $this->actingAs($this->user)->postJson('api/review', [
-        'itemId' => 1,
+        'itemId' => $movie->id,
         'content' => 'Lorem ipsum.'
       ])->assertStatus(200);
-      $this->actingAs($this->user)->postJson('api/review', [
-        'itemId' => 1,
+      $review = $this->actingAs($this->user)->postJson('api/review', [
+        'itemId' => $movie->id,
         'content' => 'Lorem ipsum dolor.'
       ])->assertStatus(200);
       Queue::assertPushed(ReviewSendActivities::class);
       $this->assertDatabaseHas('reviews', [
-        'item_id' => 1,
+        'user_id' => $this->user->id,
         'content' => 'Lorem ipsum dolor.',
       ]);
     }
@@ -107,8 +107,11 @@ class ReviewTest extends TestCase {
     /** @test */
     public function itShouldFailAtChangingOtherUserRating(): void
     {
-      $this->createMovie();
-      $review = $this->createReview();
+      $movie = $this->createMovie();
+      $review = $this->createReview([
+        'user_id' => $this->user->id,
+        'item_id' => $movie->id
+      ]);
       $user2 = $this->createUser();
 
       $this->actingAs($user2)->patchJson('api/review/change-rating/' . $review->id, [

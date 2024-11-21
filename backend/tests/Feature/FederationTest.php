@@ -9,7 +9,7 @@ use App\Models\Profile;
 use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ProfileService;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -17,7 +17,7 @@ use Tests\TestCase;
 class FederationTest extends TestCase
 {
 
-    use DatabaseMigrations;
+    use DatabaseTransactions;
 
     private $host;
     private $profile;

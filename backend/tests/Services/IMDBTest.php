@@ -2,13 +2,13 @@
 
   namespace Tests\Services;
 
-  use Illuminate\Foundation\Testing\DatabaseMigrations;
+  use Illuminate\Foundation\Testing\DatabaseTransactions;
   use Tests\TestCase;
   use App\Services\IMDB;
 
   class IMDBTest extends TestCase {
 
-    use DatabaseMigrations;
+    use DatabaseTransactions;
 
     /** @test */
     public function it_should_parse_imdb_rating()

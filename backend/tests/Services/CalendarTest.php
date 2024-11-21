@@ -4,14 +4,14 @@ namespace Tests\Services;
 
 use App\Services\Calendar;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
 use Tests\Traits\Mocks;
 
 class CalendarTest extends TestCase {
 
-  use DatabaseMigrations;
+  use DatabaseTransactions;
   use Factories;
   use Fixtures;
   use Mocks;
@@ -30,8 +30,11 @@ class CalendarTest extends TestCase {
   {
     $user = $this->createUser();
     $this->be($user);
-    $this->createTv();
-    $this->createReview();
+    $tv = $this->createTv();
+    $this->createReview([
+      'user_id' => $user->id,
+      'item_id' => $tv['item']->id
+    ]);
 
     $items = $this->calendar->items();
 
@@ -55,8 +58,10 @@ class CalendarTest extends TestCase {
   {
     $user = $this->createUser();
     $this->be($user);
-    $this->createTv();
+    $tv = $this->createTv();
     $this->createReview([
+      'user_id' => $user->id,
+      'item_id' => $tv['item']->id,
       'watchlist' => true
     ]);
 
@@ -72,8 +77,11 @@ class CalendarTest extends TestCase {
   {
     $user = $this->createUser();
     $this->be($user);
-    $this->createMovie();
-    $this->createReview();
+    $movie = $this->createMovie();
+    $this->createReview([
+      'user_id' => $user->id,
+      'item_id' => $movie->id
+    ]);
 
     $items = $this->calendar->items();
 
@@ -97,8 +105,10 @@ class CalendarTest extends TestCase {
   {
     $user = $this->createUser();
     $this->be($user);
-    $this->createMovie();
+    $movie = $this->createMovie();
     $this->createReview([
+      'user_id' => $user->id,
+      'item_id' => $movie->id,
       'watchlist' => true
     ]);
 
@@ -116,11 +126,13 @@ class CalendarTest extends TestCase {
     $this->be($user);
     $tv = $this->createTv();
     $this->createReview([
+      'user_id' => $user->id,
       'item_id' => $tv['item']->id,
       'watchlist' => true
     ]);
     $movie = $this->createMovie();
     $this->createReview([
+      'user_id' => $user->id,
       'item_id' => $movie->id,
       'watchlist' => false
     ]);

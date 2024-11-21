@@ -7,7 +7,7 @@ use App\Services\Fediverse\Activity\ActorActivity;
 use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ProfileService;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Tests\TestCase;
@@ -15,7 +15,7 @@ use Tests\TestCase;
 class HttpSignatureTest extends TestCase
 {
 
-    use DatabaseMigrations;
+    use DatabaseTransactions;
 
     private $host;
     private $profile;

@@ -2,12 +2,12 @@
 
   namespace Tests;
 
-  use Illuminate\Foundation\Testing\DatabaseMigrations;
+  use Illuminate\Foundation\Testing\DatabaseTransactions;
   use Illuminate\Support\Facades\Schema;
 
   class ApplicationTest extends TestCase {
 
-    use DatabaseMigrations;
+    use DatabaseTransactions;
 
     /** @test */
     public function it_can_create_migrations()
