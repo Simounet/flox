@@ -4,14 +4,14 @@ namespace Tests\Services;
 
 use App\Services\Calendar;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
 use Tests\Traits\Mocks;
 
 class CalendarTest extends TestCase {
 
-  use DatabaseMigrations;
+  use DatabaseTransactions;
   use Factories;
   use Fixtures;
   use Mocks;

@@ -5,13 +5,13 @@ namespace Tests\Feature;
 use App\Models\Profile;
 use App\Services\Models\ProfileService;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class ActorTest extends TestCase
 {
 
-    use DatabaseMigrations;
+    use DatabaseTransactions;
 
     private $host;
     private $profile;

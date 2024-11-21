@@ -10,7 +10,7 @@
   use App\Services\Models\ItemService;
   use App\Services\Storage;
   use App\Models\Setting;
-  use Illuminate\Foundation\Testing\DatabaseMigrations;
+  use Illuminate\Foundation\Testing\DatabaseTransactions;
   use Illuminate\Http\UploadedFile;
   use Illuminate\Support\Facades\Queue;
   use Mockery;
@@ -20,7 +20,7 @@
 
   class ExportImportTest extends TestCase {
 
-    use DatabaseMigrations;
+    use DatabaseTransactions;
     use Factories;
     use Mocks;
 

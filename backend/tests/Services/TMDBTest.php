@@ -2,7 +2,7 @@
 
   namespace Tests\Services;
 
-  use Illuminate\Foundation\Testing\DatabaseMigrations;
+  use Illuminate\Foundation\Testing\DatabaseTransactions;
   use Tests\TestCase;
   use App\Services\TMDB;
   use GuzzleHttp\Client;
@@ -15,7 +15,7 @@
 
   class TMDBTest extends TestCase {
 
-    use DatabaseMigrations;
+    use DatabaseTransactions;
     use Factories;
     use Fixtures;
     use Mocks;

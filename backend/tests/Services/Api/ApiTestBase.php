@@ -8,7 +8,7 @@ use App\Models\Item;
 use App\Models\Review;
 use App\Models\User;
 use App\ValueObjects\EpisodeUserValueObject;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 use Tests\Traits\Factories;
@@ -17,7 +17,7 @@ use Tests\Traits\Mocks;
 
 class ApiTestBase extends TestCase
 {
-  use DatabaseMigrations;
+  use DatabaseTransactions;
   use Mocks;
   use Factories;
   use Fixtures;

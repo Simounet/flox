@@ -7,7 +7,7 @@ use App\Models\EpisodeUser;
 use App\Models\Review;
 use App\Services\Models\EpisodeUserService;
 use App\ValueObjects\EpisodeUserValueObject;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
@@ -16,7 +16,7 @@ use Tests\Traits\Mocks;
 class EpisodeUserServiceTest extends TestCase
 {
 
-    use RefreshDatabase;
+    use DatabaseTransactions;
     use Factories;
     use Fixtures;
     use Mocks;
