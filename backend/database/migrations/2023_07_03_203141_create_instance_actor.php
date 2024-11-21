@@ -15,7 +15,7 @@ return new class extends Migration
 
         $user = new User();
         $user->id = null;
-        $user->username = env('APP_DOMAIN');
+        $user->username = config('flox.domain');
 
         Profile::unguard();
         (new ProfileService($profile))->storeLocal($user, Profile::INSTANCE_ACTOR_ID);

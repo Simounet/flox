@@ -30,7 +30,7 @@ class ProfileService
         $profile = [
             'id' => $forcedId ?? $snowflake->next(),
             'user_id' => $user->id,
-            'domain' => env('APP_DOMAIN'),
+            'domain' => config('flox.domain'),
             'username' => $user->username,
             'name' => $user->username,
             'shared_inbox_url' => $this->sharedInboxUrl(),

@@ -1,6 +1,9 @@
 <?php
 
 return [
+
+    'domain' => parse_url(env('APP_URL'), PHP_URL_HOST),
+
     /*
     |--------------------------------------------------------------------------
     | Federation

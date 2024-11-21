@@ -14,7 +14,7 @@ class ActivityService
     {
         if(
                 $targetProfile === null
-                || $targetProfile->domain !== env('APP_DOMAIN')
+                || $targetProfile->domain !== config('flox.domain')
           ) {
             throw new \Exception(self::ACTIVITY_WRONG_TARGET);
         }

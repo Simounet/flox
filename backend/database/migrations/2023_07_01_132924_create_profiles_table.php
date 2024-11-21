@@ -17,7 +17,7 @@ return new class extends Migration
      */
     public function up()
     {
-        if(empty(env('APP_DOMAIN'))) {
+        if(empty(config('flox.domain'))) {
             throw new \Exception('APP_DOMAIN parameter is missing in the .env file. Look at the .env.example file.');
         }
         Schema::create('profiles', function (Blueprint $table) {

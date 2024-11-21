@@ -53,6 +53,6 @@ class Profile extends Model
 
     public function whereLocalProfile(string $username): ?self
     {
-        return $this->firstWhere(['username' => $username, 'domain' => env('APP_DOMAIN')]);
+        return $this->firstWhere(['username' => $username, 'domain' => config('flox.domain')]);
     }
 }
