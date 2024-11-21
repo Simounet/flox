@@ -8,6 +8,8 @@ The rating based on an 3-Point system for `good`, `medium` and `bad`.
 
 ![flox](./public/assets/screenshot.jpg)
 
+## [Flox documentation](https://simounet.github.io/flox/)
+
 ## Requirements
 
 * PHP >=8.1
