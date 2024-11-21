@@ -59,7 +59,10 @@ class ReviewServiceTest extends TestCase
     public function it_should_change_rating()
     {
       $item = $this->createMovie();
-      $review = $this->createReview(['item_id' => $item->id]);
+      $review = $this->createReview([
+        'user_id' => $this->user->id,
+        'item_id' => $item->id
+      ]);
 
       $review = $this->review->find($review->id);
       $this->reviewService->changeRating($review->id, 3, $this->user->id);
@@ -74,7 +77,11 @@ class ReviewServiceTest extends TestCase
     public function it_should_change_review_updated_at_if_rating_was_neutral()
     {
       $item = $this->createMovie();
-      $review = $this->createReview(['item_id' => $item->id, 'rating' => 0]);
+      $review = $this->createReview([
+        'user_id' => $this->user->id,
+        'item_id' => $item->id,
+        'rating' => 0
+      ]);
 
       $review = $this->review->find($review->id);
       sleep(1);
@@ -89,10 +96,18 @@ class ReviewServiceTest extends TestCase
     {
       $item = $this->createMovie();
       $user1InitialRating = 0;
-      $reviewUser1 = $this->createReview(['item_id' => $item->id, 'rating' => $user1InitialRating]);
+      $reviewUser1 = $this->createReview([
+        'user_id' => $this->user->id,
+        'item_id' => $item->id,
+        'rating' => $user1InitialRating
+      ]);
 
       $user2 = $this->createUser();
-      $reviewUser2 = $this->createReview(['user_id' => $user2->id, 'item_id' => $item->id, 'rating' => 1]);
+      $reviewUser2 = $this->createReview([
+        'user_id' => $user2->id,
+        'item_id' => $item->id,
+        'rating' => 1
+      ]);
       $user2ModifiedRating = 1;
       $this->reviewService->changeRating($reviewUser2->id, $user2ModifiedRating, $user2->id);
 

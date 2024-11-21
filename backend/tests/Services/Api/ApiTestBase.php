@@ -120,16 +120,19 @@ class ApiTestBase extends TestCase
   public function it_should_rate_a_movie($fixture, $shouldHaveRating)
   {
     $this->be($this->user);
-    $this->createMovie();
-    $this->createReview();
+    $movie = $this->createMovie();
+    $review = $this->createReview([
+        'user_id' => $this->user->id,
+        'item_id' => $movie->id
+    ]);
 
     $api = app($this->apiClass);
 
-    $movieBefore = Review::first();
+    $movieBefore = Review::where(['id' => $review->id])->first();
 
     $api->handle($this->apiFixtures($fixture));
 
-    $movieAfter = Review::first();
+    $movieAfter = Review::where(['id' => $review->id])->first();
 
     $this->assertEquals(1, $movieBefore->rating);
     $this->assertEquals($shouldHaveRating, $movieAfter->rating);
@@ -138,16 +141,19 @@ class ApiTestBase extends TestCase
   public function it_should_rate_a_tv_show($fixture, $shouldHaveRating)
   {
     $this->be($this->user);
-    $this->createTv();
-    $this->createReview();
+    $tv = $this->createTv();
+    $review = $this->createReview([
+        'user_id' => $this->user->id,
+        'item_id' => $tv['item']->id
+    ]);
 
     $api = app($this->apiClass);
 
-    $tvBefore = Review::first();
+    $tvBefore = Review::where(['id' => $review->id])->first();
 
     $api->handle($this->apiFixtures($fixture));
 
-    $tvAfter = Review::first();
+    $tvAfter = Review::where(['id' => $review->id])->first();
 
     $this->assertEquals(1, $tvBefore->rating);
     $this->assertEquals($shouldHaveRating, $tvAfter->rating);
@@ -175,19 +181,22 @@ class ApiTestBase extends TestCase
   public function it_should_updated_review_updated_at($fixture)
   {
     $this->be($this->user);
-    $this->createTv();
-    $this->createReview();
+    $tv = $this->createTv();
+    $review = $this->createReview([
+        'user_id' => $this->user->id,
+        'item_id' => $tv['item']->id
+    ]);
 
     $api = app($this->apiClass);
 
-    $updatedAt = Review::first()->updated_at;
+    $updatedAt = Review::where(['id' => $review->id])->first()->updated_at;
 
     // sleep for 1 second so that Carbon::now() returns a different date
     sleep(1);
 
     $api->handle($this->apiFixtures($fixture));
 
-    $updatedAtUpdated = Review::first()->updated_at;
+    $updatedAtUpdated = Review::where(['id' => $review->id])->first()->updated_at;
 
     $this->assertNotEquals($updatedAt, $updatedAtUpdated);
   }
@@ -195,8 +204,11 @@ class ApiTestBase extends TestCase
   public function it_should_add_a_review_to_existing_item($fixture)
   {
     $this->be($this->user);
-    $this->createTv();
-    $review = $this->createReview();
+    $tv = $this->createTv();
+    $review = $this->createReview([
+        'user_id' => $this->user->id,
+        'item_id' => $tv['item']->id
+    ]);
 
     $this->assertEquals(1, Review::count());
     $review->delete();

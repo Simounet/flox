@@ -118,9 +118,15 @@
       $user = $this->createUser();
       $this->actingAs($user);
       $movie = $this->createMovie();
-      $this->createReview(['item_id' => $movie->id]);
+      $this->createReview([
+        'user_id' => $user->id,
+        'item_id' => $movie->id
+      ]);
       $tv = $this->createTv();
-      $this->createReview(['item_id' => $tv['item']->id]);
+      $this->createReview([
+        'user_id' => $user->id,
+        'item_id' => $tv['item']->id
+      ]);
 
       $tmdb = app(TMDB::class);
       $trending = $tmdb->trending();
@@ -140,8 +146,11 @@
 
       $user = $this->createUser();
       $this->actingAs($user);
-      $this->createMovie();
-      $this->createReview();
+      $movie = $this->createMovie();
+      $this->createReview([
+        'user_id' => $user->id,
+        'item_id' => $movie->id
+      ]);
 
       $tmdb = app(TMDB::class);
       $trending = $tmdb->upcoming();

@@ -42,13 +42,13 @@ class EpisodeUserServiceTest extends TestCase
         $episodeId = 1;
         $user = $this->createUser();
         $this->actingAs($user);
-        $this->createTv();
+        $tv = $this->createTv();
         $episodeUserValueObject = new EpisodeUserValueObject($user->id, $episodeId);
 
         $isEpisodeSeen1 = $this->episodeUser->isSeen($episodeUserValueObject);
-        $this->episodeUserService->toggleSeen(1);
+        $this->episodeUserService->toggleSeen($tv['episodes'][0]->id);
         $isEpisodeSeen2 = $this->episodeUser->isSeen($episodeUserValueObject);
-        $this->episodeUserService->toggleSeen(1);
+        $this->episodeUserService->toggleSeen($tv['episodes'][0]->id);
         $isEpisodeSeen3 = $this->episodeUser->isSeen($episodeUserValueObject);
 
         $this->assertEquals(0, $isEpisodeSeen1);
@@ -61,10 +61,10 @@ class EpisodeUserServiceTest extends TestCase
     {
         $user = $this->createUser();
         $this->actingAs($user);
-        $this->createTv();
+        $tv = $this->createTv();
 
-        $season = 1;
-        $tmdbId = 1399;
+        $season = $tv['episodes'][0]->season_number;
+        $tmdbId = $tv['item']->tmdb_id;
 
         $episodes1 = $this->episode->select('id')->where('season_number', $season)->pluck('id');
         $this->episodeUserService->toggleSeason($tmdbId, $season, 1);
@@ -88,13 +88,16 @@ class EpisodeUserServiceTest extends TestCase
     {
         $user = $this->createUser();
         $this->actingAs($user);
-        $this->createTv();
-        $this->createReview();
+        $tv = $this->createTv();
+        $review = $this->createReview([
+            'user_id' => $user->id,
+            'item_id' => $tv['item']->id
+        ]);
 
-        $review = $this->review->first();
+        $review = $this->review->where(['id' => $review->id])->first();
         sleep(1);
-        $this->episodeUserService->toggleSeen(1);
-        $reviewUpdated = $this->review->first();
+        $this->episodeUserService->toggleSeen($tv['episodes'][0]->id);
+        $reviewUpdated = $this->review->where(['id' => $review->id])->first();
 
         $this->assertNotEquals($reviewUpdated->updated_at, $review->updated_at);
     }
@@ -104,16 +107,19 @@ class EpisodeUserServiceTest extends TestCase
     {
         $user = $this->createUser();
         $this->actingAs($user);
-        $this->createTv();
-        $this->createReview();
+        $tv = $this->createTv();
+        $initialReview = $this->createReview([
+            'user_id' => $user->id,
+            'item_id' => $tv['item']->id
+        ]);
 
-        $this->episodeUserService->toggleSeen(1);
-        $review = $this->review->first();
+        $this->episodeUserService->toggleSeen($tv['episodes'][0]->id);
+        $reviewWithEpisodeSeen1= $this->review->where(['id' => $initialReview->id])->first();
         sleep(1);
-        $this->episodeUserService->toggleSeen(1);
-        $reviewUpdated = $this->review->first();
+        $this->episodeUserService->toggleSeen($tv['episodes'][0]->id);
+        $reviewWithEpisodeSeen2= $this->review->where(['id' => $initialReview->id])->first();
 
-        $this->assertEquals($reviewUpdated->updated_at, $review->updated_at);
+        $this->assertEquals($reviewWithEpisodeSeen1->updated_at, $reviewWithEpisodeSeen2->updated_at);
     }
 
     /** @test */
@@ -121,15 +127,18 @@ class EpisodeUserServiceTest extends TestCase
     {
         $user = $this->createUser();
         $this->actingAs($user);
-        $this->createTv();
-        $this->createReview();
+        $tv = $this->createTv();
+        $initialReview = $this->createReview([
+            'user_id' => $user->id,
+            'item_id' => $tv['item']->id
+        ]);
 
-        $review = $this->review->first();
+        $review = $this->review->where(['id' => $initialReview->id])->first();
         sleep(1);
-        $this->episodeUserService->toggleSeason(1399, 1, 1);
-        $reviewUpdated = $this->review->first();
+        $this->episodeUserService->toggleSeason($tv['item']->tmdb_id, $tv['episodes'][0]->season_number, true);
+        $updatedReview = $this->review->first();
 
-        $this->assertNotEquals($reviewUpdated->updated_at, $review->updated_at);
+        $this->assertNotEquals($updatedReview->updated_at, $review->updated_at);
     }
 
     /** @test */
@@ -137,15 +146,18 @@ class EpisodeUserServiceTest extends TestCase
     {
         $user = $this->createUser();
         $this->actingAs($user);
-        $this->createTv();
-        $this->createReview();
+        $tv = $this->createTv();
+        $initialReview = $this->createReview([
+            'user_id' => $user->id,
+            'item_id' => $tv['item']->id
+        ]);
 
-        $review = $this->review->first();
+        $review = $this->review->where(['id' => $initialReview->id])->first();
         sleep(1);
-        $this->episodeUserService->toggleSeason(1399, 1, 0);
-        $reviewUpdated = $this->review->first();
+        $this->episodeUserService->toggleSeason($tv['item']->tmdb_id, $tv['episodes'][0]->season_number, false);
+        $reviewWithSeasonToggled = $this->review->where(['id' => $initialReview->id])->first();
 
-        $this->assertEquals($reviewUpdated->updated_at, $review->updated_at);
+        $this->assertEquals($reviewWithSeasonToggled->updated_at, $review->updated_at);
     }
 
     /** @test */
@@ -154,10 +166,13 @@ class EpisodeUserServiceTest extends TestCase
         $user = $this->createUser();
         $this->actingAs($user);
         $tv = $this->createTv();
-        $this->createReview();
+        $this->createReview([
+            'user_id' => $user->id,
+            'item_id' => $tv['item']->id
+        ]);
 
-        $this->episodeUserService->toggleSeen(1);
-        $this->episodeUserService->toggleSeason($tv['item']->tmdb_id, 1, true);
+        $this->episodeUserService->toggleSeen($tv['episodes'][0]->id);
+        $this->episodeUserService->toggleSeason($tv['item']->tmdb_id, $tv['episodes'][0]->season_number, true);
 
         $episodesSeenCount = EpisodeUser::count();
         $this->assertEquals(2, $episodesSeenCount);
