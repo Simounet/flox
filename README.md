@@ -192,7 +192,7 @@ Like this project? Want to contribute? Awesome! Feel free to open some pull requ
 
 ## Changelog
 
-Detailed changes for each release are documented in the [release notes](https://github.com/simounet/flox/releases).
+Detailed changes for each release are documented in the [release notes](./CHANGELOG.md).
 
 ## License
 
