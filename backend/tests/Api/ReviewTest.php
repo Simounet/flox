@@ -131,7 +131,6 @@ class ReviewTest extends TestCase {
       $reviews = Review::query()->get();
       $this->assertEquals(1, $reviews->count());
       $review = $reviews->first();
-      echo 'Base rating: ' . $review->rating . PHP_EOL;
 
       $updatedRating = 1;
 
@@ -139,14 +138,12 @@ class ReviewTest extends TestCase {
         'rating' => $updatedRating
       ]);
       $changedRatingReview = Review::find($review->id);
-      echo 'Updated rating: ' . $changedRatingReview->rating . PHP_EOL;
       $this->postJson('api/review', [
         'itemId' => $item->id,
         'content' => 'Lorem ipsum.'
       ]);
 
       $updatedReview = Review::find($review->id);
-      echo 'After post rating: ' . $updatedReview->rating . PHP_EOL;
 
       $this->assertEquals($updatedRating, $updatedReview->rating);
     }
