@@ -1,5 +1,17 @@
 # Flox Changelog
 
+## [2.4.0](https://github.com/Simounet/flox/releases/tag/2.4.0) - 2024-11-21
+
+* Laravel upgraded to v11
+* chores
+
+### Upgrade notes
+
+#### Changes in the .env file
+
+* Variable `TRANSLATION` renamed to `APP_LOCALE`
+* Variable `APP_DOMAIN` deleted
+
 ## [2.3.0](https://github.com/Simounet/flox/releases/tag/2.3.0) - 2024-09-05
 
 * Kodi API
