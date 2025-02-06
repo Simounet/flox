@@ -4,7 +4,7 @@
 
   <meta charset="utf-8">
   <meta id="token" content="{{ csrf_token() }}">
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Flox</title>
   <link rel="stylesheet" href="{{ url('assets/app.css') }}">
