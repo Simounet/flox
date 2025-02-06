@@ -9,6 +9,7 @@
   <title>Flox</title>
   <link rel="stylesheet" href="{{ url('assets/app.css') }}">
   <link href="{{ url('assets/favicon.ico?v=3') }}" rel="icon" type="image/x-icon">
+  <link rel="manifest" href="{{ url('manifest.json') }}">
 
 </head>
 <body
