@@ -1,5 +1,11 @@
 # Flox Changelog
 
+## [2.5.0](https://github.com/Simounet/flox/releases/tag/2.5.0) - 2025-02-06
+
+* manifest.json added
+* viewport user-scalable disabled removed
+* chores
+
 ## [2.4.0](https://github.com/Simounet/flox/releases/tag/2.4.0) - 2024-11-21
 
 * Laravel upgraded to v11
