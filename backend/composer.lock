@@ -1611,25 +1611,25 @@
         },
         {
             "name": "kra8/laravel-snowflake",
-            "version": "v2.3.0",
+            "version": "v2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kra8/laravel-snowflake.git",
-                "reference": "5fe9ab806c630b91b2c61ed1528fbc7926f7467f"
+                "reference": "914dc0299cdc15d891b2ecf50e599a9179fd0894"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kra8/laravel-snowflake/zipball/5fe9ab806c630b91b2c61ed1528fbc7926f7467f",
-                "reference": "5fe9ab806c630b91b2c61ed1528fbc7926f7467f",
+                "url": "https://api.github.com/repos/kra8/laravel-snowflake/zipball/914dc0299cdc15d891b2ecf50e599a9179fd0894",
+                "reference": "914dc0299cdc15d891b2ecf50e599a9179fd0894",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^6.3|^7.0|^8.0|^9.0|^10.0|^11.0",
+                "illuminate/support": "^6.3|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
                 "php": "^8.2"
             },
             "require-dev": {
                 "orchestra/testbench": "^8.0",
-                "phpunit/phpunit": "^10.0|^11.0"
+                "phpunit/phpunit": "^10.0|^11.0|^12.0"
             },
             "type": "library",
             "extra": {
@@ -1664,7 +1664,7 @@
             ],
             "support": {
                 "issues": "https://github.com/kra8/laravel-snowflake/issues",
-                "source": "https://github.com/kra8/laravel-snowflake/tree/v2.3.0"
+                "source": "https://github.com/kra8/laravel-snowflake/tree/v2.4.0"
             },
             "funding": [
                 {
@@ -1672,7 +1672,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-03-15T01:00:47+00:00"
+            "time": "2025-02-25T01:49:37+00:00"
         },
         {
             "name": "landrok/activitypub",
@@ -1735,16 +1735,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v11.43.2",
+            "version": "v11.44.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "99d1573698abc42222f04d25fcd5b213d0eedf21"
+                "reference": "e9a33da34815ac1ed46c7e4c477a775f4592f0a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/99d1573698abc42222f04d25fcd5b213d0eedf21",
-                "reference": "99d1573698abc42222f04d25fcd5b213d0eedf21",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/e9a33da34815ac1ed46c7e4c477a775f4592f0a7",
+                "reference": "e9a33da34815ac1ed46c7e4c477a775f4592f0a7",
                 "shasum": ""
             },
             "require": {
@@ -1946,7 +1946,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2025-02-19T21:53:48+00:00"
+            "time": "2025-02-24T13:08:54+00:00"
         },
         {
             "name": "laravel/prompts",
