@@ -94,7 +94,7 @@
       // Remove movies which already are in database.
       return $items->filter(function($item) use ($inDB) {
         return ! in_array($item['tmdb_id'], array_column($inDB, 'tmdb_id'));
-      });
+      })->values();
     }
 
     /**
