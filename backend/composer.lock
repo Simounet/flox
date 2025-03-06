@@ -8560,21 +8560,21 @@
     "packages-dev": [
         {
             "name": "balping/artisan-bash-completion",
-            "version": "v2.0.1",
+            "version": "v2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.com/balping/artisan-bash-completion.git",
-                "reference": "ca19968a5f5f3e7ee0ed22cf9c046aec6d3565e2"
+                "reference": "79b0117829e859316cdb4675a1835baac29e9cd0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.com/api/v4/projects/balping%2Fartisan-bash-completion/repository/archive.zip?sha=ca19968a5f5f3e7ee0ed22cf9c046aec6d3565e2",
-                "reference": "ca19968a5f5f3e7ee0ed22cf9c046aec6d3565e2",
+                "url": "https://gitlab.com/api/v4/projects/balping%2Fartisan-bash-completion/repository/archive.zip?sha=79b0117829e859316cdb4675a1835baac29e9cd0",
+                "reference": "79b0117829e859316cdb4675a1835baac29e9cd0",
                 "shasum": ""
             },
             "require": {
-                "illuminate/console": "^9.0|^10.0|^11.0",
-                "illuminate/support": "^9.0|^10.0|^11.0"
+                "illuminate/console": "^9.0|^10.0|^11.0|^12.0",
+                "illuminate/support": "^9.0|^10.0|^11.0|^12.0"
             },
             "type": "library",
             "extra": {
@@ -8615,9 +8615,9 @@
             ],
             "support": {
                 "issues": "https://gitlab.com/balping/artisan-bash-completion/-/issues",
-                "source": "https://gitlab.com/balping/artisan-bash-completion/-/tree/v2.0.1"
+                "source": "https://gitlab.com/balping/artisan-bash-completion/-/tree/v2.0.2"
             },
-            "time": "2024-03-30T17:42:51+00:00"
+            "time": "2025-03-04T19:47:37+00:00"
         },
         {
             "name": "fakerphp/faker",
