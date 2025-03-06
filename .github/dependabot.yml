@@ -31,7 +31,7 @@ updates:
     timezone: Europe/Paris
   open-pull-requests-limit: 10
   reviewers:
-  - simounet
+  - Simounet
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
