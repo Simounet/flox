@@ -8,9 +8,7 @@ export function loadItems({state, commit}, response) {
     commit('SET_ITEMS', data);
     commit('SET_PAGINATOR', next_page_url);
 
-    setTimeout(() => {
-      commit('SET_LOADING', false);
-    }, 500);
+    commit('SET_LOADING', false);
   }, error => {
     if(error.status === 404) {
       window.location.href = config.url;
