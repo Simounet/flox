@@ -200,10 +200,6 @@
   height: 11px;
   float: left;
   margin: 0 7px 0 0;
-
-  @include media(6) {
-    display: none;
-  }
 }
 
 .big-teaser-buttons {
