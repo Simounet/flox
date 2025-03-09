@@ -19,7 +19,6 @@
     </div>
 
     <div class="item-header no-select" v-if=" ! loadingModalData">
-      <span class="header-episode">#</span>
       <span class="header-name">Name</span>
       <span class="header-seen" @click="toggleAll()" v-if="auth">Toggle all</span>
     </div>
@@ -34,7 +33,7 @@
         <i class="item-has-src" v-if="episode.src"></i>
         <span class="modal-release-episode" v-if="episode.release_episode"><i></i> {{ releasedDate(episode.release_episode) }}</span>
         <span class="modal-release-episode" v-if=" ! episode.release_episode"><i></i> {{ lang('no release') }}</span>
-        <span class="episode-seen" :class="{seen: episode.seen}"><i></i></span>
+        <i class="episode-seen" :class="{seen: episode.seen}"></i>
       </div>
     </div>
 

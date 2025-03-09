@@ -156,12 +156,6 @@
   }
 }
 
-.header-episode {
-  width: 35px;
-  margin: 0 10px 0 0;
-  text-align: right;
-}
-
 .header-seen {
   float: right !important;
   cursor: pointer;
@@ -182,11 +176,13 @@
 }
 
 .modal-item {
-  float: left;
+  display: grid;
   width: 100%;
   padding: 10px;
   cursor: pointer;
   border-bottom: 1px solid #444;
+  grid-template-areas: "title title episodenumber" "date date checkbox";
+  gap: 2px 10px;
 
   @include transition(background);
 
@@ -210,22 +206,16 @@
 }
 
 .modal-episode {
-  float: left;
-  width: 35px;
-  text-align: right;
   color: rgba(#fff, .4);
   font-size: 15px;
-  margin: 0 10px 0 0;
+  text-align: right;
+  grid-area: episodenumber;
 }
 
 .modal-name {
-  float: left;
   color: rgba(#fff, .7);
-  max-width: calc(100% - 100px);
   font-size: 15px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  grid-area: title;
 
   &.spoiler-protect {
     background: rgba(#fff, .4);
@@ -236,32 +226,31 @@
 }
 
 .modal-release-episode {
-  float: left;
   color: rgba(#fff, .4);
   font-size: 13px;
-  margin: 2px 0 0 10px;
+  align-content: end;
+  grid-area: date;
 
   i {
-    float: left;
+    display: inline-block;
     width: 13px;
     height: 13px;
-    margin: 3px 6px 0 0;
     opacity: .8;
     background: url(../../../public/assets/img/clock.png) no-repeat;
+    vertical-align: middle;
   }
 }
 
 .episode-seen {
-  float: right;
+  position: relative;
+  display: inline-block;
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  background: url(../../../public/assets/img/seen.png) no-repeat;
+  grid-area: checkbox;
 
-  i {
-    float: left;
-    width: 22px;
-    height: 22px;
-    background: url(../../../public/assets/img/seen.png) no-repeat;
-  }
-
-  &.seen i {
+  &.seen {
     background: url(../../../public/assets/img/seen-active.png) no-repeat;
   }
 }
