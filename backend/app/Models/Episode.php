@@ -16,7 +16,6 @@
      * @var array
      */
     protected $appends = [
-      'release_episode_human_format',
       'seen',
       'startDate',
     ];
@@ -27,7 +26,6 @@
      * @var array
      */
     protected $guarded = [
-      'release_episode_human_format',
       'seen',
       'startDate',
     ];
@@ -44,24 +42,6 @@
     public function getSeenAttribute()
     {
       return $this->episodesUsers()->where('user_id', Auth::id())->count() > 0;
-    }
-
-    /**
-     * Accessor for human formatted release date.
-     */
-    public function getReleaseEpisodeHumanFormatAttribute()
-    {
-      if(is_null($this->release_episode)) {
-        return null;
-      }
-
-      $release = Carbon::createFromTimestamp($this->release_episode);
-
-      if($release > now()) {
-        return $release->diffForHumans();
-      }
-
-      return null;
     }
 
     /**
