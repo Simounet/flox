@@ -13,7 +13,7 @@
     </div>
 
     <div class="season-tabs" v-if=" ! loadingModalData">
-      <span class="season-number no-select" @click="SET_SEASON_ACTIVE_MODAL(index)" v-for="(season, index) in episodes" :class="{active: index == seasonActiveModal, completed: seasonCompleted(index)}">
+      <span class="season-number no-select" @click="seasonNavigation(index)" v-for="(season, index) in episodes" :class="{active: index == seasonActiveModal, completed: seasonCompleted(index)}">
         S{{ addZero(index) }}
       </span>
     </div>
@@ -80,6 +80,13 @@
         const released = new Date(date * 1000);
 
         return this.formatLocaleDate(released);
+      },
+
+      seasonNavigation(index) {
+        this.SET_SEASON_ACTIVE_MODAL(index)
+
+        const episodesListContainer = document.querySelector('.modal-content');
+        episodesListContainer.scrollTop = 0;
       },
 
       toggleAll() {
