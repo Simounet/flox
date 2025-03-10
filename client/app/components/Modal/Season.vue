@@ -24,17 +24,19 @@
     </div>
 
     <div class="modal-content" v-if=" ! loadingModalData">
-      <div @click="toggleEpisode(episode)"
-           class="modal-item" v-for="(episode, index) in episodes[seasonActiveModal]"
-           :data-episode="episode.episode_number"
-      >
-        <span class="modal-episode no-select">E{{ addZero(episode.episode_number) }}</span>
-        <span class="modal-name" :class="{'spoiler-protect': spoiler && ! episode.seen}">{{ episode.name }}</span>
-        <i class="item-has-src" v-if="episode.src"></i>
-        <span class="modal-release-episode" v-if="episode.release_episode"><i></i> {{ releasedDate(episode.release_episode) }}</span>
-        <span class="modal-release-episode" v-if=" ! episode.release_episode"><i></i> {{ lang('no release') }}</span>
-        <i class="episode-seen" :class="{seen: episode.seen}"></i>
-      </div>
+      <template v-for="(episode, index) in episodes[seasonActiveModal]">
+        <label
+             class="modal-item"
+             :data-episode="episode.episode_number"
+        >
+          <span class="modal-episode no-select">E{{ addZero(episode.episode_number) }}</span>
+          <span class="modal-name" :class="{'spoiler-protect': spoiler && ! episode.seen}">{{ episode.name }}</span>
+          <i class="item-has-src" v-if="episode.src"></i>
+          <span class="modal-release-episode" v-if="episode.release_episode"><i></i> {{ releasedDate(episode.release_episode) }}</span>
+          <span class="modal-release-episode" v-if=" ! episode.release_episode"><i></i> {{ lang('no release') }}</span>
+          <input type="checkbox" class="episode-seen" @change="toggleEpisode(episode)" :checked="episode.seen">
+        </label>
+      </template>
     </div>
 
   </div>

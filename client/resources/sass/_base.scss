@@ -26,6 +26,10 @@ input {
   -webkit-appearance: none !important;
 }
 
+input[type="checkbox"] {
+  cursor: pointer;
+}
+
 .wrap,
 .wrap-content,
 .content-submenu {
