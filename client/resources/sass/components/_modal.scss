@@ -59,32 +59,6 @@
   padding: 10px 15px;
 }
 
-.modal-options {
-  float: left;
-  clear: both;
-  font-size: 14px;
-  margin: 10px 0 0 0;
-
-  span {
-    border: 1px solid rgba(#fff, .3);
-    padding: 2px 5px;
-    border-radius: 3px;
-    float: left;
-    cursor: pointer;
-    color: rgba(#fff, .8);
-
-    @include transition(background);
-
-    &:hover {
-      background: rgba(#fff, .2);
-    }
-
-    &:active {
-      background: rgba(#fff, .1);
-    }
-  }
-}
-
 .close-modal {
   margin: 0;
   padding: 15px;
