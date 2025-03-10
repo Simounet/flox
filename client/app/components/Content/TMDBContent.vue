@@ -8,8 +8,13 @@
             <router-link :to="'/genre/' + genre.name" v-for="genre in notCurrentGenres" :key="genre.id">{{ genre.name }}</router-link>
           </ul>
         </div>
-        <div class="show-watchlist-items element-ui-checkbox" @click="toggleWatchlistItems()">
-          <el-checkbox v-model="showWatchlistItems">Watchlist</el-checkbox>
+        <div class="show-watchlist-items element-ui-checkbox">
+          <Checkbox
+            v-model="showWatchlistItems"
+            @update:modelValue="toggleWatchlistItems"
+            id="content-tmdbcontent-showwatchlistitems"
+            :label="lang('Watchlist')"
+            />
         </div>
       </div>
     </div>
@@ -31,6 +36,7 @@
 </template>
 
 <script>
+  import Checkbox from './Checkbox.vue';
   import Item from './Item.vue';
   import MiscHelper from '../../helpers/misc';
 
@@ -94,8 +100,8 @@
         }
       },
 
-      toggleWatchlistItems() {
-        this.showWatchlistItems = ! this.showWatchlistItems;
+      toggleWatchlistItems(value) {
+        this.showWatchlistItems = value;
       },
 
       toggleShowGenres() {
@@ -156,6 +162,7 @@
     },
 
     components: {
+      Checkbox,
       Item
     },
 
