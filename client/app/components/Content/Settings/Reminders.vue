@@ -12,10 +12,26 @@
     </form>
 
     <div class="setting-box">
-      <el-checkbox v-model="daily" @change="updateReminders">{{ lang('daily reminder') }}</el-checkbox>
+      <Checkbox
+        v-model="daily"
+        @update:modelValue="(value) => {
+          daily = value;
+          updateReminders();
+        }"
+        id="settings-reminders-daily"
+        :label="lang('daily reminder')"
+        />
     </div>
     <div class="setting-box">
-      <el-checkbox v-model="weekly" @change="updateReminders">{{ lang('weekly reminder') }}</el-checkbox>
+      <Checkbox
+        v-model="weekly"
+        @update:modelValue="(value) => {
+          weekly = value;
+          updateReminders();
+        }"
+        id="settings-reminders-weekly"
+        :label="lang('weekly reminder')"
+        />
     </div>
   </div>
 
@@ -24,6 +40,7 @@
 <script>
   import { mapState, mapMutations } from 'vuex';
   import MiscHelper from '../../../helpers/misc';
+  import Checkbox from '../Checkbox.vue';
 
   import http from 'axios';
   import debounce from 'debounce';
@@ -34,6 +51,10 @@
     mixins: [MiscHelper],
 
     props: ['user'],
+
+    components: {
+      Checkbox
+    },
 
     created() {
       this.setOptionsFromUser(this.user);
