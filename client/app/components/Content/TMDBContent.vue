@@ -8,7 +8,7 @@
             <router-link :to="'/genre/' + genre.name" v-for="genre in notCurrentGenres" :key="genre.id">{{ genre.name }}</router-link>
           </ul>
         </div>
-        <div class="show-watchlist-items element-ui-checkbox">
+        <div class="show-watchlist-items">
           <Checkbox
             v-model="showWatchlistItems"
             @update:modelValue="toggleWatchlistItems"
