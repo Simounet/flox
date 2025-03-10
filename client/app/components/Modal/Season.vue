@@ -23,8 +23,10 @@
       <span class="header-seen" @click="toggleAll()" v-if="auth">Toggle all</span>
     </div>
 
-    <div class="modal-content" v-if=" ! loadingModalData">
-      <template v-for="(episode, index) in episodes[seasonActiveModal]">
+    <ol class="modal-content" v-if=" ! loadingModalData">
+      <li v-for="(episode, index) in episodes[seasonActiveModal]"
+        class="modal-item-container"
+      >
         <label
              class="modal-item"
              :data-episode="episode.episode_number"
@@ -36,8 +38,8 @@
           <span class="modal-release-episode" v-if=" ! episode.release_episode"><i></i> {{ lang('no release') }}</span>
           <input type="checkbox" class="episode-seen" @change="toggleEpisode(episode)" :checked="episode.seen">
         </label>
-      </template>
-    </div>
+      </li>
+    </ol>
 
   </div>
 </template>
