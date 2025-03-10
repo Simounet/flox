@@ -4,7 +4,15 @@
     <div class="login-error" v-if="config.env === 'demo'"><span>Data cannot be changed in the demo</span></div>
 
     <div class="setting-box">
-      <el-checkbox v-model="refresh" @change="updateRefresh">{{ lang('refresh automatically') }}</el-checkbox>
+      <Checkbox
+        v-model="refresh"
+        @update:modelValue="(value) => {
+          refresh = value;
+          updateRefresh();
+        }"
+        id="settings-refresh"
+        :label="lang('refresh automatically')"
+        />
     </div>
 
     <div class="misc-btn-wrap">
@@ -19,6 +27,7 @@
 <script>
   import { mapState, mapMutations } from 'vuex';
   import MiscHelper from '../../../helpers/misc';
+  import Checkbox from '../Checkbox.vue';
 
   import http from 'axios';
 
@@ -26,6 +35,10 @@
     mixins: [MiscHelper],
 
     props: ['initial-refresh'],
+
+    components: {
+      Checkbox
+    },
 
     data() {
       return {
