@@ -1,19 +1,51 @@
 <template>
 
-  <div class="settings-box element-ui-checkbox no-select" v-if=" ! loading">
+  <div class="settings-box no-select" v-if=" ! loading">
     <div class="login-error" v-if="config.env === 'demo'"><span>Data cannot be changed in the demo</span></div>
 
     <div class="setting-box">
-      <el-checkbox v-model="genre" @change="updateOptions">{{ lang('display genre') }}</el-checkbox>
+      <Checkbox
+        v-model="genre"
+        @update:modelValue="(value) => {
+          genre = value;
+          updateOptions();
+        }"
+        id="settings-options-genre"
+        :label="lang('display genre')"
+        />
     </div>
     <div class="setting-box">
-      <el-checkbox v-model="date" @change="updateOptions">{{ lang('display date') }}</el-checkbox>
+      <Checkbox
+        v-model="date"
+        @update:modelValue="(value) => {
+          date = value;
+          updateOptions();
+        }"
+        id="settings-options-date"
+        :label="lang('display date')"
+        />
     </div>
     <div class="setting-box">
-      <el-checkbox v-model="spoiler" @change="updateOptions">{{ lang('spoiler') }}</el-checkbox>
+      <Checkbox
+        v-model="spoiler"
+        @update:modelValue="(value) => {
+          spoiler = value;
+          updateOptions();
+        }"
+        id="settings-options-spoiler"
+        :label="lang('spoiler')"
+        />
     </div>
     <div class="setting-box">
-      <el-checkbox v-model="watchlist" @change="updateOptions">{{ lang('show watchlist') }}</el-checkbox>
+      <Checkbox
+        v-model="watchlist"
+        @update:modelValue="(value) => {
+          watchlist = value;
+          updateOptions();
+        }"
+        id="settings-options-watchlist"
+        :label="lang('show watchlist')"
+        />
     </div>
 
     <div class="setting-box select-box">
@@ -31,6 +63,7 @@
 <script>
   import { mapState, mapMutations } from 'vuex';
   import MiscHelper from '../../../helpers/misc';
+  import Checkbox from '../Checkbox.vue';
 
   import http from 'axios';
 
@@ -38,6 +71,10 @@
     mixins: [MiscHelper],
 
     props: ['user'],
+
+    components: {
+      Checkbox
+    },
 
     created() {
       this.setOptionsFromUser(this.user);
