@@ -8,9 +8,11 @@
 body {
   overflow-y: scroll;
   background: #fff;
+  accent-color: $main2;
 
   &.dark {
     background: #1c1c1c;
+    color-scheme: dark;
   }
 
   &.open-modal {
