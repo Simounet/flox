@@ -1,6 +1,6 @@
 <template>
 
-  <div class="settings-box element-ui-checkbox no-select" v-if=" ! loading">
+  <div class="settings-box" v-if=" ! loading">
     <div class="login-error" v-if="config.env === 'demo'"><span>Data cannot be changed in the demo</span></div>
 
     <form class="settings-form" @submit.prevent="generateApiKey()">
