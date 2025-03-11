@@ -2,25 +2,23 @@
   <div class="modal-wrap">
 
     <div class="modal-header">
-      <span>{{ modalData.title }}</span>
-      <span class="close-modal" @click="CLOSE_MODAL()">
-        <i class="icon-close"></i>
-      </span>
+      <span class="modal-title">{{ modalData.title }}</span>
+      <button class="close-modal" @click="CLOSE_MODAL()">✖</button>
     </div>
 
     <div class="modal-content modal-content-loading" v-if="loadingModalData">
       <span class="loader fullsize-loader"><i></i></span>
     </div>
 
-    <div class="season-tabs" v-if=" ! loadingModalData">
-      <span class="season-number no-select" @click="seasonNavigation(index)" v-for="(season, index) in episodes" :class="{active: index == seasonActiveModal, completed: seasonCompleted(index)}">
-        S{{ addZero(index) }}
-      </span>
-    </div>
+    <ol class="season-tabs" v-if=" ! loadingModalData">
+      <li v-for="(season, index) in episodes" class="season-number-item">
+        <button class="season-number-button" :class="{active: index == seasonActiveModal, completed: seasonCompleted(index)}" @click="seasonNavigation(index)">S{{ addZero(index) }}</button>
+      </li>
+    </ol>
 
-    <div class="item-header no-select" v-if=" ! loadingModalData">
+    <div class="item-header" v-if=" ! loadingModalData">
       <span class="header-name">Name</span>
-      <span class="header-seen" @click="toggleAll()" v-if="auth">Toggle all</span>
+      <button class="header-seen" @click="toggleAll()" v-if="auth">Toggle all</button>
     </div>
 
     <ol class="modal-content" v-if=" ! loadingModalData">
@@ -31,7 +29,7 @@
              class="modal-item"
              :data-episode="episode.episode_number"
         >
-          <span class="modal-episode no-select">E{{ addZero(episode.episode_number) }}</span>
+          <span class="modal-episode">E{{ addZero(episode.episode_number) }}</span>
           <span class="modal-name" :class="{'spoiler-protect': spoiler && ! episode.seen}">{{ episode.name }}</span>
           <i class="item-has-src" v-if="episode.src"></i>
           <span class="modal-release-episode" v-if="episode.release_episode"><i></i> {{ releasedDate(episode.release_episode) }}</span>

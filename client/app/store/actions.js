@@ -71,6 +71,7 @@ export function fetchEpisodes({commit}, data) {
       setTimeout(() => {
         const container = document.querySelector('.modal-content');
         const episode = document.querySelector(`[data-episode='${nextEpisode.episode_number}']`);
+        episode.focus();
 
         container.scrollTop = episode.offsetTop - episode.offsetHeight;
       }, 10);

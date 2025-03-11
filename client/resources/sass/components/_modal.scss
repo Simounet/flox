@@ -34,8 +34,8 @@
     max-height: calc(100% - 45px);
     height: 100%;
 
-    iframe {
-      float: left;
+    &:has(iframe) {
+      overflow: hidden;
     }
   }
 
@@ -45,12 +45,17 @@
 }
 
 .modal-header {
+  display: flex;
   background: $main2;
   background: $gradient;
   color: #fff;
-  float: left;
   font-size: 20px;
   width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
   padding: 10px 15px;
 }
 
@@ -81,48 +86,55 @@
 }
 
 .close-modal {
-  float: right;
-  padding: 7px;
+  margin: 0;
+  padding: 15px;
   cursor: pointer;
+  font-style: normal;
+  line-height: 1;
   opacity: .8;
-  margin: 0 -5px 0 0px;
+  background: none;
 
-  &:active {
+  &:hover,
+  &:active,
+  &:focus {
+    background: none;
     opacity: .5;
   }
 }
 
-.icon-close {
-  background: url(../../../public/assets/img/close.png) no-repeat;
-  float: left;
-  width: 14px;
-  height: 14px;
-}
-
 .season-tabs {
-  float: left;
+  display: flex;
   width: 100%;
+  flex-wrap: wrap;
   background: #464646;
 }
 
-.season-number {
-  float: left;
-  cursor: pointer;
-  font-size: 16px;
-  color: #a9a9a9;
-  padding: 10px 0;
+.season-number-item {
   width: 10%;
-  text-align: center;
+  flex-shrink: 0;
+  list-style: none;
 
   @include media(6) {
     width: 20%;
   }
+}
+
+.season-number-button {
+  cursor: pointer;
+  font-size: 16px;
+  color: #a9a9a9;
+  padding: 10px 0;
+  width: 100%;
+  background: none;
+  text-align: center;
 
   @include transition(background);
 
   &.active,
-  &:hover {
+  &:hover,
+  &:focus {
     background: #2f2f2f;
+    outline: none;
   }
 }
 
@@ -131,7 +143,6 @@
 }
 
 .modal-content {
-  float: left;
   width: 100%;
   position: relative;
   background: #2f2f2f;
@@ -144,30 +155,37 @@
 }
 
 .item-header {
-  float: left;
+  display: flex;
   width: 100%;
   padding: 10px;
+  justify-content: space-between;
   background: #2f2f2f;
+}
 
-  span {
-    float: left;
-    color: rgba(#fff, .4);
-    font-size: 14px;
-  }
+.header-name,
+.header-seen {
+  color: rgba(#fff, .4);
+  font-size: 14px;
 }
 
 .header-seen {
-  float: right !important;
+  margin: 0;
+  padding: 0;
+  background: none;
+  text-transform: initial;
   cursor: pointer;
 
   @include transition(color);
 
-  &:hover {
+  &:hover,
+  &:focus {
     color: rgba(#fff, .8);
+    background: none;
   }
 
   &:active {
     color: rgba(#fff, .4);
+    background: none;
   }
 }
 

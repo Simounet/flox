@@ -2,10 +2,8 @@
   <div class="modal-wrap modal-wrap-big">
 
     <div class="modal-header">
-      <span>{{ lang('trailer for') }} {{ modalData.title }}</span>
-      <span class="close-modal" @click="CLOSE_MODAL()">
-        <i class="icon-close"></i>
-      </span>
+      <span class="modal-title">{{ lang('trailer for') }} {{ modalData.title }}</span>
+      <button class="close-modal" @click="CLOSE_MODAL()">✖</button>
     </div>
 
     <div class="modal-content">
