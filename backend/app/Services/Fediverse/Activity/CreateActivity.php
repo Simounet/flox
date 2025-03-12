@@ -32,8 +32,51 @@ class CreateActivity
             throw new \Exception(self::ACTIVITY_UNKNOWN_REVIEW);
         }
 
+        $localProfileRemoteUrl = $explodedUrl[0];
+        $localProfile = Profile::where(['remote_url' => $localProfileRemoteUrl])->first();
+
+        if(!$localProfile) {
+            throw new \Exception(self::ACTIVITY_UNKNOWN_PROFILE);
+        }
+
+        $this->storeComment($localProfile, $createActivity, $reviewId);
+    }
+
+    private function storeComment(Profile $localProfile, Create $createActivity, int $reviewId): void
+    {
+        $actorComment = (new ActivityPubFetchService())->get($createActivity->get('actor'));
         $profileService = new ProfileService(new Profile());
-        $sourceProfile = $profileService->updateOrCreate($actor);
-        // @TODO store comment
+        $profileComment = $profileService->updateOrCreate($actorComment);
+        $commentModel = new Comment();
+        $commentData = $this->getContent($localProfile, $createActivity);
+        $commentModel->store(
+            $profileComment->id,
+            $reviewId,
+            [
+                'source_url' => $createActivity->id,
+                'content' => $commentData['content'],
+                'language' => $commentData['language'],
+                'sensitive' => $createActivity->object->sensitive ?? false,
+            ]
+        );
+    }
+
+    private function getContent(Profile $localProfile, Create $createActivity): array
+    {
+        $hasContentMap = is_array($createActivity->object->contentMap);
+        $activityObject = clone $createActivity->object;
+        $language = $hasContentMap ?
+            array_keys((array) $activityObject->contentMap)[0] : 'en';
+        $content = $hasContentMap ?
+            $createActivity->object->contentMap[$language] : $createActivity->object->content;
+        return [
+            'language' => $language,
+            'content' => $this->cleanContent($localProfile, $content),
+        ];
+    }
+
+    private function cleanContent(Profile $profile, string $content):string
+    {
+        return str_replace('@' . $profile->name . '@' . $profile->domain . ' ', '', strip_tags($content));
     }
 }

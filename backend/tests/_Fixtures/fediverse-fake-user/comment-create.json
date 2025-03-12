@@ -12,7 +12,7 @@
         },
         "https://w3id.org/security/v1"
     ],
-    "id": "%REMOTE_URL%/statuses/114145527041336240/activity",
+    "id": "%REMOTE_OBJECT_ID%/activity",
     "type": "Create",
     "actor": "%REMOTE_URL%",
     "published": "2025-03-11T19:48:39Z",
@@ -24,12 +24,12 @@
         "%LOCAL_PROFILE_URL%"
     ],
     "object": {
-        "id": "%REMOTE_URL%/statuses/114145527041336240",
+        "id": "%REMOTE_OBJECT_ID%",
         "type": "Note",
         "summary": null,
         "inReplyTo": "%LOCAL_PROFILE_URL%/review/%REVIEW_ID%",
         "published": "2025-03-11T19:48:39Z",
-        "url": "https://%REMOTE_DOMAIN%/@%REMOTE_NAME%/114145527041336240",
+        "url": "https://%REMOTE_DOMAIN%/@%REMOTE_NAME%/%STATUS_ID%",
         "attributedTo": "%REMOTE_URL%",
         "to": [
             "https://www.w3.org/ns/activitystreams#Public"
@@ -39,7 +39,7 @@
             "%LOCAL_PROFILE_URL%"
         ],
         "sensitive": false,
-        "atomUri": "%REMOTE_URL%/statuses/114145527041336240",
+        "atomUri": "%REMOTE_OBJECT_ID%",
         "inReplyToAtomUri": "%LOCAL_PROFILE_URL%/review/%REVIEW_ID%",
         "conversation": "tag:mastodon.simounet.net,2024-02-28:objectId=1161600:objectType=Conversation",
         "content": "<p><span class=\"h-card\" translate=\"no\"><a href=\"%LOCAL_PROFILE_URL%\" class=\"u-url mention\">@<span>%LOCAL_NAME_AT_DOMAIN%</span></a></span> %COMMENT%</p>",
@@ -55,22 +55,22 @@
             }
         ],
         "replies": {
-            "id": "%REMOTE_URL%/statuses/114145527041336240/replies",
+            "id": "%REMOTE_OBJECT_ID%/replies",
             "type": "Collection",
             "first": {
                 "type": "CollectionPage",
-                "next": "%REMOTE_URL%/statuses/114145527041336240/replies?only_other_accounts=true&page=true",
-                "partOf": "%REMOTE_URL%/statuses/114145527041336240/replies",
+                "next": "%REMOTE_OBJECT_ID%/replies?only_other_accounts=true&page=true",
+                "partOf": "%REMOTE_OBJECT_ID%/replies",
                 "items": []
             }
         },
         "likes": {
-            "id": "%REMOTE_URL%/statuses/114145527041336240/likes",
+            "id": "%REMOTE_OBJECT_ID%/likes",
             "type": "Collection",
             "totalItems": 0
         },
         "shares": {
-            "id": "%REMOTE_URL%/statuses/114145527041336240/shares",
+            "id": "%REMOTE_OBJECT_ID%/shares",
             "type": "Collection",
             "totalItems": 0
         }
