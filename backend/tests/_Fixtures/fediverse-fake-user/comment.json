@@ -1,0 +1,78 @@
+{
+    "@context": [
+        "https://www.w3.org/ns/activitystreams",
+        {
+            "ostatus": "http://ostatus.org#",
+            "atomUri": "ostatus:atomUri",
+            "inReplyToAtomUri": "ostatus:inReplyToAtomUri",
+            "conversation": "ostatus:conversation",
+            "sensitive": "as:sensitive",
+            "toot": "http://joinmastodon.org/ns#",
+            "votersCount": "toot:votersCount"
+        },
+        "https://w3id.org/security/v1"
+    ],
+    "id": "%REMOTE_URL%/statuses/114145527041336240/activity",
+    "type": "Create",
+    "actor": "%REMOTE_URL%",
+    "published": "2025-03-11T19:48:39Z",
+    "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+    ],
+    "cc": [
+        "%REMOTE_URL%/followers",
+        "%LOCAL_PROFILE_URL%"
+    ],
+    "object": {
+        "id": "%REMOTE_URL%/statuses/114145527041336240",
+        "type": "Note",
+        "summary": null,
+        "inReplyTo": "%LOCAL_PROFILE_URL%/review/%REVIEW_ID%",
+        "published": "2025-03-11T19:48:39Z",
+        "url": "https://%REMOTE_DOMAIN%/@%REMOTE_NAME%/114145527041336240",
+        "attributedTo": "%REMOTE_URL%",
+        "to": [
+            "https://www.w3.org/ns/activitystreams#Public"
+        ],
+        "cc": [
+            "%REMOTE_URL%/followers",
+            "%LOCAL_PROFILE_URL%"
+        ],
+        "sensitive": false,
+        "atomUri": "%REMOTE_URL%/statuses/114145527041336240",
+        "inReplyToAtomUri": "%LOCAL_PROFILE_URL%/review/%REVIEW_ID%",
+        "conversation": "tag:mastodon.simounet.net,2024-02-28:objectId=1161600:objectType=Conversation",
+        "content": "<p><span class=\"h-card\" translate=\"no\"><a href=\"%LOCAL_PROFILE_URL%\" class=\"u-url mention\">@<span>%LOCAL_NAME_AT_DOMAIN%</span></a></span> %COMMENT%</p>",
+        "contentMap": {
+            "fr": "<p><span class=\"h-card\" translate=\"no\"><a href=\"%LOCAL_PROFILE_URL%\" class=\"u-url mention\">@<span>%LOCAL_NAME_AT_DOMAIN%</span></a></span> %COMMENT%</p>"
+        },
+        "attachment": [],
+        "tag": [
+            {
+                "type": "Mention",
+                "href": "%LOCAL_PROFILE_URL%",
+                "name": "@%LOCAL_NAME_AT_DOMAIN%"
+            }
+        ],
+        "replies": {
+            "id": "%REMOTE_URL%/statuses/114145527041336240/replies",
+            "type": "Collection",
+            "first": {
+                "type": "CollectionPage",
+                "next": "%REMOTE_URL%/statuses/114145527041336240/replies?only_other_accounts=true&page=true",
+                "partOf": "%REMOTE_URL%/statuses/114145527041336240/replies",
+                "items": []
+            }
+        },
+        "likes": {
+            "id": "%REMOTE_URL%/statuses/114145527041336240/likes",
+            "type": "Collection",
+            "totalItems": 0
+        },
+        "shares": {
+            "id": "%REMOTE_URL%/statuses/114145527041336240/shares",
+            "type": "Collection",
+            "totalItems": 0
+        }
+    }
+}

@@ -6,10 +6,12 @@ use ActivityPhp\Type;
 use ActivityPhp\Type\Extended\Activity\Delete;
 use ActivityPhp\Type\Extended\Activity\Follow;
 use ActivityPhp\Type\Extended\Activity\Undo;
+use ActivityPhp\Type\Extended\Activity\Create;
 use ActivityPhp\Type\TypeConfiguration;
 use App\Models\Profile;
 use App\Services\Fediverse\Activity\ActivityService;
 use App\Services\Fediverse\Activity\ActorActivity;
+use App\Services\Fediverse\Activity\CreateActivity;
 use App\Services\Fediverse\Activity\UndoActivity;
 use App\Services\Fediverse\Activity\FollowActivity;
 use App\Services\Fediverse\FollowingCollection;
@@ -89,7 +91,7 @@ class ActorController
             $actor = false;
             if(Delete::class === $activity::class) {
                 if(!$activity->object || ($activity->object !== $activity->actor)) {
-                    Log::debug("[InboxActivity] " . $activity::class . ' invalid state');
+                    $this->logInvalidState("[InboxActivity] " . $activity::class . ' invalid state', $request);
                     return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
                         ->header('Access-Control-Allow-Origin', '*');
                 }
@@ -114,6 +116,32 @@ class ActorController
         }
 
         switch($activity::class) {
+            case Create::class:
+                try {
+                    $createActivity = new CreateActivity();
+                    $createActivity->activity($activity);
+                    $this->logInvalidState("[InboxCreateResponse] Create activity: " . $activity::class, $request);
+                } catch(\Exception $e) {
+                    switch($e->getMessage()) {
+                        case $createActivity::ACTIVITY_MISSING_IN_REPLY_TO:
+                            Log::debug("[InboxCreateResponse] Missing inReplyTo");
+                            return response()->json('', 400, [], JSON_UNESCAPED_SLASHES)
+                                ->header('Access-Control-Allow-Origin', '*');
+                        case $createActivity::ACTIVITY_UNKNOWN_PROFILE:
+                            Log::debug("[InboxCreateResponse] Unknown local profile");
+                            return response()->json('', 404, [], JSON_UNESCAPED_SLASHES)
+                                ->header('Access-Control-Allow-Origin', '*');
+                        case $createActivity::ACTIVITY_UNKNOWN_REVIEW:
+                            Log::debug("[InboxCreateResponse] Unknown review");
+                            return response()->json('', 404, [], JSON_UNESCAPED_SLASHES)
+                                ->header('Access-Control-Allow-Origin', '*');
+                        default:
+                            throw new \Exception($e);
+                    }
+                }
+                return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
+                    ->header('Access-Control-Allow-Origin', '*');
+
             case Delete::class:
                 try {
                     Profile::where(['remote_url' => $activity->get('object')])->delete();
@@ -165,7 +193,7 @@ class ActorController
                 return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
                     ->header('Access-Control-Allow-Origin', '*');
             default:
-                Log::debug("[InboxDefaultResponse] Unknown activity: " . $activity::class);
+                $this->logInvalidState("[InboxDefaultResponse] Unknown activity: " . $activity::class, $request);
                 return response('', 501);
         }
 
@@ -181,5 +209,11 @@ class ActorController
         abort_if(config('flox.federation.enabled') === false, 404);
 
         return $this->inbox($request, '');
+    }
+
+    private function logInvalidState(string $header, Request $request): void
+    {
+        Log::channel('federation-unknown')->debug($header);
+        Log::channel('federation-unknown')->debug(str_replace('\/', '/', json_encode($request->all(), JSON_PRETTY_PRINT)));
     }
 }

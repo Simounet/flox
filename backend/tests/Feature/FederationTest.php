@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\Follower;
+use App\Models\Item;
 use App\Models\Profile;
 use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ProfileService;
@@ -14,6 +15,7 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
+use App\Models\Review;
 
 class FederationTest extends TestCase
 {
@@ -24,6 +26,7 @@ class FederationTest extends TestCase
     private $profile;
     private $profileService;
     private $remoteProfile;
+    private $user;
 
     public function setUp(): void
     {
@@ -35,8 +38,8 @@ class FederationTest extends TestCase
         $this->host = parse_url(env('APP_URL'))['host'];
         $this->withHeader('Host', $this->host);
         $this->profileService = new ProfileService(new Profile());
-        $user = User::factory()->create();
-        $this->profile = $this->profileService->storeLocal($user);
+        $this->user = User::factory()->create();
+        $this->profile = $this->profileService->storeLocal($this->user);
         $this->remoteProfile = json_decode(file_get_contents(__DIR__ . '/../_Fixtures/fediverse-fake-user/profile.json'));
 
         Http::fake([
@@ -185,6 +188,122 @@ class FederationTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertEquals(0, Follower::count());
+    }
+
+    /** @test */
+    public function shouldAddCommentWithCreateActivity(): void
+    {
+        $profileNumber = Profile::count();
+        $comment = 'New test.';
+        $item = Item::factory()->create();
+        $review = Review::factory()->create([
+            'user_id' => $this->user->id,
+            'item_id' => $item->id
+        ]);
+        $dataStr = str_replace([
+            '%COMMENT%',
+            '%LOCAL_NAME_AT_DOMAIN%',
+            '%LOCAL_PROFILE_URL%',
+            '%REMOTE_URL%',
+            '%REMOTE_NAME%',
+            '%REMOTE_DOMAIN%',
+            '%REVIEW_ID%'
+        ], [
+            $comment,
+            $this->profile->name . '@' . $this->profile->domain,
+            $this->profile->remote_url,
+            $this->remoteProfile->remote_url,
+            $this->remoteProfile->name,
+            $this->remoteProfile->domain,
+            (string) $review->id
+        ], file_get_contents(__DIR__ . '/../_Fixtures/fediverse-fake-user/comment.json'));
+
+        $response = $this->postJson('/inbox', (array) json_decode($dataStr), $this->getHeaders($dataStr));
+
+        $response->assertStatus(200);
+        $this->assertEquals(Profile::count(), $profileNumber + 1);
+    }
+
+    /** @test */
+    public function shouldFailCommentMissingInReplyTo(): void
+    {
+        $dataStr = str_replace([
+            '%COMMENT%',
+            '%LOCAL_NAME_AT_DOMAIN%',
+            '%LOCAL_PROFILE_URL%',
+            '%REMOTE_URL%',
+            '%REMOTE_NAME%',
+            '%REMOTE_DOMAIN%',
+            '%REVIEW_ID%'
+        ], [
+            '',
+            $this->profile->name . '@' . $this->profile->domain,
+            $this->profile->remote_url,
+            $this->remoteProfile->remote_url,
+            $this->remoteProfile->name,
+            $this->remoteProfile->domain,
+            ''
+        ], file_get_contents(__DIR__ . '/../_Fixtures/fediverse-fake-user/comment.json'));
+        $data = json_decode($dataStr);
+        $data->object->inReplyTo = '';
+
+        $response = $this->postJson('/inbox', (array) $data, $this->getHeaders(json_encode($data)));
+
+        $response->assertStatus(400);
+    }
+
+    /** @test */
+    public function shouldFailOnUnknownLocalProfile(): void
+    {
+        $comment = 'New test.';
+        $dataStr = str_replace([
+            '%COMMENT%',
+            '%LOCAL_NAME_AT_DOMAIN%',
+            'https://flox.dev/users/unknownuser',
+            '%REMOTE_URL%',
+            '%REMOTE_NAME%',
+            '%REMOTE_DOMAIN%',
+            '%REVIEW_ID%'
+        ], [
+            $comment,
+            $this->profile->name . '@' . $this->profile->domain,
+            $this->profile->remote_url,
+            $this->remoteProfile->remote_url,
+            $this->remoteProfile->name,
+            $this->remoteProfile->domain,
+            '123'
+        ], file_get_contents(__DIR__ . '/../_Fixtures/fediverse-fake-user/comment.json'));
+
+        $response = $this->postJson('/inbox', (array) json_decode($dataStr), $this->getHeaders($dataStr));
+
+        $response->assertStatus(404);
+    }
+
+    /** @test */
+    public function shouldFailOnUnknownReview(): void
+    {
+        $comment = 'New test.';
+        $dataStr = str_replace([
+            '%COMMENT%',
+            '%LOCAL_NAME_AT_DOMAIN%',
+            '%LOCAL_PROFILE_URL%',
+            '%REMOTE_URL%',
+            '%REMOTE_NAME%',
+            '%REMOTE_DOMAIN%',
+            '%REVIEW_ID%'
+        ], [
+            $comment,
+            $this->profile->name . '@' . $this->profile->domain,
+            $this->profile->remote_url,
+            $this->remoteProfile->remote_url,
+            $this->remoteProfile->name,
+            $this->remoteProfile->domain,
+            '123'
+        ], file_get_contents(__DIR__ . '/../_Fixtures/fediverse-fake-user/comment.json'));
+
+        $response = $this->postJson('/inbox', (array) json_decode($dataStr), $this->getHeaders($dataStr));
+
+        $response->assertStatus(404);
     }
 
     private function getHeaders(string $dataStr): array

@@ -20,6 +20,7 @@ class ItemFactory extends Factory
     public function definition(): array
     {
         return [
+          'title' => fake()->name,
           'poster' => '',
           'released' => time(),
           'released_datetime' => now(),
