@@ -1,5 +1,15 @@
 # Flox Changelog
 
+## [2.6.0](https://github.com/Simounet/flox/releases/tag/2.6.0) - 2025-03-13
+
+* Seasons navigation scroll to the top
+* New episode list layout (release date always displayed)
+* episode list accessibility improved
+* CSS accent-color and color-scheme
+* Self hosted fonts
+* Laravel v12 upgrade
+* chores
+
 ## [2.5.0](https://github.com/Simounet/flox/releases/tag/2.5.0) - 2025-02-06
 
 * manifest.json added
