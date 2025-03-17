@@ -8,6 +8,7 @@ use ActivityPhp\Type\Extended\Activity\Follow;
 use ActivityPhp\Type\Extended\Activity\Undo;
 use ActivityPhp\Type\Extended\Activity\Create;
 use ActivityPhp\Type\TypeConfiguration;
+use App\Models\Comment;
 use App\Models\Profile;
 use App\Services\Fediverse\Activity\ActivityService;
 use App\Services\Fediverse\Activity\ActorActivity;
@@ -90,18 +91,21 @@ class ActorController
         try {
             $actor = false;
             if(Delete::class === $activity::class) {
-                if(!$activity->object || ($activity->object !== $activity->actor)) {
+                if(!$activity->object || ($activity->object !== $activity->actor && $activity->object && !$this->isTombstone($activity))) {
                     $this->logInvalidState("[InboxActivity] " . $activity::class . ' invalid state', $request);
                     return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
                         ->header('Access-Control-Allow-Origin', '*');
                 }
-                $profiles = Profile::where(['remote_url' => $activity->object]);
+                $remoteUrl = is_string($activity->object) ?
+                    $activity->object : $activity->actor;
+                $profiles = Profile::where(['remote_url' => $remoteUrl]);
                 if(0 === $profiles->count()) {
-                    Log::debug("[InboxActivity] " . $activity::class . ' unknown profile: ' . $activity->object);
+                    Log::debug("[InboxActivity] " . $activity::class . ' unknown profile: ' . $remoteUrl);
                     return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
                         ->header('Access-Control-Allow-Origin', '*');
                 } else {
-                    $actor = (new ActorActivity())->actorObject($profiles->first());
+                    $profile = $profiles->first();
+                    $actor = (new ActorActivity())->actorObject($profile);
                 }
             }
             $verifiedSignature = (new HttpSignature())->verifySignature($request->getMethod(),  $request->getPathInfo(), $headers, $payload, $actor);
@@ -144,17 +148,25 @@ class ActorController
 
             case Delete::class:
                 try {
-                    Profile::where(['remote_url' => $activity->get('object')])->delete();
+                    if($this->isTombstone($activity)) {
+                        Log::debug("[InboxDeleteResponseBefore] Deleted: " . json_encode($activity->get('object')));
+                        $deletedComment = Comment::where([
+                            'profile_id' => $profile->id,
+                            'source_url' => $activity->object->id
+                        ])->delete();
+                        Log::debug("[InboxDeleteResponseAfter] Deleted: " . json_encode($deletedComment));
+                    } else {
+                        Profile::where(['remote_url' => $activity->get('object')])->delete();
+                    }
                 } catch(\Exception $e) {
                     switch($e->getMessage()) {
                         default:
                             throw new \Exception($e);
                     }
                 }
-                Log::debug("[InboxDeleteResponse] Deleted: " . $activity->get('object'));
+                Log::debug("[InboxDeleteResponse] Deleted: " . json_encode($activity->get('object')));
                 return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
                     ->header('Access-Control-Allow-Origin', '*');
-                return false;
             case Follow::class:
                 try {
                     $followActivity = new FollowActivity();
@@ -215,5 +227,10 @@ class ActorController
     {
         Log::channel('federation-unknown')->debug($header);
         Log::channel('federation-unknown')->debug(str_replace('\/', '/', json_encode($request->all(), JSON_PRETTY_PRINT)));
+    }
+
+    private function isTombstone(Delete $activity): bool
+    {
+        return is_object($activity->object) && $activity->object->type === 'Tombstone';
     }
 }

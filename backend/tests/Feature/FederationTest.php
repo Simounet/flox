@@ -215,6 +215,16 @@ class FederationTest extends TestCase
             $statusId,
         );
 
+        $deleteCommentFixture = new CommentFixture(
+            'delete',
+            $comment,
+            $objectId,
+            $this->profile,
+            $this->remoteProfile,
+            $review->id,
+            $statusId,
+        );
+
         $response = $this->postJson(
             '/inbox',
             $commentFixture->toArray(),
@@ -226,6 +236,28 @@ class FederationTest extends TestCase
         $createdComment = Comment::first();
         $this->assertEquals($createdComment->content, $comment);
         $this->assertEquals($createdComment->language, 'fr');
+        $commentNumber = Comment::count();
+        $this->assertEquals($commentNumber, 1);
+
+        $deleteCommentFixture = new CommentFixture(
+            'delete',
+            $comment,
+            $objectId,
+            $this->profile,
+            $this->remoteProfile,
+            $review->id,
+            $statusId,
+        );
+        $deleteHeaders = $this->getHeaders($deleteCommentFixture->toString());
+
+        $deleteResponse = $this->postJson(
+            '/inbox',
+            $deleteCommentFixture->toArray(),
+            $deleteHeaders
+        );
+        $deleteResponse->assertStatus(200);
+        $commentNumber = Comment::count();
+        $this->assertEquals($commentNumber, 0);
     }
 
     /** @test */

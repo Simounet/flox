@@ -53,7 +53,7 @@ class CreateActivity
             $profileComment->id,
             $reviewId,
             [
-                'source_url' => $createActivity->id,
+                'source_url' => $createActivity->object->id,
                 'content' => $commentData['content'],
                 'language' => $commentData['language'],
                 'sensitive' => $createActivity->object->sensitive ?? false,
