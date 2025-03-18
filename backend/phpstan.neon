@@ -1,5 +1,6 @@
 includes:
     - vendor/larastan/larastan/extension.neon
+    - vendor/nesbot/carbon/extension.neon
 
 parameters:
 
@@ -7,4 +8,4 @@ parameters:
         - app/
 
     # Level 9 is the highest level
-    level: 9
+    level: 5
