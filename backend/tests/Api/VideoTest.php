@@ -5,6 +5,7 @@
   use App\Models\Episode;
   use App\Models\Item;
   use Illuminate\Foundation\Testing\DatabaseTransactions;
+  use PHPUnit\Framework\Attributes\Test;
   use Tests\TestCase;
   use Tests\Traits\Factories;
 
@@ -45,7 +46,7 @@
       $movie->save();
     }
 
-    /** @test **/
+    #[Test]
     public function it_should_return_mp4_file_from_tv()
     {
       $response = $this->actingAs($this->user)->get('/api/video/tv/1');
@@ -59,7 +60,7 @@
       $this->assertEquals($this->episode->find(2)->src, $response->getFile());
     }
 
-    /** @test **/
+    #[Test]
     public function it_should_return_mp4_file_from_movie()
     {
       $response = $this->actingAs($this->user)->get('/api/video/movie/1');
@@ -73,7 +74,7 @@
       $this->assertEquals($this->movie->find(2)->src, $response->getFile());
     }
 
-    /** @test **/
+    #[Test]
     public function it_should_handle_unsupported_routes()
     {
       // only tv and movie as type allowed, not episode
@@ -85,7 +86,7 @@
         ->assertStatus(404);
     }
 
-    /** @test **/
+    #[Test]
     public function it_should_only_be_available_for_logged_in_users()
     {
       $this->getJson('/api/video/tv/1')

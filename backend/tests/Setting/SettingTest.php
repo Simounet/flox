@@ -5,6 +5,7 @@
   use Illuminate\Foundation\Testing\DatabaseTransactions;
   use Tests\TestCase;
   use App\Models\Setting;
+  use PHPUnit\Framework\Attributes\Test;
   use Tests\Traits\Factories;
 
   class SettingTest extends TestCase {
@@ -23,7 +24,7 @@
       $this->user2 = $this->createUser();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_change_settings()
     {
       $oldSettings = Setting::where('user_id', $this->user1->id)->first();
@@ -50,7 +51,7 @@
       $this->assertEquals('hover', $newSettings->show_ratings);
     }
 
-    /** @test */
+    #[Test]
     public function multi_user_change_only_its_settings()
     {
       $beforeSettingsUser1 = Setting::where('user_id', $this->user1->id)->first();
@@ -92,7 +93,7 @@
       $this->assertEquals('hover', $afterSettingsUser2->show_ratings);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_change_refresh()
     {
       $oldSettings = Setting::first();
@@ -107,7 +108,7 @@
       $this->assertEquals(1, $newSettings->refresh_automatically);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_change_reminders_send_to()
     {
       $oldSettings = Setting::first();
@@ -122,7 +123,7 @@
       $this->assertEquals('jon@snow.io', $newSettings->reminders_send_to);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_change_reminder_options()
     {
       $oldSettings = Setting::first();
@@ -140,7 +141,7 @@
       $this->assertEquals(1, $newSettings->weekly_reminder);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_generate_a_new_api_key()
     {
       $apiKeyBefore = $this->user1->api_key;
@@ -158,7 +159,7 @@
       $this->assertNotEquals($apiKeyAfterSecond, $apiKeyAfter);
     }
 
-    /** @test */
+    #[Test]
     public function multi_user_can_generate_a_new_api_key(): void
     {
       $this->user2 = $this->createUser();

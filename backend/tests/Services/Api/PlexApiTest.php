@@ -6,6 +6,7 @@ use App\Enums\StatusEnum;
 use App\Services\Api\Plex;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
@@ -30,7 +31,7 @@ class PlexApiTest extends TestCase implements ApiTestInterface
     $this->apiTestBase->setUp();
   }
 
-  /** @test */
+  #[Test]
   public function token_needs_to_be_provided()
   {
     $response = $this->postJson('/api/plex');
@@ -39,7 +40,7 @@ class PlexApiTest extends TestCase implements ApiTestInterface
     $response->assertStatus(Response::HTTP_UNAUTHORIZED);
   }
 
-  /** @test */
+  #[Test]
   public function valid_token_needs_to_be_provided()
   {
     $mock = $this->mock(Plex::class);
@@ -55,73 +56,73 @@ class PlexApiTest extends TestCase implements ApiTestInterface
     $responseAfter->assertSuccessful();
   }
 
-  /** @test */
+  #[Test]
   public function it_should_abort_the_request()
   {
     $this->apiTestBase->it_should_abort_the_request('plex/abort.json');
   }
 
-  /** @test */
+  #[Test]
   public function it_should_create_a_new_movie()
   {
     $this->apiTestBase->it_should_create_a_new_movie('plex/movie.json');
   }
 
-  /** @test */
+  #[Test]
   public function it_should_not_create_a_new_movie_if_it_exists()
   {
     $this->apiTestBase->it_should_not_create_a_new_movie_if_it_exists('plex/movie.json');
   }
 
-  /** @test */
+  #[Test]
   public function it_should_create_a_new_tv_show()
   {
     $this->apiTestBase->it_should_create_a_new_tv_show('plex/tv.json');
   }
 
-  /** @test */
+  #[Test]
   public function it_should_not_create_a_new_tv_show_if_it_exists()
   {
     $this->apiTestBase->it_should_not_create_a_new_tv_show_if_it_exists('plex/tv.json');
   }
 
-  /** @test */
+  #[Test]
   public function it_should_rate_a_movie()
   {
     $this->apiTestBase->it_should_rate_a_movie('plex/movie_rating.json', 2);
   }
 
-  /** @test */
+  #[Test]
   public function it_should_rate_a_tv_show()
   {
     $this->apiTestBase->it_should_rate_a_tv_show('plex/tv_rating.json', 3);
   }
 
-  /** @test */
+  #[Test]
   public function it_should_mark_an_episode_as_seen()
   {
     $this->apiTestBase->it_should_mark_an_episode_as_seen('plex/episode_seen.json');
   }
 
-  /** @test */
+  #[Test]
   public function it_should_updated_review_updated_at()
   {
     $this->apiTestBase->it_should_updated_review_updated_at('plex/episode_seen.json');
   }
 
-  /** @test */
+  #[Test]
   public function it_should_add_a_review_to_existing_item()
   {
     $this->apiTestBase->it_should_add_a_review_to_existing_item('plex/episode_seen.json');
   }
 
-  /** @test */
+  #[Test]
   public function add_a_movie_from_api() {
     $fixture = 'plex/movie.json';
     $this->apiTestBase->add_a_movie_from_api($fixture, self::API_URI, $this->getPayload(json_encode($this->apiFixtures($fixture))));
   }
 
-  /** @test */
+  #[Test]
   public function mark_episode_seen_multiple_times_from_api() {
     $fixture = 'plex/episode_seen.json';
     $this->apiTestBase->mark_episode_seen_multiple_times_from_api($fixture, self::API_URI, $this->getPayload(json_encode($this->apiFixtures($fixture))));

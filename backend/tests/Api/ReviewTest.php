@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
@@ -49,7 +50,7 @@ class ReviewTest extends TestCase {
       ]);
     }
 
-    /** @test */
+    #[Test]
     public function shouldFailOnPostingAReviewIfUserNotLoggedIn()
     {
       $this->postJson('api/review', [
@@ -58,7 +59,7 @@ class ReviewTest extends TestCase {
       ])->assertStatus(401);
     }
 
-    /** @test */
+    #[Test]
     public function shouldFailOnPostingAReviewWithoutItemId()
     {
       $this->actingAs($this->user)->postJson('api/review', [
@@ -66,7 +67,7 @@ class ReviewTest extends TestCase {
       ])->assertStatus(400);
     }
 
-    /** @test */
+    #[Test]
     public function shouldPostAReview()
     {
       Queue::fake();
@@ -83,7 +84,7 @@ class ReviewTest extends TestCase {
       ]);
     }
 
-    /** @test */
+    #[Test]
     public function shouldUpdateAReview()
     {
       Queue::fake();
@@ -104,7 +105,7 @@ class ReviewTest extends TestCase {
       ]);
     }
 
-    /** @test */
+    #[Test]
     public function itShouldFailAtChangingOtherUserRating(): void
     {
       $movie = $this->createMovie();
@@ -119,7 +120,7 @@ class ReviewTest extends TestCase {
       ])->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function itShouldNotChangeRatingOnReviewPost(): void
     {
       $this->actingAs($this->user);

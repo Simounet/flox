@@ -6,6 +6,7 @@
   use App\Models\AlternativeTitle;
   use App\Services\Models\AlternativeTitleService;
   use Illuminate\Foundation\Testing\DatabaseTransactions;
+  use PHPUnit\Framework\Attributes\Test;
   use Tests\Traits\Factories;
   use Tests\Traits\Fixtures;
   use Tests\Traits\Mocks;
@@ -26,7 +27,7 @@
       $this->alternativeTitles = app(AlternativeTitle::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_store_alternative_titles_for_new_movie()
     {
       $this->createGuzzleMock($this->tmdbFixtures('movie/alternative_titles'));
@@ -41,7 +42,7 @@
       ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_store_alternative_titles_for_new_tv_show()
     {
       $this->createGuzzleMock($this->tmdbFixtures('tv/alternative_titles'));
@@ -56,7 +57,7 @@
       ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_update_alternative_titles_for_all_movies()
     {
       $this->createGuzzleMock($this->tmdbFixtures('movie/alternative_titles'));
@@ -71,7 +72,7 @@
       ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_update_alternative_titles_for_specific_movie()
     {
       $this->createGuzzleMock($this->tmdbFixtures('movie/alternative_titles'));
@@ -86,7 +87,7 @@
       ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_update_alternative_titles_for_all_tv_shows()
     {
       $this->createGuzzleMock($this->tmdbFixtures('tv/alternative_titles'));
@@ -101,7 +102,7 @@
       ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_update_alternative_titles_for_specific_tv_show()
     {
       $this->createGuzzleMock($this->tmdbFixtures('tv/alternative_titles'));
@@ -116,7 +117,7 @@
       ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_remove_titles()
     {
       $this->createGuzzleMock($this->tmdbFixtures('movie/alternative_titles'));

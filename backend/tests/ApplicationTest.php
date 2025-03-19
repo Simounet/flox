@@ -4,12 +4,13 @@
 
   use Illuminate\Foundation\Testing\DatabaseTransactions;
   use Illuminate\Support\Facades\Schema;
+  use PHPUnit\Framework\Attributes\Test;
 
   class ApplicationTest extends TestCase {
 
     use DatabaseTransactions;
 
-    /** @test */
+    #[Test]
     public function it_can_create_migrations()
     {
       $this->assertTrue(Schema::hasTable('users'));
@@ -32,7 +33,7 @@
       $this->assertTrue(Schema::hasColumn('episodes', 'release_season'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_call_homepage_successfully()
     {
       $response = $this->call('GET', '/');

@@ -6,6 +6,7 @@ use App\Models\Profile;
 use App\Services\Models\ProfileService;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ActorTest extends TestCase
@@ -28,7 +29,7 @@ class ActorTest extends TestCase
         $this->profile = $this->profileService->storeLocal($user);
     }
 
-    /** @test */
+    #[Test]
     public function shouldReturnResourceOk(): void
     {
         $response = $this->get($this->profile->remote_url);
@@ -51,7 +52,7 @@ class ActorTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function shouldReturn404OnUnknownUser(): void
     {
         $response = $this->get('/users/unknownuser');

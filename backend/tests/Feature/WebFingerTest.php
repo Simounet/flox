@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class WebFingerTest extends TestCase
@@ -23,7 +24,7 @@ class WebFingerTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    /** @test */
+    #[Test]
     public function shouldReturnResourceOk(): void
     {
         $actor = $this->user->username . '@' . $this->host;
@@ -34,14 +35,14 @@ class WebFingerTest extends TestCase
         $this->assertJson($expectedJson, json_encode($response->json()));
     }
 
-    /** @test */
+    #[Test]
     public function shouldReturn404OnWrongUser(): void
     {
         $response = $this->get('/.well-known/webfinger?resource=acct:simon@test.com');
         $response->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function shouldReturn400OnResourceMissing(): void
     {
         $response = $this->get('/.well-known/webfinger');

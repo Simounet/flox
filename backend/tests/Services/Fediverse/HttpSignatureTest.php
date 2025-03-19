@@ -9,6 +9,7 @@ use App\Services\Models\ProfileService;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Tests\TestCase;
 
@@ -35,7 +36,7 @@ class HttpSignatureTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function shouldSignAndVerifySignature(): void
     {
         $payload = '{"id": "' . $this->profile->remote_url . '#Follow", "actor": "' . $this->profile->remote_url . '"}';

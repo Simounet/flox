@@ -4,6 +4,7 @@
 
   use Illuminate\Foundation\Testing\DatabaseTransactions;
   use Illuminate\Support\Facades\DB;
+  use PHPUnit\Framework\Attributes\Test;
   use Tests\TestCase;
   use App\Models\Item;
   use App\Services\Models\ItemService;
@@ -40,7 +41,7 @@
       return $itemService->create($data, $userId);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_create_a_new_movie()
     {
       $this->createGuzzleMock(
@@ -59,7 +60,7 @@
       ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_create_a_new_tv_show()
     {
       $this->createGuzzleMock(
@@ -80,7 +81,7 @@
       ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_fields_on_refresh()
     {
       $this->createMovie();
@@ -104,7 +105,7 @@
       $this->assertEquals('5.1', $updatedItem->imdb_rating);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_find_item_in_database()
     {
       $this->createMovie();
@@ -116,7 +117,7 @@
       $this->assertEquals(68735, $itemFromId->tmdb_id);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_find_item_in_database_by_strict_search()
     {
       $this->createMovie();
@@ -128,7 +129,7 @@
       $this->assertEquals(68735, $found->tmdb_id);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_remove_a_item()
     {
       $this->createMovie();
@@ -141,7 +142,7 @@
       $this->assertNull($item2);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_parse_correct_imdb_id()
     {
       $idMovie = $this->itemService->parseImdbId(json_decode($this->tmdbFixtures('movie/details')));
@@ -151,7 +152,7 @@
       $this->assertEquals('tt0944947', $idTv);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_parse_correct_youtube_key()
     {
       $this->createGuzzleMock(
@@ -179,7 +180,7 @@
       $this->assertEquals('qnIhJwhBeqY', $fallBackTv);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_accept_tmdb_decline()
     {
       $this->createGuzzleMock(
@@ -199,7 +200,7 @@
       $this->assertEquals('IGNORE ME', $updatedItem->title);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_create_an_item_with_release_date_before_1970(): void
     {
       $this->createGuzzleMock(

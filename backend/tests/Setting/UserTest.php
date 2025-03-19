@@ -4,6 +4,7 @@
 
   use App\Models\User;
   use Illuminate\Foundation\Testing\DatabaseTransactions;
+  use PHPUnit\Framework\Attributes\Test;
   use Tests\TestCase;
   use Illuminate\Support\Facades\Hash;
 
@@ -20,7 +21,7 @@
       $this->user = User::factory()->create();
     }
 
-    /** @test */
+    #[Test]
     public function change_user_data_only_if_user_is_logged_in()
     {
       $this->patchJson('api/userdata', [
@@ -28,7 +29,7 @@
       ])->assertStatus(401);
     }
 
-    /** @test */
+    #[Test]
     public function save_new_password()
     {
       $this->actingAs($this->user)->patchJson('api/userdata', [
@@ -38,7 +39,7 @@
       $this->assertTrue(Hash::check('Igarashi', User::first()->password));
     }
 
-    /** @test */
+    #[Test]
     public function change_password_only_if_new_password_is_given()
     {
       $oldPassword = $this->user->password;
@@ -50,7 +51,7 @@
       $this->assertEquals($oldPassword, $this->user->password);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_login_with_correct_credentials()
     {
       $this->postJson('api/login', [
@@ -59,7 +60,7 @@
       ])->assertSuccessful();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_not_login_with_wrong_credentials()
     {
       $this->postJson('api/login', [

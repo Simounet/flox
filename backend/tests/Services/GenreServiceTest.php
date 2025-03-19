@@ -7,6 +7,7 @@
   use App\Services\Models\GenreService;
   use Illuminate\Foundation\Testing\DatabaseTransactions;
   use Illuminate\Support\Facades\DB;
+  use PHPUnit\Framework\Attributes\Test;
   use Tests\TestCase;
   use Tests\Traits\Factories;
   use Tests\Traits\Fixtures;
@@ -19,7 +20,7 @@
     use Fixtures;
     use Mocks;
     
-    /** @test */
+    #[Test]
     public function it_should_update_the_genre_table()
     {
       $this->createGuzzleMock(
@@ -39,7 +40,7 @@
       $this->assertCount(27, $genresAfterUpdate);
     }
     
-    /** @test */
+    #[Test]
     public function it_should_sync_genres_for_an_item()
     {
       $genreIds = [28, 12, 16];

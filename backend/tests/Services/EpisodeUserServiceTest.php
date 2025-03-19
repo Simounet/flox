@@ -8,6 +8,7 @@ use App\Models\Review;
 use App\Services\Models\EpisodeUserService;
 use App\ValueObjects\EpisodeUserValueObject;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
@@ -36,7 +37,7 @@ class EpisodeUserServiceTest extends TestCase
         $this->review = app(Review::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_set_a_episode_as_seen_or_unseen()
     {
         $episodeId = 1;
@@ -56,7 +57,7 @@ class EpisodeUserServiceTest extends TestCase
         $this->assertEquals(0, $isEpisodeSeen3);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_set_all_episodes_of_a_season_as_seen_or_unseen()
     {
         $user = $this->createUser();
@@ -83,7 +84,7 @@ class EpisodeUserServiceTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_items_from_one_episode()
     {
         $user = $this->createUser();
@@ -102,7 +103,7 @@ class EpisodeUserServiceTest extends TestCase
         $this->assertNotEquals($reviewUpdated->updated_at, $review->updated_at);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_items_only_on_seen_from_one_episode()
     {
         $user = $this->createUser();
@@ -122,7 +123,7 @@ class EpisodeUserServiceTest extends TestCase
         $this->assertEquals($reviewWithEpisodeSeen1->updated_at, $reviewWithEpisodeSeen2->updated_at);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_items_from_all_episodes()
     {
         $user = $this->createUser();
@@ -141,7 +142,7 @@ class EpisodeUserServiceTest extends TestCase
         $this->assertNotEquals($updatedReview->updated_at, $review->updated_at);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_items_only_on_seen_from_all_episodes()
     {
         $user = $this->createUser();
@@ -160,7 +161,7 @@ class EpisodeUserServiceTest extends TestCase
         $this->assertEquals($reviewWithSeasonToggled->updated_at, $review->updated_at);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_toggle_season_even_with_some_episodes_already_watched(): void
     {
         $user = $this->createUser();

@@ -9,6 +9,7 @@
   use GuzzleHttp\Handler\MockHandler;
   use GuzzleHttp\HandlerStack;
   use GuzzleHttp\Psr7\Response;
+  use PHPUnit\Framework\Attributes\Test;
   use Tests\Traits\Factories;
   use Tests\Traits\Fixtures;
   use Tests\Traits\Mocks;
@@ -20,7 +21,7 @@
     use Fixtures;
     use Mocks;
 
-    /** @test */
+    #[Test]
     public function it_should_search_and_merge_movies_and_tv()
     {
       $this->createGuzzleMock(
@@ -37,7 +38,7 @@
       $this->assertTrue($hasMovie);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_only_search_for_tv()
     {
       $this->createGuzzleMock(
@@ -54,7 +55,7 @@
       $this->assertFalse($hasMovie);
     }
     
-    /** @test */
+    #[Test]
     public function it_should_fetch_all_genres()
     {
       $this->createGuzzleMock(
@@ -72,7 +73,7 @@
       $this->assertCount(19, $genres['movies']->genres);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_only_search_for_movies()
     {
       $this->createGuzzleMock(
@@ -89,7 +90,7 @@
       $this->assertTrue($hasMovie);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_fetch_and_merge_movies_and_tv_in_trending()
     {
       $this->createGuzzleMock(
@@ -107,7 +108,7 @@
       $this->assertTrue($hasMovie);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_merge_database_items_in_trending()
     {
       $this->createGuzzleMock(
@@ -136,7 +137,7 @@
       $this->assertEquals(null, $trending[2]['user_review']);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_merge_database_movie_in_upcoming()
     {
       $this->createGuzzleMock(
@@ -159,7 +160,7 @@
       $this->assertEquals(null, $trending[1]['user_review']);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_respect_request_limit()
     {
       $mock = new MockHandler([
@@ -177,7 +178,7 @@
       $this->assertArrayHasKey('tmdb_id', $result[0]);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_sort_by_popularity_and_title()
     {
       $this->createGuzzleMock(

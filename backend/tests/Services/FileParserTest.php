@@ -5,6 +5,7 @@
   use Illuminate\Foundation\Testing\DatabaseTransactions;
   use Illuminate\Routing\Middleware\ThrottleRequests;
   use Illuminate\Support\Facades\Hash;
+  use PHPUnit\Framework\Attributes\Test;
   use Tests\TestCase;
   use App\Models\Episode;
   use App\Models\Item;
@@ -42,7 +43,7 @@
       $this->createImdbRatingMock();
     }
 
-    /** @test */
+    #[Test]
     public function it_should_make_a_rollback_if_status_for_movie_is_unknown()
     {
       $items = $this->item->get();
@@ -60,7 +61,7 @@
       $this->assertNull($settingAfterRollback);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_make_a_rollback_if_status_for_tv_episode_is_unknown()
     {
       $episodes = $this->episode->get();
@@ -78,7 +79,7 @@
       $this->assertNull($settingAfterRollback);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_repopulate_fields_for_movies()
     {
       $this->createMovie(['fp_name' => 'warcraft', 'src' => $this->getMovieSrc(), 'subtitles' => 'SUB']);
@@ -95,7 +96,7 @@
       $this->assertEquals('warcraft', $updatedItem->fp_name);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_repopulate_fields_for_tv_episodes()
     {
       $this->createTv();
@@ -121,7 +122,7 @@
       });
     }
 
-    /** @test */
+    #[Test]
     public function it_should_store_fields_if_movie_found_in_database()
     {
       $this->createMovie(['fp_name' => 'warcraft']);
@@ -136,7 +137,7 @@
       $this->assertNotNull($item2->subtitles);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_store_fields_for_episodes_if_tv_found_in_database()
     {
       $this->createTv();
@@ -158,7 +159,7 @@
       });
     }
 
-    /** @test */
+    #[Test]
     public function it_should_create_movie_and_store_fields_if_not_found_in_database()
     {
       $this->be($this->user);
@@ -184,7 +185,7 @@
       ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_create_tv_with_episodes_and_store_fields_if_not_found_in_database()
     {
       $this->be($this->user);
@@ -217,7 +218,7 @@
       });
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_last_fetch_to_file_parser_timestamp()
     {
       $this->createMovie();
@@ -236,7 +237,7 @@
       $this->assertNotEquals($setting2->last_fetch_to_file_parser, $setting3->last_fetch_to_file_parser);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_remove_fields_from_movie()
     {
       $this->createMovie(['fp_name' => 'warcraft']);
@@ -254,7 +255,7 @@
       $this->assertNull($withoutData->fp_name);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_remove_fields_from_tv_episode()
     {
       $this->createTv();
@@ -275,7 +276,7 @@
       });
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_fields_if_movie_found_in_database()
     {
       $this->createMovie(['fp_name' => 'warcraft', 'src' => $this->getMovieSrc()]);
@@ -292,7 +293,7 @@
       $this->assertEquals('NEW NAME', $updatedItem->fp_name);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_fields_for_episodes_if_tv_found_in_database()
     {
       $this->createTv(['fp_name' => 'Game of Thrones']);
@@ -317,7 +318,7 @@
       });
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_proper_fields_for_episodes_if_season_and_episode_number_changed()
     {
       $this->createTv(['fp_name' => 'Game of Thrones']);
@@ -343,7 +344,7 @@
       $this->assertEquals('Game of Thrones', $updatedEpisodes[1]->fp_name);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_empty_movie_if_found_in_tmdb()
     {
       $this->be($this->user);
@@ -370,7 +371,7 @@
       $this->assertEquals(68735, $updated->tmdb_id);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_empty_tv_and_episodes_if_found_in_tmdb()
     {
       $this->be($this->user);
@@ -403,7 +404,7 @@
       });
     }
 
-    /** @test */
+    #[Test]
     public function it_should_create_empty_movie_from_updated_if_not_found_in_tmdb()
     {
       $this->createGuzzleMock($this->tmdbFixtures('empty'), $this->tmdbFixtures('movie/alternative_titles'));
@@ -416,7 +417,7 @@
       $this->assertNull($item->tmdb_id);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_create_empty_tv_without_episodes_from_updated_if_not_found_in_tmdb()
     {
       $this->createGuzzleMock($this->tmdbFixtures('empty'), $this->tmdbFixtures('tv/alternative_titles'));
@@ -430,7 +431,7 @@
       $this->assertNull($item->tmdb_id);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_create_empty_movie_from_added_if_not_found_in_tmdb()
     {
       $this->createGuzzleMock($this->tmdbFixtures('empty'), $this->tmdbFixtures('movie/alternative_titles'));
@@ -443,7 +444,7 @@
       $this->assertNull($item->tmdb_id);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_create_empty_tv_without_episodes_from_added_if_not_found_in_tmdb()
     {
       $this->createGuzzleMock($this->tmdbFixtures('empty'), $this->tmdbFixtures('tv/alternative_titles'));
@@ -458,7 +459,7 @@
       $this->assertNull($item->tmdb_id);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_use_http_basic_auth()
     {
       $this->patch('/api/update-files')
@@ -468,7 +469,7 @@
         ->assertSuccessful();
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_database_with_given_json_param()
     {
       $this->be($this->user);
@@ -508,7 +509,7 @@
       $this->assertGreaterThan($timestamp, Setting::select('last_fetch_to_file_parser')->where('user_id', $this->user->id)->first()->last_fetch_to_file_parser->timestamp);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_last_fetch_timestamp()
     {
       $timestamp = 9999;

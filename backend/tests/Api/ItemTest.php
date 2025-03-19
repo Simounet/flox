@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Api;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
@@ -22,7 +23,7 @@ final class ItemTest extends TestCase {
         parent::setUp();
     }
 
-    /** @test */
+    #[Test]
     public function it_should_check_user_review_with_one_user(): void
     {
         $user = $this->createUser();
@@ -42,7 +43,7 @@ final class ItemTest extends TestCase {
         $this->assertEquals($user->id, $item['user_review']['user_id']);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_check_user_review_with_multiple_users(): void
     {
         $movie = $this->createMovie();
@@ -76,7 +77,7 @@ final class ItemTest extends TestCase {
         $this->assertEquals('', $itemUser2['user_review']['content']);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_return_empty_data_on_anonymous_call(): void
     {
         $user = $this->createUser();

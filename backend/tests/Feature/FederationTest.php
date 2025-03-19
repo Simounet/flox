@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class FederationTest extends TestCase
@@ -44,7 +45,7 @@ class FederationTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function shouldReturnAcceptOnFollowRequest(): void
     {
         $dataStr = '{"@context":"https://www.w3.org/ns/activitystreams","id":"https://fediverse.tld/c5a8e80d-eeba-4f1f-827a-e759687881cc","type":"Follow","actor":"' . $this->remoteProfile->remote_url . '","object":"' . $this->profile->remote_url . '"}';
@@ -54,7 +55,7 @@ class FederationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function shouldReturnAcceptOnMultipleFollowRequest(): void
     {
         $dataStr = '{"@context":"https://www.w3.org/ns/activitystreams","id":"https://fediverse.tld/c5a8e80d-eeba-4f1f-827a-e759687881cc","type":"Follow","actor":"' . $this->remoteProfile->remote_url . '","object":"' . $this->profile->remote_url . '"}';
@@ -66,7 +67,7 @@ class FederationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function shouldFailOnWrongFollowRequest(): void
     {
         $dataStr = '{"@context":"https://www.w3.org/ns/activitystreams","id":"https://fediverse.tld/c5a8e80d-eeba-4f1f-827a-e759687881cc","type":"Follow","actor":"' . $this->remoteProfile->remote_url . '","object":"https://fake-instance.tld/users/test"}';
@@ -77,7 +78,7 @@ class FederationTest extends TestCase
         $response->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function shouldFailOnWrongRequest(): void
     {
         $dataStr = '{"@context":"https://www.w3.org/ns/activitystreams","id":"https://fediverse.tld/c5a8e80d-eeba-4f1f-827a-e759687881cc","actor":"' . $this->remoteProfile->remote_url . '","object":"' . $this->profile->remote_url . '"}';
@@ -88,7 +89,7 @@ class FederationTest extends TestCase
         $response->assertStatus(400);
     }
 
-    /** @test */
+    #[Test]
     public function shouldFailOnWrongUndoRequest(): void
     {
         $dataStr = '{"@context":"https://www.w3.org/ns/activitystreams","id":"https://fediverse.tld/c5a8e80d-eeba-4f1f-827a-e759687881cc","type":"Follow","actor":"' . $this->remoteProfile->remote_url . '","object":"' . $this->profile->remote_url . '"}';
@@ -103,7 +104,7 @@ class FederationTest extends TestCase
         $response->assertStatus(400);
     }
 
-    /** @test */
+    #[Test]
     public function shouldReturn501OnNotSupportedActivity(): void
     {
         $dataStr = '{"@context":"https://www.w3.org/ns/activitystreams","id":"https://fediverse.tld/c5a8e80d-eeba-4f1f-827a-e759687881cc","type":"Offer","actor":"' . $this->remoteProfile->remote_url . '","object":"' . $this->profile->remote_url . '"}';
@@ -114,7 +115,7 @@ class FederationTest extends TestCase
         $response->assertStatus(501);
     }
 
-    /** @test */
+    #[Test]
     public function followUnfollowWorkflow(): void
     {
         $dataStr = '{"@context":"https://www.w3.org/ns/activitystreams","id":"https://fediverse.tld/c5a8e80d-eeba-4f1f-827a-e759687881cc","type":"Follow","actor":"' . $this->remoteProfile->remote_url . '","object":"' . $this->profile->remote_url . '"}';
@@ -139,7 +140,7 @@ class FederationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function shouldFollowerList(): void
     {
         $this->getJson($this->profile->followers_url)
@@ -152,7 +153,7 @@ class FederationTest extends TestCase
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function shouldReturn200ForUnknownProfileDeleteActivity(): void
     {
         $payload = '{"@context":"https://www.w3.org/ns/activitystreams","id":"https://fediverse.tld/users/testuser#delete","type":"Delete","actor":"https://fediverse.tld/users/testuser","to":["https://www.w3.org/ns/activitystreams#Public"],"object":"https://fediverse.tld/users/testuser","signature":{"type":"RsaSignature2017","creator":"https://fediverse.tld/users/testuser#main-key","created":"2023-11-30T05:01:05Z","signatureValue":"PWVGCagVgZToMyHT6aCUCE9qmn/JuYRrUAqDL/EGt1Pde/+LjpvnLOzB3H61EWKWVaSX0EYfZN96nJbSnxrtDE9MgqXjAM91X1Lg/oB9iF1DZAcpympuGUQ1mvRs2e5qVaXxb9rO9urW7MrO2lY2xMHd9LRIvP8b3O74m4GwwRcBOL3CEovOjfseV2uyBPm20USskCZo862KcXYaY7FqzvcnM55EuJHJIc0Zff7Y0VjmBTCZhmNgDvAoeF0Whfousuv+aAmgGAY6EFZmgoX/oxkINchfRSbGtvv5hE/NA2XxJDOKAWCO6L/b/0ozR/wJafxZfVMBHtGX0EsBkB+Gvw=="}}';
@@ -165,7 +166,7 @@ class FederationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function shouldRemoveProfileAndAssociatedFollowerOnDeleteActivity(): void
     {
         $dataStr = '{"@context":"https://www.w3.org/ns/activitystreams","id":"https://fediverse.tld/c5a8e80d-eeba-4f1f-827a-e759687881cc","type":"Follow","actor":"' . $this->remoteProfile->remote_url . '","object":"' . $this->profile->remote_url . '"}';

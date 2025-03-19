@@ -7,6 +7,7 @@ use App\Models\Review;
 use App\Services\Models\ItemService;
 use App\Services\Models\ReviewService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
@@ -37,7 +38,7 @@ class ReviewServiceTest extends TestCase
       $this->createImdbRatingMock();
     }
 
-    /** @test */
+    #[Test]
     public function review_should_be_created_on_item_creation(): void
     {
       $this->createGuzzleMock(
@@ -55,7 +56,7 @@ class ReviewServiceTest extends TestCase
       $this->assertEquals(0, $item->review[0]->rating);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_change_rating()
     {
       $item = $this->createMovie();
@@ -73,7 +74,7 @@ class ReviewServiceTest extends TestCase
       $this->assertEquals($review->updated_at, $reviewUpdated->updated_at);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_change_review_updated_at_if_rating_was_neutral()
     {
       $item = $this->createMovie();
@@ -91,7 +92,7 @@ class ReviewServiceTest extends TestCase
       $this->assertNotEquals($review->updated_at, $reviewUpdated->updated_at);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_only_change_target_user_rating(): void
     {
       $item = $this->createMovie();

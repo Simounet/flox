@@ -14,6 +14,7 @@
   use Illuminate\Http\UploadedFile;
   use Illuminate\Support\Facades\Queue;
   use Mockery;
+  use PHPUnit\Framework\Attributes\Test;
   use Tests\TestCase;
   use Tests\Traits\Factories;
   use Tests\Traits\Mocks;
@@ -33,7 +34,7 @@
       $this->user = $this->createUser();
     }
 
-    /** @test */
+    #[Test]
     public function it_should_export_a_backup_file()
     {
       $filename = 'flox-export-test.json';
@@ -65,7 +66,7 @@
       $this->removeExportFile($path);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_start_the_queues_from_import()
     {
       Queue::fake();
@@ -79,7 +80,7 @@
       $this->assertCount(1, Setting::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_should_import_from_old_backup_file()
     {
       $oldBackupFile = json_decode(file_get_contents(__DIR__ . '/../Fixtures/flox/export.json'));
@@ -87,7 +88,7 @@
       $this->import($oldBackupFile);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_import_from_new_backup_file()
     {
       $newBackupFile = json_decode(file_get_contents(__DIR__ . '/../Fixtures/flox/export-new-version.json'));
@@ -121,7 +122,7 @@
       $this->assertCount(10, Episode::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_should_abort_import_if_not_json()
     {
       $this->callImport('wrong-file.txt')

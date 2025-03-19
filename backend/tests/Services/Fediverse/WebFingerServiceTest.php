@@ -3,6 +3,7 @@
 namespace Tests\Services\Fediverse;
 
 use App\Services\Fediverse\WebFingerService;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class WebFingerServiceTest extends TestCase
@@ -18,7 +19,7 @@ class WebFingerServiceTest extends TestCase
         $this->webFingerService = new WebFingerService();
     }
 
-    /** @test */
+    #[Test]
     public function shouldReturnResourceFromProfileUrl(): void
     {
         $username = 'test';
@@ -33,7 +34,7 @@ class WebFingerServiceTest extends TestCase
         $this->assertEquals($expectedResource, $resource);
     }
 
-    /** @test */
+    #[Test]
     public function shouldReturnEmptyResourceOnEmptyInfo(): void
     {
         $expectedResource = [];

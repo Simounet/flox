@@ -7,6 +7,7 @@
   use App\Models\Episode;
   use App\Models\Item;
   use App\Services\Models\EpisodeService;
+  use PHPUnit\Framework\Attributes\Test;
   use Tests\Traits\Factories;
   use Tests\Traits\Fixtures;
   use Tests\Traits\Mocks;
@@ -31,7 +32,7 @@
       $this->item = app(Item::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_create_episodes()
     {
       $tv = $this->getTv();
@@ -47,7 +48,7 @@
       $this->assertCount(4, $episodes2);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_create_episodes_if_new_from_tmdb_are_available()
     {
       $this->createTv();
@@ -66,7 +67,7 @@
       $this->assertCount(4, $updatedEpisodes);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_fields_on_refresh()
     {
       $this->createTv();
@@ -85,7 +86,7 @@
       $this->assertEquals('name', $updatedEpisode->name);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_remove_episodes()
     {
       $this->createTv();

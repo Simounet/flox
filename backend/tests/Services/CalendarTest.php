@@ -5,6 +5,7 @@ namespace Tests\Services;
 use App\Services\Calendar;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Traits\Factories;
 use Tests\Traits\Fixtures;
 use Tests\Traits\Mocks;
@@ -25,7 +26,7 @@ class CalendarTest extends TestCase {
     $this->calendar = app(Calendar::class);
   }
 
-  /** @test */
+  #[Test]
   public function it_should_contain_and_format_tv_shows()
   {
     $user = $this->createUser();
@@ -53,7 +54,7 @@ class CalendarTest extends TestCase {
     }
   }
 
-  /** @test */
+  #[Test]
   public function it_should_format_tv_shows_on_watchlist()
   {
     $user = $this->createUser();
@@ -72,7 +73,7 @@ class CalendarTest extends TestCase {
     }
   }
 
-  /** @test */
+  #[Test]
   public function it_should_contain_and_format_movies()
   {
     $user = $this->createUser();
@@ -100,7 +101,7 @@ class CalendarTest extends TestCase {
     }
   }
 
-  /** @test */
+  #[Test]
   public function it_should_format_movies_on_watchlist()
   {
     $user = $this->createUser();
@@ -119,7 +120,7 @@ class CalendarTest extends TestCase {
     }
   }
 
-  /** @test */
+  #[Test]
   public function it_should_format_tv_shows_and_movies_on_watchlist()
   {
     $user = $this->createUser();
