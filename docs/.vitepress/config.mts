@@ -8,7 +8,7 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     footer: {
-      message: 'Feel free to <a href="https://github.com/Simounet/flox/tree/master/docs">improve this doc</a>.'
+      message: 'Feel free to <a href="https://github.com/Simounet/flox/tree/main/docs">improve this doc</a>.'
     },
 
     nav: [
@@ -58,7 +58,7 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+      { icon: 'github', link: 'https://github.com/Simounet/flox/' }
     ]
   }
 })
