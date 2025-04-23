@@ -1612,16 +1612,16 @@
         },
         {
             "name": "kra8/laravel-snowflake",
-            "version": "v2.4.0",
+            "version": "v2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kra8/laravel-snowflake.git",
-                "reference": "914dc0299cdc15d891b2ecf50e599a9179fd0894"
+                "reference": "b0365701617be62c91b8b9f0a1b9072f75432e52"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kra8/laravel-snowflake/zipball/914dc0299cdc15d891b2ecf50e599a9179fd0894",
-                "reference": "914dc0299cdc15d891b2ecf50e599a9179fd0894",
+                "url": "https://api.github.com/repos/kra8/laravel-snowflake/zipball/b0365701617be62c91b8b9f0a1b9072f75432e52",
+                "reference": "b0365701617be62c91b8b9f0a1b9072f75432e52",
                 "shasum": ""
             },
             "require": {
@@ -1665,7 +1665,7 @@
             ],
             "support": {
                 "issues": "https://github.com/kra8/laravel-snowflake/issues",
-                "source": "https://github.com/kra8/laravel-snowflake/tree/v2.4.0"
+                "source": "https://github.com/kra8/laravel-snowflake/tree/v2.4.1"
             },
             "funding": [
                 {
@@ -1673,7 +1673,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-02-25T01:49:37+00:00"
+            "time": "2025-04-23T02:58:19+00:00"
         },
         {
             "name": "landrok/activitypub",
