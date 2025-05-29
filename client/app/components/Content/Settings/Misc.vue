@@ -5,9 +5,9 @@
       <span class="current-version">{{ lang('current version') }} <span>{{ version }}</span></span>
       <span class="update-check" v-if=" ! isUpdate">{{ updateMessage }}</span>
       <span class="update-check" v-if="isUpdate">
-        <a href="https://github.com/devfake/flox/releases" target="_blank" class="new-update">{{ lang('new update') }}</a>
+        <a href="https://github.com/Simounet/flox/releases" target="_blank" class="new-update">{{ lang('new update') }}</a>
       </span>
-      <span class="update-check">{{ lang('feedback') }} <a href="https://github.com/devfake/flox/issues" target="_blank">GitHub</a></span>
+      <span class="update-check">{{ lang('feedback') }} <a href="https://github.com/Simounet/flox/issues" target="_blank">GitHub</a></span>
     </div>
 
     <!--<div class="misc-btn-wrap">-->

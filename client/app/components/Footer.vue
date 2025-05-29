@@ -10,7 +10,7 @@
 
       <span class="footer-actions">
         <span :title="lang('change color')" class="icon-constrast"  @click="toggleColorScheme()"><i></i></span>
-        <a class="icon-github" href="https://github.com/devfake/flox" target="_blank"></a>
+        <a class="icon-github" href="https://github.com/Simounet/flox" target="_blank"></a>
       </span>
 
       <div class="sub-links">
