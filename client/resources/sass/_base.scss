@@ -25,7 +25,13 @@ html {
 }
 
 input {
+  background-color: #eee;
   -webkit-appearance: none !important;
+
+  .dark & {
+      color: #fff;
+      background-color: #333;
+  }
 }
 
 input[type="checkbox"] {
