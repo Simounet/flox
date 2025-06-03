@@ -25,10 +25,6 @@
   export default {
     mixins: [MiscHelper],
 
-    created() {
-      document.body.classList.add('dark');
-    },
-
     data() {
       return {
         username: '',
