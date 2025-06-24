@@ -1,5 +1,13 @@
 # Tools you can use Flox with
 
+## Kodi
+
+You can track your activity from Kodi to Flox following these intructions:
+
+1. Download [the last version of the Flox for Kodi addon](https://github.com/simounet/script.flox/releases/latest/download/script.flox.zip)
+2. Put the extracted archive content (`script.flox`) inside the `~/.kodi/addons` directory
+3. Activate the addon and fill in the requested credentials (url/api token)
+
 ## Plex
 
 To enable the sync from Plex to Flox, you first need to generate an API-Key in Flox in the settings page. Then enter the Flox API-URL to the webhooks section in Plex.
