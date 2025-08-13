@@ -55,6 +55,7 @@
 
   .dark & {
     color: #989898;
+    background: transparent;
   }
 
   @include misc.media(5) {
