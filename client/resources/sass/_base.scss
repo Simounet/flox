@@ -1,3 +1,6 @@
+@use "colors";
+@use "misc";
+
 * {
   box-sizing: border-box;
   font-family: 'Open Sans', sans-serif;
@@ -8,7 +11,7 @@
 body {
   overflow-y: scroll;
   background: #fff;
-  accent-color: $main2;
+  accent-color: colors.$main2;
 
   &.dark {
     background: #1c1c1c;
@@ -47,11 +50,11 @@ input[type="checkbox"] {
 
 .wrap-content,
 .content-submenu {
-  @include media(1) { lost-center: 1120px 20px; }
-  @include media(2) { lost-center: 960px 20px; }
-  @include media(3) { lost-center: 800px 20px; }
-  @include media(4) { lost-center: 620px 20px; }
-  @include media(6) { lost-center: 290px 20px; }
+  @include misc.media(1) { lost-center: 1120px 20px; }
+  @include misc.media(2) { lost-center: 960px 20px; }
+  @include misc.media(3) { lost-center: 800px 20px; }
+  @include misc.media(4) { lost-center: 620px 20px; }
+  @include misc.media(6) { lost-center: 290px 20px; }
 }
 
 input,
@@ -72,21 +75,21 @@ input[type="submit"],
   font-size: 17px;
   text-transform: uppercase;
   text-decoration: none;
-  background: $main1;
-  background: $gradient;
+  background: colors.$main1;
+  background: colors.$gradient;
   border: 0;
   cursor: pointer;
 
   &:hover,
   &:active,
   &:focus {
-    background: $main2;
+    background: colors.$main2;
     opacity: .8;
   }
 }
 
 ::selection {
-  background: rgba($main1, .99);
+  background: rgba(colors.$main1, .99);
   color: #fff;
 }
 

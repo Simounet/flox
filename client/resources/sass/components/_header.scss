@@ -1,3 +1,6 @@
+@use "../colors";
+@use "../misc";
+
 .header-wrap {
   position: fixed;
   z-index: 200;
@@ -9,8 +12,8 @@
 }
 
 header {
-  background: $main2;
-  background: $gradient;
+  background: colors.$main2;
+  background: colors.$gradient;
   width: 100%;
   padding: 25px 0;
   position: relative;
@@ -33,7 +36,7 @@ header {
   }
   
   .mobile-open & {
-    background: $gradient;
+    background: colors.$gradient;
   }
 
   .open-modal & {
@@ -48,7 +51,7 @@ header {
   user-select: none;
   
   img {
-    @include transition(width, height);
+    @include misc.transition(width, height);
 
     .sticky & {
       //width: 90px;
@@ -56,7 +59,7 @@ header {
     }
   }
 
-  @include media(5) {
+  @include misc.media(5) {
     //width: 80px;
     //height: auto;
     //margin: 7px 0 0 0;
@@ -76,13 +79,13 @@ header {
   padding: 0;
   opacity: .9;
 
-  @include media(3) {
+  @include misc.media(3) {
     clear: left;
     float: left;
     margin: 20px 0 0 0;
   }
   
-  @include media(5) {
+  @include misc.media(5) {
     display: none;
     margin: 0;
     width: 100%;
@@ -100,12 +103,12 @@ header {
       margin: 0;
     }
     
-    @include media(5) {
+    @include misc.media(5) {
       width: 33%;
       margin: 0;
     }
     
-    @include media(6) {
+    @include misc.media(6) {
       width: 100%;
     }
   }
@@ -126,18 +129,18 @@ header {
       opacity: .6;
     }
 
-    @include media(3) {
+    @include misc.media(3) {
       font-size: 14px;
     }
     
-    @include media(5) {
+    @include misc.media(5) {
       padding: 8px 0;
     }
   }
 }
 
 .site-nav-first {
-  @include media(5) {
+  @include misc.media(5) {
     margin: 15px 0 0 0;
   }
 }
@@ -146,13 +149,13 @@ header {
   float: right;
   margin: 7px 0 0 0;
 
-  @include media(3) {
+  @include misc.media(3) {
     clear: none;
     float: left;
     margin: 20px 0 0 15px;
   }
   
-  @include media(5) {
+  @include misc.media(5) {
     margin: 0;
   }
 }
@@ -170,7 +173,7 @@ header {
     opacity: .6;
   }
   
-  @include media(5) {
+  @include misc.media(5) {
     display: block;
   }
 }

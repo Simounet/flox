@@ -1,3 +1,6 @@
+@use "../colors";
+@use "../misc";
+
 .search-wrap {
   width: 100%;
   //position: absolute;
@@ -30,7 +33,7 @@
   width: 100%;
   position: relative;
 
-  @include transition(padding);
+  @include misc.transition(padding);
 
   .sticky & {
     //padding: 0 0 0 50px;
@@ -48,13 +51,13 @@
   border: 0;
   font-size: 19px;
   padding: 12px 0 12px 30px;
-  color: $dark;
+  color: colors.$dark;
 
   .dark & {
     color: #989898;
   }
 
-  @include media(5) {
+  @include misc.media(5) {
     font-size: 16px;
   }
 
@@ -72,7 +75,7 @@
   top: 15px;
   opacity: .5;
 
-  @include transition(left);
+  @include misc.transition(left);
 
   .dark & {
     background: url(../../../public/assets/img/search-dark.png);
@@ -98,7 +101,7 @@
   left: -50px;
   position: absolute;
 
-  @include transition(opacity, left);
+  @include misc.transition(opacity, left);
 
   .sticky & {
     opacity: 1;
