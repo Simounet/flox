@@ -1,18 +1,15 @@
-@import
-
-'normalize',
-'colors',
-'misc',
-'sprite',
-'shake',
-'base',
-
-'components/header',
-'components/search',
-'components/content',
-'components/subpage',
-'components/login',
-'components/footer',
-'components/modal',
-'components/lists',
-'components/review';
+@use 'normalize';
+@use 'colors';
+@use 'misc';
+@use 'sprite';
+@use 'shake';
+@use 'base';
+@use 'components/header';
+@use 'components/search';
+@use 'components/content';
+@use 'components/subpage';
+@use 'components/login';
+@use 'components/footer';
+@use 'components/modal';
+@use 'components/lists';
+@use 'components/review';

@@ -1,7 +1,10 @@
+@use "../colors";
+@use "../misc";
+
 .list-item-wrap {
   position: relative;
   margin: 0 0 30px 0;
-  background: $gradient;
+  background: colors.$gradient;
   height: 220px;
   cursor: pointer;
   box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .5);
@@ -12,8 +15,8 @@
 
   lost-column: 1/3;
 
-  @include transition(box-shadow);
-  @include media(3) { lost-column: 1; }
+  @include misc.transition(box-shadow);
+  @include misc.media(3) { lost-column: 1; }
 
   &:hover {
     //box-shadow: 0 0 2px 2px $main2;

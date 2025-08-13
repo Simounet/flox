@@ -1,3 +1,7 @@
+@use "sass:color";
+@use "../colors";
+@use "../misc";
+
 .overlay {
   background: rgba(#333, .7);
   height: 100vh;
@@ -21,7 +25,7 @@
   box-shadow: 0 5px 20px 0 rgba(#000, .6);
   z-index: 300;
 
-  @include media(4) {
+  @include misc.media(4) {
     top: 0;
   }
 }
@@ -39,15 +43,15 @@
     }
   }
 
-  @include media(4) {
+  @include misc.media(4) {
     height: 100%;
   }
 }
 
 .modal-header {
   display: flex;
-  background: $main2;
-  background: $gradient;
+  background: colors.$main2;
+  background: colors.$gradient;
   color: #fff;
   font-size: 20px;
   width: 100%;
@@ -88,7 +92,7 @@
   flex-shrink: 0;
   list-style: none;
 
-  @include media(6) {
+  @include misc.media(6) {
     width: 20%;
   }
 }
@@ -102,7 +106,7 @@
   background: none;
   text-align: center;
 
-  @include transition(background);
+  @include misc.transition(background);
 
   &.active,
   &:hover,
@@ -113,7 +117,7 @@
 }
 
 .completed {
-  color: $rating1;
+  color: colors.$rating1;
 }
 
 .modal-content {
@@ -123,7 +127,7 @@
   max-height: calc(60vh - 100px);
   overflow: auto;
 
-  @include media(4) {
+  @include misc.media(4) {
     max-height: 100%;
   }
 }
@@ -149,7 +153,7 @@
   text-transform: initial;
   cursor: pointer;
 
-  @include transition(color);
+  @include misc.transition(color);
 
   &:hover,
   &:focus {
@@ -183,16 +187,16 @@
   grid-template-areas: "title title episodenumber" "date date checkbox";
   gap: 2px 10px;
 
-  @include transition(background);
+  @include misc.transition(background);
 
   &:hover,
   &:focus-within {
-    background: darken(#2f2f2f, 5%);
+    background: color.adjust(#2f2f2f, $lightness: -5%);
   }
 
   &:active {
     .logged & {
-      background: darken(#2f2f2f, 3%);
+      background: color.adjust(#2f2f2f, $lightness: -3%);
     }
   }
 
@@ -243,7 +247,7 @@
   margin-left: auto;
   width: 22px;
   height: 22px;
-  color: $mediumGray;
+  color: colors.$mediumGray;
   border: 3px solid currentColor;
   border-radius: 4px;
   grid-area: checkbox;
@@ -260,6 +264,6 @@
   }
 
   &[checked] {
-    color: $main2;
+    color: colors.$main2;
   }
 }

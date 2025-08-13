@@ -1,18 +1,22 @@
+@use "sass:color";
+@use "../colors";
+@use "../misc";
+
 .bigsize-header {
   height: 600px;
   position: relative;
 
-  @include transition(height);
+  @include misc.transition(height);
 
-  @include media(3) {
+  @include misc.media(3) {
     height: 500px;
   }
 
-  @include media(4) {
+  @include misc.media(4) {
     height: 590px;
   }
 
-  @include media(6) {
+  @include misc.media(6) {
     height: 650px;
   }
 }
@@ -21,8 +25,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  background: $main2;
-  background: $gradient;
+  background: colors.$main2;
+  background: colors.$gradient;
   width: 100%;
   //height: 65vh;
   //height: 600px;
@@ -36,18 +40,18 @@
 }
 
 .button-trailer {
-  background: $dark;
+  background: colors.$dark;
   color: rgba(255,255,255,.9);
 
   &:hover {
-    background: lighten($dark, 5%);
+    background: color.adjust(colors.$dark, $lightness: 5%);
   }
 
   &:active {
-    background: $dark;
+    background: colors.$dark;
   }
 
-  @include media(4) {
+  @include misc.media(4) {
     .without-watchlist & {
       //width: 100% !important;
     }
@@ -59,7 +63,7 @@
   color: rgba(255,255,255,.9);
 
   &:hover {
-    background: lighten(#238cce, 5%);
+    background: color.adjust(#238cce, $lightness: 5%);
   }
 
   &:active {
@@ -69,14 +73,14 @@
 
 .button-tmdb-rating {
   background: #00d373;
-  color: $dark;
+  color: colors.$dark;
 
   i {
     font-style: normal;
   }
 
   &:hover {
-    background: lighten(#00d373, 5%);
+    background: color.adjust(#00d373, $lightness: 5%);
   }
 
   &:active {
@@ -86,14 +90,14 @@
 
 .button-imdb-rating {
   background: #e3b81f;
-  color: $dark;
+  color: colors.$dark;
 
   i {
     font-style: normal;
   }
 
   &:hover {
-    background: lighten(#e3b81f, 10%);
+    background: color.adjust(#e3b81f, $lightness: 10%);
   }
 
   &:active {
@@ -110,7 +114,7 @@
   }
 
   &:hover {
-    background: lighten(#e50914, 10%);
+    background: color.adjust(#e50914, $lightness: 10%);
   }
 
   &:active {
@@ -120,14 +124,14 @@
 
 .button-amazon {
   background: #ff9900;
-  color: $dark;
+  color: colors.$dark;
 
   i {
     font-style: normal;
   }
 
   &:hover {
-    background: lighten(#ff9900, 10%);
+    background: color.adjust(#ff9900, $lightness: 10%);
   }
 
   &:active {
@@ -144,7 +148,7 @@
   }
 
   &:hover {
-    background: lighten(#234c97, 10%);
+    background: color.adjust(#234c97, $lightness: 10%);
   }
 
   &:active {
@@ -162,7 +166,7 @@
   }
 
   &:hover {
-    background: lighten(#444444, 10%);
+    background: color.adjust(#444444, $lightness: 10%);
   }
 
   &:active {
@@ -218,21 +222,21 @@
     align-items: center;
     flex: auto;
 
-    @include transition(background);
+    @include misc.transition(background);
 
-    @include media(4) {
+    @include misc.media(4) {
       //padding: 5px 8px;
       font-size: 15px;
       //width: 50%;
       //text-align: center;
     }
 
-    @include media(5) {
+    @include misc.media(5) {
       // clear: both;
       //width: 50%;
     }
 
-    @include media(6) {
+    @include misc.media(6) {
       width: auto;
       //width: 50%;
       //overflow: hidden;
@@ -242,12 +246,12 @@
     }
   }
 
-  @include media(4) {
+  @include misc.media(4) {
     margin: 0;
     width: 100%;
   }
 
-  @include media(6) {
+  @include misc.media(6) {
     flex-direction: column;
   }
 }
@@ -260,7 +264,7 @@
     font-size: 34px;
     margin: 0 0 10px 0;
 
-    @include media(4) {
+    @include misc.media(4) {
       font-size: 18px;
     }
   }
@@ -272,24 +276,24 @@
     a {
       color: rgba(#fff, .8);
       text-decoration: none;
-      background: rgba($dark, .5);
+      background: rgba(colors.$dark, .5);
       font-size: 14px;
       padding: 3px 7px;
       margin: 0 5px 5px 0;
       float: left;
 
-      @include transition(background);
+      @include misc.transition(background);
 
       &:last-child {
         margin: 0;
       }
 
       &:hover {
-        background: $dark;
+        background: colors.$dark;
       }
 
       &:active {
-        background: rgba($dark, .7);
+        background: rgba(colors.$dark, .7);
       }
     }
 
@@ -299,7 +303,7 @@
     }
   }
 
-  @include media(3) {
+  @include misc.media(3) {
     clear: both;
     margin: 30px 20px 40px 20px;
   }
@@ -332,7 +336,7 @@
   margin-left: 270px;
   width: 100%;
 
-  @include media(4) {
+  @include misc.media(4) {
     margin-left: 0;
   }
 }
@@ -343,7 +347,7 @@
   align-items: end;
   bottom: 0;
 
-  @include media(4) {
+  @include misc.media(4) {
     width: 100%;
     left: 0;
     flex-direction: column;
@@ -364,7 +368,7 @@
   position: absolute;
   top: -180px;
 
-  @include media(4) {
+  @include misc.media(4) {
     position: relative;
     display: flex;
     margin-left: 20px;
@@ -380,11 +384,11 @@
   img {
     border: 0;
 
-    @include media(3) {
+    @include misc.media(3) {
       height: auto;
     }
 
-    @include media(4) {
+    @include misc.media(4) {
       width: 120px;
     }
   }
@@ -421,7 +425,7 @@
     clear: both;
   }
 
-  @include media(4) {
+  @include misc.media(4) {
     margin: 0;
   }
 }
@@ -433,20 +437,20 @@
   cursor: pointer;
   font-size: 13px;
   text-transform: uppercase;
-  color: $dark;
+  color: colors.$dark;
 
   .dark & {
     color: #717171;
 
-    @include media(4) {
+    @include misc.media(4) {
       color: white;
     }
   }
 
-  @include transition(color);
+  @include misc.transition(color);
 
   &:hover {
-    color: $rating3;
+    color: colors.$rating3;
     text-decoration: underline;
   }
 
@@ -470,7 +474,7 @@
 .edit-data {
 
   &:hover {
-    color: $rating2;
+    color: colors.$rating2;
     text-decoration: underline;
   }
 
@@ -484,33 +488,33 @@
   width: calc(100% - 310px);
   padding: 0 0 30px 0;
 
-  @include media(3) {
+  @include misc.media(3) {
     width: calc(100% - 240px);
   }
 
-  @include media(4) {
+  @include misc.media(4) {
     margin: 0;
     width: 100%;
   }
 
   h2 {
-    color: $main2;
+    color: colors.$main2;
     text-transform: uppercase;
     font-size: 18px;
     margin: 30px 0 10px 0;
 
-    @include media(6) {
+    @include misc.media(6) {
       font-size: 14px;
     }
   }
 
   p {
     margin-bottom: 30px;
-    color: $dark;
+    color: colors.$dark;
     font-size: 15px;
     line-height: 19pt;
 
-    @include media(6) {
+    @include misc.media(6) {
       font-size: 14px;
     }
 

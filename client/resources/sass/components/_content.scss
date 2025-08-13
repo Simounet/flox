@@ -1,3 +1,7 @@
+@use "sass:color";
+@use "../colors";
+@use "../misc";
+
 main {
   float: left;
   width: 100%;
@@ -16,11 +20,11 @@ main {
     padding: 200px 17px 0 0;
   }
 
-  @include media(3) {
+  @include misc.media(3) {
     padding: 230px 0 0 0;
   }
 
-  @include media(5) {
+  @include misc.media(5) {
     padding: 190px 0 0 0;
   }
 
@@ -36,12 +40,12 @@ main {
 .suggestions-for {
   float: left;
   width: 100%;
-  color: $dark;
+  color: colors.$dark;
   font-size: 18px;
   border-top: 1px solid #ccc;
   padding: 10px 0;
 
-  @include media(6) {
+  @include misc.media(6) {
     font-size: 14px;
   }
 
@@ -51,11 +55,11 @@ main {
   }
 
   a {
-    color: $main2;
+    color: colors.$main2;
     text-decoration: none;
 
     &:active {
-      color: $main1;
+      color: colors.$main1;
     }
   }
 }
@@ -66,17 +70,17 @@ main {
 
   lost-column: 1/6;
 
-  @include media(1) { lost-column: 1/4; }
+  @include misc.media(1) { lost-column: 1/4; }
   //@include media(3) { lost-column: 1/5; }
-  @include media(3) { lost-column: 1/3; }
+  @include misc.media(3) { lost-column: 1/3; }
   //@include media(4) { lost-column: 1/4; }
-  @include media(5) {
+  @include misc.media(5) {
     lost-column: 1/2;
     display: flex;
     align-items: center;
     flex-direction: column;
   }
-  @include media(6) {  }
+  @include misc.media(6) {  }
 }
 
 .show-ratings-never {
@@ -111,19 +115,19 @@ main {
   max-width: 185px;
   width: 100%;
 
-  @include transition(box-shadow);
+  @include misc.transition(box-shadow);
 
-  @include media(3) {
+  @include misc.media(3) {
     //width: 120px;
     height: auto;
   }
 
-  @include media(6) {
+  @include misc.media(6) {
     //width: 100px;
   }
 
   &:hover {
-    box-shadow: 0 0 2px 2px $main2;
+    box-shadow: 0 0 2px 2px colors.$main2;
 
     .logged & {
       .item-new {
@@ -151,7 +155,7 @@ main {
   }
 
   &:active {
-    box-shadow: 0 0 2px 2px $main1;
+    box-shadow: 0 0 2px 2px colors.$main1;
   }
 }
 
@@ -160,9 +164,9 @@ main {
   width: 100%;
   //border: 1px solid transparent;
 
-  @include transition(border);
+  @include misc.transition(border);
 
-  @include media(3) {
+  @include misc.media(3) {
     height: auto;
   }
 }
@@ -170,7 +174,7 @@ main {
 .no-image {
   width: 185px;
   height: 270px;
-  background: $dark;
+  background: colors.$dark;
   float: left;
   box-shadow: 0 5px 10px 0 rgba(0, 0, 0, .5);
 }
@@ -181,7 +185,7 @@ main {
   max-width: 185px;
   margin: 20px 0 0 0;
 
-  @include media(5) {
+  @include misc.media(5) {
     margin: 10px 0 0 0;
   }
 
@@ -203,13 +207,13 @@ main {
       float: right;
     }
 
-    @include media(3) {
+    @include misc.media(3) {
       font-size: 13px;
     }
   }
 
   .item-title {
-    color: $dark;
+    color: colors.$dark;
     clear: both;
     font-size: 17px;
     overflow: hidden;
@@ -224,14 +228,14 @@ main {
     }
 
     &:hover {
-      color: $main2;
+      color: colors.$main2;
     }
 
     &:active {
-      color: $main1;
+      color: colors.$main1;
     }
 
-    @include media(3) {
+    @include misc.media(3) {
       font-size: 15px;
     }
   }
@@ -273,7 +277,7 @@ main {
     &:hover {
       transform: translate(-50%, -50%) scale(1.2);
 
-      @include media(3) {
+      @include misc.media(3) {
         transform: translate(-50%, -50%) scale(1);
       }
     }
@@ -282,10 +286,10 @@ main {
       transform: translate(-50%, -50%) scale(1.1) !important;
     }
 
-    @include transition(transform, background, opacity);
+    @include misc.transition(transform, background, opacity);
   }
 
-  @include media(3) {
+  @include misc.media(3) {
     transform: translate(-50%, -50%) scale(.8);
 
     .logged & {
@@ -297,7 +301,7 @@ main {
 }
 
 .rating-1 {
-  background: $rating1;
+  background: colors.$rating1;
 
   .icon-rating {
     background: url(../../../public/assets/img/rating-1.png);
@@ -305,7 +309,7 @@ main {
 }
 
 .rating-2 {
-  background: $rating2;
+  background: colors.$rating2;
 
   .icon-rating {
     background: url(../../../public/assets/img/rating-2.png);
@@ -313,7 +317,7 @@ main {
 }
 
 .rating-3 {
-  background: $rating3;
+  background: colors.$rating3;
 
   .icon-rating {
     background: url(../../../public/assets/img/rating-3.png);
@@ -335,10 +339,10 @@ main {
 }
 
 .item-new {
-  background: $main1;
+  background: colors.$main1;
   display: none;
 
-  @include media(3) {
+  @include misc.media(3) {
     .logged & {
       display: block;
     }
@@ -362,7 +366,7 @@ main {
   left: 0;
   width: 100%;
   padding: 3px 0;
-  background: $dark;
+  background: colors.$dark;
   color: #fff;
   font-size: 13px;
   text-transform: uppercase;
@@ -371,7 +375,7 @@ main {
   opacity: 0;
   z-index: 100;
 
-  @include transition(opacity);
+  @include misc.transition(opacity);
 
   .subpage-open & {
     opacity: .7 !important;
@@ -385,7 +389,7 @@ main {
     opacity: .7 !important;
   }
 
-  @include media(3) {
+  @include misc.media(3) {
     display: none;
     /*font-size: 12px;
     padding: 8px 1px;
@@ -411,10 +415,10 @@ main {
   color: #fff;
   width: 100%;
 
-  @include transition(background, opacity);
+  @include misc.transition(background, opacity);
 
   &:hover {
-    background: lighten(#238cce, 5%);
+    background: color.adjust(#238cce, $lightness: 5%);
     opacity: 1 !important;
   }
 
@@ -423,7 +427,7 @@ main {
     opacity: .7 !important;
   }
 
-  @include media(3) {
+  @include misc.media(3) {
     display: none;
   }
 }
@@ -438,9 +442,9 @@ main {
   right: 10px;
   opacity: 0;
 
-  @include transition(opacity);
+  @include misc.transition(opacity);
 
-  @include media(4) {
+  @include misc.media(4) {
     opacity: 1;
   }
 
@@ -461,7 +465,7 @@ main {
 
 .is-a-show {
   float: left;
-  background: $gradient;
+  background: colors.$gradient;
   padding: 0 5px;
   color: #fff;
   font-size: 13px;
@@ -472,7 +476,7 @@ main {
 
   opacity: .8;
 
-  @include transition(opacity);
+  @include misc.transition(opacity);
 
   &:hover {
     opacity: 1;
@@ -488,13 +492,13 @@ main {
   align-items: center;
   height: 25px;
   float: left;
-  background: $dark;
+  background: colors.$dark;
   padding: 0 8px;
   cursor: pointer;
 
   opacity: .8;
 
-  @include transition(opacity);
+  @include misc.transition(opacity);
 
   &:hover {
     opacity: 1;
@@ -510,7 +514,7 @@ main {
 }
 
 .el-tooltip__popper.is-dark {
-  background: $main2 !important;
+  background: colors.$main2 !important;
   text-transform: uppercase;
   border-radius: 0 !important;
   font-size: 12px !important;
@@ -531,7 +535,7 @@ main {
 
   opacity: .8;
 
-  @include transition(opacity);
+  @include misc.transition(opacity);
 
   &:hover {
     opacity: 1;
@@ -547,15 +551,15 @@ main {
 }
 
 .edit-item {
-  background: $rating2;
+  background: colors.$rating2;
   opacity: 1;
 
   &:hover {
-    background: lighten($rating2, 5%);
+    background: color.adjust(colors.$rating2, $lightness: 5%);
   }
 
   &:active {
-    background: $rating2;
+    background: colors.$rating2;
   }
 }
 
@@ -564,8 +568,8 @@ main {
   bottom: 0;
   right: 0;
   opacity: 0;
-  background: $main2;
-  background: $gradient;
+  background: colors.$main2;
+  background: colors.$gradient;
   padding: 3px 6px;
   cursor: pointer;
   text-transform: uppercase;
@@ -574,7 +578,7 @@ main {
   width: 100%;
   z-index: 100;
 
-  @include transition(opacity, bottom);
+  @include misc.transition(opacity, bottom);
 
   .subpage-open & {
     opacity: .7 !important;
@@ -588,7 +592,7 @@ main {
     opacity: .7 !important;
   }
 
-  @include media(3) {
+  @include misc.media(3) {
     //opacity: 1 !important;
     //padding: 8px 6px;
   }
@@ -635,7 +639,7 @@ main {
     float: left;
     width: 100%;
     margin: 0 0 30px 0;
-    color: $main1;
+    color: colors.$main1;
   }
 }
 
@@ -645,7 +649,7 @@ main {
   width: 100%;
   font-size: 32px;
   margin: 0 0 30px 0;
-  color: $dark;
+  color: colors.$dark;
 }
 
 .content-submenu {
@@ -667,7 +671,7 @@ main {
     cursor: pointer;
     opacity: .6;
 
-    @include transition(opacity);
+    @include misc.transition(opacity);
 
     &.active {
       opacity: 1;
@@ -741,7 +745,7 @@ main {
   position: absolute;
   top: 70%;
   right: 0;
-  background: $main2;
+  background: colors.$main2;
   list-style: none;
   min-width: 170px;
   //display: none;
@@ -750,7 +754,7 @@ main {
   max-height: 300px;
   overflow-y: auto;
 
-  @include transition(opacity, top);
+  @include misc.transition(opacity, top);
 
   &.active {
     //display: block;
@@ -769,10 +773,10 @@ main {
     text-decoration: none;
     border-bottom: 1px solid rgba(#fff, .3);
 
-    @include transition(background);
+    @include misc.transition(background);
 
     &:hover {
-      background: $main1;
+      background: colors.$main1;
     }
 
     &:last-child {
@@ -802,7 +806,7 @@ main {
     border-bottom: 2px solid transparent;
     cursor: pointer;
 
-    @include media(6) {
+    @include misc.media(6) {
       width: 50%;
       text-align: center;
       margin: 0 0 20px 0;
@@ -813,10 +817,10 @@ main {
     }
 
     &.active {
-      color: $main2;
-      border-bottom: 2px solid $main2;
+      color: colors.$main2;
+      border-bottom: 2px solid colors.$main2;
 
-      @include media(6) {
+      @include misc.media(6) {
         border-bottom: 2px solid transparent;
       }
     }
@@ -842,7 +846,7 @@ main {
   margin: 10px 0;
 
   a {
-    color: $main1;
+    color: colors.$main1;
     text-decoration: none;
 
     &:hover {
@@ -856,14 +860,14 @@ main {
 }
 
 .new-update {
-  color: $rating1;
+  color: colors.$rating1;
   width: 100%;
   margin: 0 0 10px 0;
   border-bottom: 1px solid transparent;
   text-decoration: none;
 
   &:hover {
-    border-bottom: 1px solid $rating1;
+    border-bottom: 1px solid colors.$rating1;
   }
 
   &:active {
@@ -883,7 +887,7 @@ main {
   width: 100%;
   padding: 15px;
   background: #e1e1e1;
-  color: $dark;
+  color: colors.$dark;
   text-align: center;
   font-size: 15px;
   cursor: pointer;
@@ -925,7 +929,7 @@ main {
     margin: 0 0 0 10px;
     cursor: pointer;
 
-    @include media(5) {
+    @include misc.media(5) {
       width: calc(100% - 30px);
     }
   }
@@ -949,13 +953,13 @@ main {
 }
 
 .userdata-changed {
-  color: $rating1;
+  color: colors.$rating1;
   margin: 10px 0;
   font-size: 14px;
 }
 
 .userdata-changed--error {
-  color: $rating3;
+  color: colors.$rating3;
 }
 
 .import-info {
@@ -997,7 +1001,7 @@ main {
 }
 
 .production-message {
-  color: $main2;
+  color: colors.$main2;
   font-size: 16px;
   float: left;
   width: 100%;

@@ -31,7 +31,7 @@
   import {mapState, mapMutations, mapActions} from 'vuex';
   import MiscHelper from '../../helpers/misc';
 
-  import 'vue-simple-calendar/dist/style.css';
+  import 'vue-simple-calendar/dist/vue-simple-calendar.css';
   import 'vue-simple-calendar/dist/css/default.css';
   import '../../../resources/sass/calendar.scss';
 

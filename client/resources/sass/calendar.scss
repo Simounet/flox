@@ -1,4 +1,4 @@
-@import 'colors';
+@use 'colors';
 
 .calendar-main {
   padding: 100px 0 0 0;
@@ -41,7 +41,7 @@
     background: transparent !important;
     
     .dark & {
-      color: $lightGray;
+      color: colors.$lightGray;
     }
   }
   
@@ -50,7 +50,7 @@
     width: auto;
     
     .dark & {
-      color: $lightGray !important;
+      color: colors.$lightGray !important;
     }
   }
 
@@ -108,11 +108,11 @@
     }
 
     &.tv {
-      background: $main1;
+      background: colors.$main1;
     }
     
     &.movies {
-      background: $main2;
+      background: colors.$main2;
     }
     
     &.watchlist-1 {
@@ -145,11 +145,11 @@
     outline: none;
     
     &:hover {
-      color: $dark;
+      color: colors.$dark;
     }
     
     &:active {
-      color: $lightGray;
+      color: colors.$lightGray;
     }
   }
 
@@ -182,7 +182,7 @@
     display: block;
 
     .dark & {
-      color: $lightGray !important;
+      color: colors.$lightGray !important;
     }
   }
 
@@ -193,7 +193,7 @@
   .today {
     
     .cv-day-number {
-      color: $main2 !important;
+      color: colors.$main2 !important;
     }
   }
   
