@@ -7,7 +7,7 @@
     "mail": "./node_modules/.bin/mjml ./resources/mails/templates/*.mjml.blade.php -o ./resources/mails/compiled"
   },
   "dependencies": {
-    "axios": "^1.7.4",
+    "axios": "^1.12.0",
     "babel-runtime": "^6.26.0",
     "dayjs": "^1.11.8",
     "debounce": "^2.0.0",
