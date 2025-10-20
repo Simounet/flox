@@ -37,7 +37,7 @@ jobs:
           path: "./client"
 
       - name: Set up node ${{ steps.versions.outputs.nodeVersion }}
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ steps.versions.outputs.nodeVersion }}
 
