@@ -35,7 +35,7 @@
     "sass": "^1.90.0",
     "sass-loader": "^16.0.5",
     "style-loader": "^3.3.3",
-    "terser-webpack-plugin": "^5.3.9",
+    "terser-webpack-plugin": "^5.3.17",
     "vue-html-loader": "^1.2.4",
     "vue-loader": "^17.4.2",
     "webpack": "^5.94.0",
