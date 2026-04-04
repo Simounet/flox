@@ -3,6 +3,9 @@
     <div class="wrap-review" v-if=" ! loading">
         <h1>{{ pageTitle }}</h1>
         <p class="review-content">{{ review.content }}</p>
+        <ol v-if="comments.length">
+            <li v-for="(comment, index) in comments">{{ comment.content }}</li>
+        </ol>
         <div class="review-actions">
             <router-link
               :to="itemLink"
@@ -36,6 +39,7 @@
     data() {
       return {
         item: {},
+        comments: [],
         review: {},
         user: {}
       }
@@ -62,6 +66,7 @@
         http(`${config.api}/review/${reviewId}`).then(response => {
           this.review = response.data;
           this.item = this.review.item;
+          this.comments = this.review.comments;
           this.user = this.review.user;
           this.pageTitle = `${this.item.title} ${this.lang('reviewed_by')} ${this.user.username}`;
 

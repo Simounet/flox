@@ -28,6 +28,11 @@ class Review extends Model
 
     protected $with = ['user'];
 
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
     public function item()
     {
         return $this->belongsTo(Item::class);
