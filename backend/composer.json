@@ -13,14 +13,14 @@
   "license": "MIT",
   "type": "project",
   "require": {
-    "php": "^8.2",
+    "php": "^8.3",
     "ext-json": "*",
     "doctrine/dbal": "^3.0",
     "guzzlehttp/guzzle": "^7.0.1",
     "kra8/laravel-snowflake": "^2.2",
     "landrok/activitypub": "^0.8.1",
-    "laravel/framework": "^12.0",
-    "laravel/tinker": "^2.0"
+    "laravel/framework": "^13.0",
+    "laravel/tinker": "^3.0"
   },
   "require-dev": {
     "balping/artisan-bash-completion": "^2.0",
@@ -56,6 +56,22 @@
     }
   },
   "scripts": {
+    "setup": [
+      "composer install",
+      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+      "@php artisan key:generate",
+      "@php artisan migrate --force",
+      "npm install --ignore-scripts",
+      "npm run build"
+    ],
+    "dev": [
+      "Composer\\Config::disableProcessTimeout",
+      "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
+    ],
+    "test": [
+      "@php artisan config:clear --ansi @no_additional_args",
+      "@php artisan test"
+    ],
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
       "@php artisan package:discover --ansi"
@@ -67,7 +83,12 @@
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ],
     "post-create-project-cmd": [
-      "@php artisan key:generate --ansi"
+      "@php artisan key:generate --ansi",
+      "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
+      "@php artisan migrate --graceful --ansi"
+    ],
+    "pre-package-uninstall": [
+      "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
     ]
   },
   "config": {
@@ -78,5 +99,7 @@
       "pestphp/pest-plugin": true,
       "php-http/discovery": true
     }
-  }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
 }
