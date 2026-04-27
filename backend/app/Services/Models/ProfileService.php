@@ -63,7 +63,7 @@ class ProfileService
             'followers_url' => $person->get('followers'),
             'following_url' => $person->get('following'),
             'public_key' => $person->get('publicKey')['publicKeyPem'],
-            'remote_url' => $person->get('url'),
+            'remote_url' => $person->get('id'),
         ];
 
         return Profile::updateOrCreate(['domain' => $entity['domain'], 'username' => $entity['username']], $entity);

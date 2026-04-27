@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\Comment;
 use App\Models\Follower;
+use App\Models\Item;
 use App\Models\Profile;
 use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ProfileService;
@@ -14,6 +16,8 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
+use App\Models\Review;
+use Tests\_Fixtures\CommentFixture;
 
 class FederationTest extends TestCase
 {
@@ -24,6 +28,7 @@ class FederationTest extends TestCase
     private $profile;
     private $profileService;
     private $remoteProfile;
+    private $user;
 
     public function setUp(): void
     {
@@ -35,8 +40,8 @@ class FederationTest extends TestCase
         $this->host = parse_url(env('APP_URL'))['host'];
         $this->withHeader('Host', $this->host);
         $this->profileService = new ProfileService(new Profile());
-        $user = User::factory()->create();
-        $this->profile = $this->profileService->storeLocal($user);
+        $this->user = User::factory()->create();
+        $this->profile = $this->profileService->storeLocal($this->user);
         $this->remoteProfile = json_decode(file_get_contents(__DIR__ . '/../_Fixtures/fediverse-fake-user/profile.json'));
 
         Http::fake([
@@ -185,6 +190,160 @@ class FederationTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertEquals(0, Follower::count());
+    }
+
+    /** @test */
+    public function shouldValidateCommentCreateAndDeleteWorkflow(): void
+    {
+        $profileNumber = Profile::count();
+        $statusId = 114145527041336240;
+        $objectId = $this->remoteProfile->remote_url . '/statuses/' . $statusId;
+        $comment = 'New test.';
+        $item = Item::factory()->create();
+        $review = Review::factory()->create([
+            'user_id' => $this->user->id,
+            'item_id' => $item->id
+        ]);
+
+        $commentFixture = new CommentFixture(
+            'create',
+            $comment,
+            $objectId,
+            $this->profile,
+            $this->remoteProfile,
+            $review->id,
+            $statusId,
+        );
+
+        $deleteCommentFixture = new CommentFixture(
+            'delete',
+            $comment,
+            $objectId,
+            $this->profile,
+            $this->remoteProfile,
+            $review->id,
+            $statusId,
+        );
+
+        $response = $this->postJson(
+            '/inbox',
+            $commentFixture->toArray(),
+            $this->getHeaders($commentFixture->toString())
+        );
+
+        $response->assertStatus(200);
+        $this->assertEquals(Profile::count(), $profileNumber + 1);
+        $createdComment = Comment::first();
+        $this->assertEquals($createdComment->content, $comment);
+        $this->assertEquals($createdComment->language, 'fr');
+        $commentNumber = Comment::count();
+        $this->assertEquals($commentNumber, 1);
+
+        $deleteCommentFixture = new CommentFixture(
+            'delete',
+            $comment,
+            $objectId,
+            $this->profile,
+            $this->remoteProfile,
+            $review->id,
+            $statusId,
+        );
+        $deleteHeaders = $this->getHeaders($deleteCommentFixture->toString());
+
+        $deleteResponse = $this->postJson(
+            '/inbox',
+            $deleteCommentFixture->toArray(),
+            $deleteHeaders
+        );
+        $deleteResponse->assertStatus(200);
+        $commentNumber = Comment::count();
+        $this->assertEquals($commentNumber, 0);
+    }
+
+    /** @test */
+    public function shouldStoreContentInsteadOfContentMap(): void
+    {
+        $statusId = 114145527041336240;
+        $objectId = $this->remoteProfile->remote_url . '/statuses/' . $statusId;
+        $comment = 'New test.';
+        $item = Item::factory()->create();
+        $review = Review::factory()->create([
+            'user_id' => $this->user->id,
+            'item_id' => $item->id
+        ]);
+
+        $commentFixture = new CommentFixture(
+            'create',
+            $comment,
+            $objectId,
+            $this->profile,
+            $this->remoteProfile,
+            $review->id,
+            $statusId,
+        );
+        unset($commentFixture->data['object']->contentMap);
+
+        $this->postJson(
+            '/inbox',
+            $commentFixture->toArray(),
+            $this->getHeaders($commentFixture->toString())
+        );
+
+        $createdComment = Comment::first();
+        $this->assertEquals($createdComment->content, $comment);
+        $this->assertEquals($createdComment->language, 'en');
+    }
+
+    /** @test */
+    public function shouldFailCommentMissingInReplyTo(): void
+    {
+        $statusId = 114145527041336240;
+        $objectId = $this->remoteProfile->remote_url . '/statuses/' . $statusId;
+
+        $commentFixture = new CommentFixture(
+            'create',
+            '',
+            $objectId,
+            $this->profile,
+            $this->remoteProfile,
+            0,
+            $statusId,
+        );
+        $commentFixture->data['object']->inReplyTo = '';
+
+        $response = $this->postJson(
+            '/inbox',
+            $commentFixture->toArray(),
+            $this->getHeaders($commentFixture->toString())
+        );
+
+        $response->assertStatus(400);
+    }
+
+    /** @test */
+    public function shouldFailOnUnknownReview(): void
+    {
+        $statusId = 114145527041336240;
+        $objectId = $this->remoteProfile->remote_url . '/statuses/' . $statusId;
+
+        $comment = 'New test.';
+        $commentFixture = new CommentFixture(
+            'create',
+            $comment,
+            $objectId,
+            $this->profile,
+            $this->remoteProfile,
+            0,
+            $statusId,
+        );
+
+        $response = $this->postJson(
+            '/inbox',
+            $commentFixture->toArray(),
+            $this->getHeaders($commentFixture->toString())
+        );
+
+        $response->assertStatus(404);
     }
 
     private function getHeaders(string $dataStr): array

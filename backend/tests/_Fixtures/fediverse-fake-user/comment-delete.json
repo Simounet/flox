@@ -1,0 +1,21 @@
+{
+    "@context": [
+        "https://www.w3.org/ns/activitystreams",
+        {
+            "ostatus": "http://ostatus.org#",
+            "atomUri": "ostatus:atomUri"
+        },
+        "https://w3id.org/security/v1"
+    ],
+    "id": "%REMOTE_OBJECT_ID%#delete",
+    "type": "Delete",
+    "actor": "%REMOTE_URL%",
+    "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+    ],
+    "object": {
+        "id": "%REMOTE_OBJECT_ID%",
+        "type": "Tombstone",
+        "atomUri": "%REMOTE_OBJECT_ID%"
+    }
+}

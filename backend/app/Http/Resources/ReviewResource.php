@@ -19,7 +19,8 @@ class ReviewResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'user' => $this->getUser($this->user),
-            'item' => $this->when($this->relationLoaded('item'), $this->getItem($this->item))
+            'item' => $this->when($this->relationLoaded('item'), $this->getItem($this->item)),
+            'comments' => $this->when($this->relationLoaded('comments'), $this->comments)
         ];
         return $data;
     }

@@ -83,7 +83,7 @@ class ReviewController extends Controller
      */
     public function show(string $id)
     {
-        $review = Review::with('item')->findOrFail($id);
+        $review = Review::with('item', 'comments')->findOrFail($id);
         $data = new ReviewResource($review);
 
         return $data;
