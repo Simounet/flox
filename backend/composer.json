@@ -15,8 +15,6 @@
   "require": {
     "php": "^8.3",
     "ext-json": "*",
-    "doctrine/dbal": "^3.0",
-    "guzzlehttp/guzzle": "^7.0.1",
     "kra8/laravel-snowflake": "^2.2",
     "landrok/activitypub": "^0.8.1",
     "laravel/framework": "^13.0",
