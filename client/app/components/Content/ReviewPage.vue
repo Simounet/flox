@@ -11,7 +11,7 @@
               :to="itemLink"
               class="review-back-link"
               :title="item.title">{{ lang('return_item') }}</router-link>
-            <button @click="deleteReview">{{ lang('delete item') }}</button>
+            <button v-if="isCurrentUser" @click="deleteReview">{{ lang('delete item') }}</button>
         </div>
     </div>
 
@@ -38,6 +38,7 @@
 
     data() {
       return {
+        auth: config.auth,
         item: {},
         comments: [],
         review: {},
@@ -49,6 +50,10 @@
       ...mapState({
         loading: state => state.loading
       }),
+
+      isCurrentUser() {
+        return this.auth && this.auth === this.user.user_id;
+      },
 
       itemLink() {
         return { name: `subpage-${this.item.media_type}`, params: { tmdbId: this.item.tmdb_id, slug: this.item.slug }};
