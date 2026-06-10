@@ -2,6 +2,7 @@
 
   namespace App\Services;
 
+  use App\Enums\MediaTypeEnum;
   use App\Models\AlternativeTitle;
   use App\Models\Item;
   use App\Services\Models\EpisodeService;
@@ -204,7 +205,7 @@
      */
     private function searchTmdb($item)
     {
-      $found = $this->tmdb->search(getFileName($item), $this->itemCategory);
+      $found = $this->tmdb->search(getFileName($item), $this->getMediaTypeFromFileType($this->itemCategory));
 
       if( ! $found) {
         return false;
@@ -391,5 +392,18 @@
       return [
         'last_fetch_to_file_parser' => $lastFetch->timestamp ?? 0,
       ];
+    }
+
+    private function getMediaTypeFromFileType(string $type): MediaTypeEnum
+    {
+        if($type === 'movie' || $type === 'movies') {
+            return MediaTypeEnum::MOVIE;
+        }
+
+        if($type === 'tv') {
+            return MediaTypeEnum::TV;
+        }
+
+        throw new \Exception('Unknown type: ' . $type);
     }
   }

@@ -2,7 +2,8 @@
 
   namespace Tests\Services;
 
-  use Illuminate\Foundation\Testing\DatabaseTransactions;
+  use App\Enums\MediaTypeEnum;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
   use Tests\TestCase;
   use App\Services\TMDB;
   use GuzzleHttp\Client;
@@ -46,7 +47,7 @@
         $this->tmdbFixtures('movie/search')
       );
 
-      $result = $this->callSearch('tv');
+      $result = $this->callSearch(MediaTypeEnum::TV);
 
       $hasTv = $this->in_array_r('Avatar: The Last Airbender', $result);
       $hasMovie = $this->in_array_r('Avatar: Aufbruch nach Pandora', $result);
@@ -81,7 +82,7 @@
         $this->tmdbFixtures('tv/search')
       );
 
-      $result = $this->callSearch('movies');
+      $result = $this->callSearch(MediaTypeEnum::MOVIE);
 
       $hasTv = $this->in_array_r('Avatar: The Last Airbender', $result);
       $hasMovie = $this->in_array_r('Avatar: Aufbruch nach Pandora', $result);
@@ -172,7 +173,7 @@
       $this->app->instance(Client::class, new Client(['handler' => $handler]));
 
       $tmdb = app(TMDB::class);
-      $result = $tmdb->search('Avatar - Legend of Korra', 'tv');
+      $result = $tmdb->search('Avatar - Legend of Korra', MediaTypeEnum::TV);
 
       $this->assertCount(1, $result);
       $this->assertArrayHasKey('tmdb_id', $result[0]);
@@ -186,7 +187,7 @@
       );
 
       $tmdb = app(TMDB::class);
-      $results = $tmdb->search("the office", "tv");
+      $results = $tmdb->search("the office", MediaTypeEnum::TV);
 
       $this->assertCount(4, $results);
 

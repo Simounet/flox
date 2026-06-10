@@ -2,6 +2,7 @@
 
   namespace App\Services;
 
+  use App\Enums\MediaTypeEnum;
   use App\Http\Resources\ItemResource;
   use App\Services\Models\ItemService;
   use App\Services\Models\PersonService;
@@ -24,9 +25,9 @@
       $this->tmdb = $tmdb;
     }
 
-    public function item($tmdbId, $mediaType)
+    public function item($tmdbId, MediaTypeEnum $mediaType)
     {
-      if($found = $this->itemService->findBy('tmdb_id_strict', $tmdbId, $mediaType)) {
+      if($found = $this->itemService->findBy('tmdb_id_strict', $tmdbId, $mediaType->value)) {
         return new ItemResource($found);
       }
 

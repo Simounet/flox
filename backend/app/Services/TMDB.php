@@ -4,6 +4,7 @@
 
   use App\Models\CreditCast;
   use App\Models\CreditCrew;
+  use App\Enums\MediaTypeEnum;
   use App\Models\Genre;
   use App\Models\Item;
   use App\Services\Models\PersonService;
@@ -32,10 +33,9 @@
      * Search TMDb by 'title'.
      *
      * @param $title
-     * @param null $mediaType
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|Collection
      */
-    public function search($title, $mediaType = null)
+    public function search($title, ?MediaTypeEnum $mediaType = null)
     {
       if( ! $title) {
         return response([], Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -44,14 +44,14 @@
       $tv = collect();
       $movies = collect();
 
-      if( ! $mediaType || $mediaType == 'tv') {
-        $response = $this->fetchSearch($title, 'tv');
-        $tv = collect($this->createItems($response, 'tv'));
+      if( ! $mediaType || $mediaType === MediaTypeEnum::TV) {
+        $response = $this->fetchSearch($title, MediaTypeEnum::TV);
+        $tv = collect($this->createItems($response, MediaTypeEnum::TV));
       }
 
-      if( ! $mediaType || $mediaType == 'movies' || $mediaType == 'movie') {
-        $response = $this->fetchSearch($title, 'movie');
-        $movies = collect($this->createItems($response, 'movie'));
+      if( ! $mediaType || $mediaType === MediaTypeEnum::MOVIE) {
+        $response = $this->fetchSearch($title, MediaTypeEnum::MOVIE);
+        $movies = collect($this->createItems($response, MediaTypeEnum::MOVIE));
       }
 
       $sortedEntries = $movies
@@ -69,8 +69,8 @@
       return $withExactTitles->merge($rest)->values()->all();
     }
 
-    private function fetchSearch($title, $mediaType) {
-      return $this->requestTmdb(self::BASE . '/3/search/' . $mediaType, [
+    private function fetchSearch(string $title, MediaTypeEnum $mediaType) {
+      return $this->requestTmdb(self::BASE . '/3/search/' . $mediaType->value, [
         'query' => $title,
       ]);
     }
@@ -82,7 +82,7 @@
      * @param $tmdbId
      * @return \Illuminate\Support\Collection
      */
-    public function suggestions($mediaType, $tmdbId)
+    public function suggestions(MediaTypeEnum $mediaType, $tmdbId)
     {
       $recommendations = $this->searchSuggestions($mediaType, $tmdbId, 'recommendations');
       $similar = $this->searchSuggestions($mediaType, $tmdbId, 'similar');
@@ -104,9 +104,9 @@
      *
      * @return Collection
      */
-    private function searchSuggestions($mediaType, $tmdbId, $type)
+    private function searchSuggestions(MediaTypeEnum $mediaType, $tmdbId, $type)
     {
-      $response = $this->requestTmdb(self::BASE . '/3/' . $mediaType . '/' . $tmdbId . '/' . $type);
+      $response = $this->requestTmdb(self::BASE . '/3/' . $mediaType->value . '/' . $tmdbId . '/' . $type);
 
       return collect($this->createItems($response, $mediaType));
     }
@@ -125,7 +125,7 @@
           'region' => $region,
         ]);
 
-        return $this->createItems($response, 'movie');
+        return $this->createItems($response, MediaTypeEnum::MOVIE);
       });
 
       return $this->filterItems(collect($cache));
@@ -145,7 +145,7 @@
           'region' => $region,
         ]);
 
-        return $this->createItems($response, 'movie');
+        return $this->createItems($response, MediaTypeEnum::MOVIE);
       });
 
       return $this->filterItems(collect($cache));
@@ -159,11 +159,11 @@
     public function trending()
     {
       $cache = Cache::remember('trending', $this->untilEndOfDay(), function() {
-        $responseMovies = $this->fetchPopular('movie');
-        $responseTv = $this->fetchPopular('tv');
+        $responseMovies = $this->fetchPopular(MediaTypeEnum::MOVIE);
+        $responseTv = $this->fetchPopular(MediaTypeEnum::TV);
 
-        $tv = collect($this->createItems($responseTv, 'tv'));
-        $movies = collect($this->createItems($responseMovies, 'movie'));
+        $tv = collect($this->createItems($responseTv, MediaTypeEnum::TV));
+        $movies = collect($this->createItems($responseMovies, MediaTypeEnum::MOVIE));
 
         return $tv->merge($movies)->shuffle()->toArray();
       });
@@ -186,8 +186,8 @@
         $responseMovies = $this->requestTmdb(self::BASE . '/3/discover/movie', ['with_genres' => $genreId]);
         $responseTv = $this->requestTmdb(self::BASE . '/3/discover/tv', ['with_genres' => $genreId]);
 
-        $movies = collect($this->createItems($responseMovies, 'movie'));
-        $tv = collect($this->createItems($responseTv, 'tv'));
+        $movies = collect($this->createItems($responseMovies, MediaTypeEnum::MOVIE));
+        $tv = collect($this->createItems($responseTv, MediaTypeEnum::TV));
 
         return $tv->merge($movies)->shuffle()->toArray();
       });
@@ -228,9 +228,9 @@
       return array_values($merged->reverse()->toArray());
     }
 
-    private function fetchPopular($mediaType)
+    private function fetchPopular(MediaTypeEnum $mediaType)
     {
-      return $this->requestTmdb(self::BASE . '/3/' . $mediaType . '/popular');
+      return $this->requestTmdb(self::BASE . '/3/' . $mediaType->value . '/popular');
     }
 
     /**
@@ -238,7 +238,7 @@
      * @param $mediaType
      * @return array
      */
-    private function createItems($response, $mediaType)
+    private function createItems($response, MediaTypeEnum $mediaType)
     {
       $items = [];
       $response = json_decode($response->getBody());
@@ -250,7 +250,7 @@
       return $items;
     }
 
-    public function createItem(object $data, string $mediaType): array
+    public function createItem(object $data, MediaTypeEnum $mediaType): array
     {
       try {
         $release = Carbon::createFromFormat('Y-m-d',
@@ -268,7 +268,7 @@
         'slug' => getSlug($title),
         'original_title' => $data->original_name ?? $data->original_title,
         'poster' => $data->poster_path,
-        'media_type' => $mediaType,
+        'media_type' => $mediaType->value,
         'released' => $release->copy()->getTimestamp(),
         'released_datetime' => $release->toString(),
         'genre_ids' => $data->genre_ids,
@@ -323,9 +323,9 @@
      * @param $mediaType
      * @return mixed
      */
-    public function details($tmdbId, $mediaType)
+    public function details($tmdbId, MediaTypeEnum $mediaType)
     {
-      $response = $this->requestTmdb(self::BASE . '/3/' . $mediaType . '/' . $tmdbId, [
+      $response = $this->requestTmdb(self::BASE . '/3/' . $mediaType->value . '/' . $tmdbId, [
         'append_to_response' => 'videos,external_ids,credits',
       ]);
 
@@ -337,9 +337,9 @@
       return json_decode($response->getBody());
     }
 
-    public function videos($tmdbId, $mediaType, $translation = null)
+    public function videos($tmdbId, MediaTypeEnum $mediaType, $translation = null)
     {
-      $response = $this->requestTmdb(self::BASE . '/3/' . $mediaType . '/' . $tmdbId . '/videos', [
+      $response = $this->requestTmdb(self::BASE . '/3/' . $mediaType->value . '/' . $tmdbId . '/videos', [
         'language' => $translation ?? $this->translation,
       ]);
 
@@ -354,9 +354,9 @@
      * @param $mediaType
      * @return integer | null
      */
-    private function tvSeasonsCount($id, $mediaType)
+    private function tvSeasonsCount($id, MediaTypeEnum $mediaType)
     {
-      if($mediaType == 'tv') {
+      if($mediaType === MediaTypeEnum::TV) {
         $response = $this->requestTmdb(self::BASE . '/3/tv/' . $id);
 
         $seasons = collect(json_decode($response->getBody())->seasons);
@@ -378,7 +378,7 @@
      */
     public function tvEpisodes($tmdbId)
     {
-      $seasons = $this->tvSeasonsCount($tmdbId, 'tv');
+      $seasons = $this->tvSeasonsCount($tmdbId, MediaTypeEnum::TV);
       $data = [];
 
       for($i = 1; $i <= $seasons; $i++) {
@@ -411,7 +411,7 @@
 
     public function fetchAlternativeTitles($item)
     {
-      return $this->requestTmdb(self::BASE . '/3/' . $item['media_type'] . '/' . $item['tmdb_id'] . '/alternative_titles');
+      return $this->requestTmdb(self::BASE . '/3/' . MediaTypeEnum::from($item['media_type'])->value . '/' . $item['tmdb_id'] . '/alternative_titles');
     }
 
     /**

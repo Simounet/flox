@@ -177,10 +177,8 @@ abstract class Api
 
   /**
    * Is it a movie or tv show? Should return 'tv' or 'movie'.
-   *
-   * @return string
    */
-  abstract protected function getType();
+  abstract protected function getType(): string;
 
   /**
    * Title for the item (name of the movie or tv show).
