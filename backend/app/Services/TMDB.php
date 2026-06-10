@@ -125,10 +125,10 @@
           'region' => $region,
         ]);
 
-        return collect($this->createItems($response, 'movie'));
+        return $this->createItems($response, 'movie');
       });
 
-      return $this->filterItems($cache);
+      return $this->filterItems(collect($cache));
     }
 
     /**
@@ -145,10 +145,10 @@
           'region' => $region,
         ]);
 
-        return collect($this->createItems($response, 'movie'));
+        return $this->createItems($response, 'movie');
       });
 
-      return $this->filterItems($cache);
+      return $this->filterItems(collect($cache));
     }
 
     /**
@@ -165,10 +165,10 @@
         $tv = collect($this->createItems($responseTv, 'tv'));
         $movies = collect($this->createItems($responseMovies, 'movie'));
 
-        return $tv->merge($movies)->shuffle();
+        return $tv->merge($movies)->shuffle()->toArray();
       });
 
-      return $this->filterItems($cache);
+      return $this->filterItems(collect($cache));
     }
 
     /**
@@ -189,12 +189,12 @@
         $movies = collect($this->createItems($responseMovies, 'movie'));
         $tv = collect($this->createItems($responseTv, 'tv'));
 
-        return $tv->merge($movies)->shuffle();
+        return $tv->merge($movies)->shuffle()->toArray();
       });
 
       //$inDB = Item::findByGenreId($genreId)->get();
 
-      return $this->filterItems($cache, $genreId);
+      return $this->filterItems(collect($cache), $genreId);
     }
 
     /**
@@ -204,7 +204,7 @@
      * @param null $genreId
      * @return array
      */
-    private function filterItems($items, $genreId = null)
+    private function filterItems(Collection $items, $genreId = null)
     {
       $allId = $items->pluck('tmdb_id');
 
@@ -270,13 +270,13 @@
         'poster' => $data->poster_path,
         'media_type' => $mediaType,
         'released' => $release->copy()->getTimestamp(),
-        'released_datetime' => $release,
+        'released_datetime' => $release->toString(),
         'genre_ids' => $data->genre_ids,
         'credit_cast' => $data->credit_cast ?? [],
         'credit_crew' => $data->credit_crew ?? [],
         'review' => $data->review ?? [],
         'user_review' => $data->user_review ?? null,
-        'genre' => Genre::whereIn('id', $data->genre_ids)->get(),
+        'genre' => Genre::whereIn('id', $data->genre_ids)->get()->toArray(),
         'episodes' => [],
         'overview' => $data->overview,
         'backdrop' => $data->backdrop_path,
