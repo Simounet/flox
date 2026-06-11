@@ -2,6 +2,8 @@
 
 namespace App\Services\Api;
 
+use App\Enums\MediaTypeEnum;
+
 class Plex extends Api
 {
 
@@ -16,11 +18,11 @@ class Plex extends Api
   /**
    * @inheritDoc
    */
-  protected function getType()
+  protected function getType(): string
   {
     $type = $this->data['Metadata']['type'];
 
-    return in_array($type, ['episode', 'show']) ? 'tv' : 'movie';
+    return in_array($type, ['episode', 'show']) ? MediaTypeEnum::TV->value : MediaTypeEnum::MOVIE->value;
   }
 
   /**

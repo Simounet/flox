@@ -2,6 +2,7 @@
 
   namespace App\Services\Models;
 
+  use App\Enums\MediaTypeEnum;
   use App\Models\Genre;
   use App\Models\Item;
   use App\Models\Review;
@@ -138,7 +139,7 @@
         || ! isset($data['credit_cast'])
         || ! isset($data['credit_crew'])
       ) {
-        $details = $this->tmdb->details($data['tmdb_id'], $data['media_type']);
+        $details = $this->tmdb->details($data['tmdb_id'], MediaTypeEnum::from($data['media_type']));
         $title = $details->name ?? $details->title;
 
         // @todo extract
@@ -206,7 +207,7 @@
 
       $item = $this->item->findOrFail($itemId);
 
-      $details = $this->tmdb->details($item->tmdb_id, $item->media_type);
+      $details = $this->tmdb->details($item->tmdb_id, MediaTypeEnum::from($item->media_type));
 
       $title = $details->name ?? ($details->title ?? null);
 
@@ -302,7 +303,7 @@
       }
 
       // Try to fetch details again with english language as fallback.
-      $videos = $this->tmdb->videos($details->id, $mediaType, 'en');
+      $videos = $this->tmdb->videos($details->id, MediaTypeEnum::from($mediaType), 'en');
 
       return $videos->results[0]->key ?? null;
     }

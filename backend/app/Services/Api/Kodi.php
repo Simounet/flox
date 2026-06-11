@@ -2,6 +2,8 @@
 
 namespace App\Services\Api;
 
+use App\Enums\MediaTypeEnum;
+
 class Kodi extends Api
 {
 
@@ -16,11 +18,11 @@ class Kodi extends Api
   /**
    * @inheritDoc
    */
-  protected function getType()
+  protected function getType(): string
   {
     $type = $this->data['mediaType'];
 
-    return in_array($type, ['tv']) ? 'tv' : 'movie';
+    return in_array($type, ['tv']) ? MediaTypeEnum::TV->value : MediaTypeEnum::MOVIE->value;
   }
 
   /**

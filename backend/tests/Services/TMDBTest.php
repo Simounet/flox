@@ -2,13 +2,12 @@
 
   namespace Tests\Services;
 
+  use App\Enums\MediaTypeEnum;
   use Illuminate\Foundation\Testing\DatabaseTransactions;
+  use Illuminate\Support\Facades\Http;
   use Tests\TestCase;
   use App\Services\TMDB;
-  use GuzzleHttp\Client;
-  use GuzzleHttp\Handler\MockHandler;
-  use GuzzleHttp\HandlerStack;
-  use GuzzleHttp\Psr7\Response;
+  use Illuminate\Http\Response;
   use PHPUnit\Framework\Attributes\Test;
   use Tests\Traits\Factories;
   use Tests\Traits\Fixtures;
@@ -46,7 +45,7 @@
         $this->tmdbFixtures('movie/search')
       );
 
-      $result = $this->callSearch('tv');
+      $result = $this->callSearch(MediaTypeEnum::TV);
 
       $hasTv = $this->in_array_r('Avatar: The Last Airbender', $result);
       $hasMovie = $this->in_array_r('Avatar: Aufbruch nach Pandora', $result);
@@ -81,7 +80,7 @@
         $this->tmdbFixtures('tv/search')
       );
 
-      $result = $this->callSearch('movies');
+      $result = $this->callSearch(MediaTypeEnum::MOVIE);
 
       $hasTv = $this->in_array_r('Avatar: The Last Airbender', $result);
       $hasMovie = $this->in_array_r('Avatar: Aufbruch nach Pandora', $result);
@@ -163,16 +162,12 @@
     #[Test]
     public function it_should_respect_request_limit()
     {
-      $mock = new MockHandler([
-        new Response(429, []),
-        new Response(200, ['X-RateLimit-Remaining' => [40]], $this->tmdbFixtures('multi')),
-      ]);
-
-      $handler = HandlerStack::create($mock);
-      $this->app->instance(Client::class, new Client(['handler' => $handler]));
+      Http::fakeSequence()
+        ->push('', 429)
+        ->push($this->tmdbFixtures('multi'), 200, ['X-RateLimit-Remaining' => 40]);
 
       $tmdb = app(TMDB::class);
-      $result = $tmdb->search('Avatar - Legend of Korra', 'tv');
+      $result = $this->getResultFromResponse($tmdb->search('Avatar - Legend of Korra', MediaTypeEnum::TV));
 
       $this->assertCount(1, $result);
       $this->assertArrayHasKey('tmdb_id', $result[0]);
@@ -186,7 +181,7 @@
       );
 
       $tmdb = app(TMDB::class);
-      $results = $tmdb->search("the office", "tv");
+      $results = $this->getResultFromResponse($tmdb->search("the office", MediaTypeEnum::TV));
 
       $this->assertCount(4, $results);
 
@@ -207,5 +202,10 @@
 
     private function in_array_r($item , $array){
       return (bool) preg_match('/"' . $item . '"/i' , json_encode($array));
+    }
+
+    private function getResultFromResponse(Response $response): array
+    {
+      return json_decode($response->getContent(), true);
     }
   }

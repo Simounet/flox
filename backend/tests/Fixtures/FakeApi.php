@@ -18,7 +18,7 @@ class FakeApi extends Api
   /**
    * @inheritDoc
    */
-  protected function getType()
+  protected function getType(): string
   {
     return $this->data['data']['type'];
   }
