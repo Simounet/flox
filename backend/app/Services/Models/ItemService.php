@@ -470,7 +470,7 @@
         case 'last seen':
           return 'reviews.updated_at';
         case 'own rating':
-          return 'review.rating';
+          return 'reviews.rating';
         case 'title':
           return 'title';
         case 'release':
