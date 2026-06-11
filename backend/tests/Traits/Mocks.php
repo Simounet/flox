@@ -8,10 +8,7 @@
   use App\Services\Models\ReviewService;
   use App\Services\Storage;
   use App\Services\TMDB;
-  use GuzzleHttp\Client;
-  use GuzzleHttp\Handler\MockHandler;
-  use GuzzleHttp\HandlerStack;
-  use GuzzleHttp\Psr7\Response;
+  use Illuminate\Support\Facades\Http;
   use Mockery;
 
   trait Mocks {
@@ -19,16 +16,11 @@
     public function createGuzzleMock()
     {
       $fixtures = func_get_args();
-      $responses = [];
+      $sequence = Http::fakeSequence();
 
       foreach($fixtures as $fixture) {
-        $responses[] = new Response(200, ['X-RateLimit-Remaining' => [40]], $fixture);
+        $sequence->push($fixture, 200, ['X-RateLimit-Remaining' => 40]);
       }
-
-      $mock = new MockHandler($responses);
-
-      $handler = HandlerStack::create($mock);
-      $this->app->instance(Client::class, new Client(['handler' => $handler]));
     }
 
     public function createStorageDownloadsMock()

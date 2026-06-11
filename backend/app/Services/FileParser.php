@@ -205,7 +205,7 @@
      */
     private function searchTmdb($item)
     {
-      $found = $this->tmdb->search(getFileName($item), $this->getMediaTypeFromFileType($this->itemCategory));
+      $found = json_decode($this->tmdb->search(getFileName($item), $this->getMediaTypeFromFileType($this->itemCategory))->getContent(), true);
 
       if( ! $found) {
         return false;

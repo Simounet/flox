@@ -3,13 +3,11 @@
   namespace Tests\Services;
 
   use App\Enums\MediaTypeEnum;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+  use Illuminate\Foundation\Testing\DatabaseTransactions;
+  use Illuminate\Support\Facades\Http;
   use Tests\TestCase;
   use App\Services\TMDB;
-  use GuzzleHttp\Client;
-  use GuzzleHttp\Handler\MockHandler;
-  use GuzzleHttp\HandlerStack;
-  use GuzzleHttp\Psr7\Response;
+  use Illuminate\Http\Response;
   use PHPUnit\Framework\Attributes\Test;
   use Tests\Traits\Factories;
   use Tests\Traits\Fixtures;
@@ -164,16 +162,12 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
     #[Test]
     public function it_should_respect_request_limit()
     {
-      $mock = new MockHandler([
-        new Response(429, []),
-        new Response(200, ['X-RateLimit-Remaining' => [40]], $this->tmdbFixtures('multi')),
-      ]);
-
-      $handler = HandlerStack::create($mock);
-      $this->app->instance(Client::class, new Client(['handler' => $handler]));
+      Http::fakeSequence()
+        ->push('', 429)
+        ->push($this->tmdbFixtures('multi'), 200, ['X-RateLimit-Remaining' => 40]);
 
       $tmdb = app(TMDB::class);
-      $result = $tmdb->search('Avatar - Legend of Korra', MediaTypeEnum::TV);
+      $result = $this->getResultFromResponse($tmdb->search('Avatar - Legend of Korra', MediaTypeEnum::TV));
 
       $this->assertCount(1, $result);
       $this->assertArrayHasKey('tmdb_id', $result[0]);
@@ -187,7 +181,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
       );
 
       $tmdb = app(TMDB::class);
-      $results = $tmdb->search("the office", MediaTypeEnum::TV);
+      $results = $this->getResultFromResponse($tmdb->search("the office", MediaTypeEnum::TV));
 
       $this->assertCount(4, $results);
 
@@ -208,5 +202,10 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 
     private function in_array_r($item , $array){
       return (bool) preg_match('/"' . $item . '"/i' , json_encode($array));
+    }
+
+    private function getResultFromResponse(Response $response): array
+    {
+      return json_decode($response->getContent(), true);
     }
   }
