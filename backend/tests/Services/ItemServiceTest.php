@@ -38,7 +38,7 @@
       $userId = 1;
       $this->createReviewServiceMock();
       $itemService = app(ItemService::class);
-      return $itemService->create($data, $userId);
+      return $itemService->create($data['tmdb_id'], $data['media_type'], $userId);
     }
 
     #[Test]
@@ -56,7 +56,7 @@
       $this->assertCount(0, $item1);
       $this->assertCount(1, $item2);
       $this->assertDatabaseHas('items', [
-        'title' => 'Warcraft: The Beginning',
+        'title' => 'Warcraft',
       ]);
     }
 

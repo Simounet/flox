@@ -181,7 +181,7 @@
       $this->assertNotNull($item->subtitles);
       $this->assertNotNull($item->fp_name);
       $this->assertDatabaseHas('items', [
-        'title' => 'Warcraft: The Beginning'
+        'title' => 'Warcraft'
       ]);
     }
 
@@ -367,7 +367,7 @@
       $this->assertEquals('NOT EXISTS MOVIE', $empty->title);
       $this->assertNull($empty->tmdb_id);
       $this->assertEquals('warcraft', $updated->fp_name);
-      $this->assertEquals('Warcraft: The Beginning', $updated->title);
+      $this->assertEquals('Warcraft', $updated->title);
       $this->assertEquals(68735, $updated->tmdb_id);
     }
 

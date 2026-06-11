@@ -41,6 +41,7 @@ class ReviewServiceTest extends TestCase
     #[Test]
     public function review_should_be_created_on_item_creation(): void
     {
+      $movieFixture = $this->floxFixtures('movie');
       $this->createGuzzleMock(
         $this->tmdbFixtures('movie/details'),
         $this->tmdbFixtures('movie/alternative_titles')
@@ -48,7 +49,7 @@ class ReviewServiceTest extends TestCase
 
       $item = app(Item::class);
       $itemService = app(ItemService::class);
-      $itemService->create($this->floxFixtures('movie'), $this->user->id);
+      $itemService->create($movieFixture['tmdb_id'], $movieFixture['media_type'], $this->user->id);
       $item = $item->all()->first();
 
       $this->assertIsObject($item->review);

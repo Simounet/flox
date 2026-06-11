@@ -151,12 +151,14 @@ class ReviewTest extends TestCase {
 
     private function mockItem(): Item
     {
+        $movieFixture = $this->floxFixtures('movie');
+
         $this->createGuzzleMock(
             $this->tmdbFixtures('movie/details'),
             $this->tmdbFixtures('movie/alternative_titles')
         );
         $itemService = app(ItemService::class);
-        return $itemService->create($this->floxFixtures('movie'), $this->user->id);
+        return $itemService->create($movieFixture['tmdb_id'], $movieFixture['media_type'], $this->user->id);
     }
 
     private function getHeaders(string $dataStr): array

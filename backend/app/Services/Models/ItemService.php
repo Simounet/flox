@@ -71,21 +71,23 @@
      * @return Item
      */
     public function create(
-      array $data,
+      int $tmdbId,
+      string $mediaTypeStr,
       int $userId
     ): Item
     {
       DB::beginTransaction();
-      $item = $this->createItemInfoIfNotExists($data);
+      $mediaType = MediaTypeEnum::from($mediaTypeStr);
+      $item = $this->createItemInfoIfNotExists($tmdbId, $mediaType);
       $this->reviewService->create($item, $userId);
       DB::commit();
 
       return $item->fresh();
     }
 
-    public function createItemInfoIfNotExists(array $data): Item
+    public function createItemInfoIfNotExists(int $tmdbId, MediaTypeEnum $mediaType): Item
     {
-      $existingItem = Item::where('tmdb_id', $data['tmdb_id'])
+      $existingItem = Item::where('tmdb_id', $tmdbId)
         ->get()
         ->first();
 
@@ -93,8 +95,7 @@
         return $existingItem;
       }
 
-      // @TODO should use server fetched data instead of client data
-      $data = $this->makeDataComplete($data);
+      $data = $this->makeDataComplete($tmdbId, $mediaType);
 
       $item = $this->item->store($data);
       $this->personService->storeCredits(
@@ -127,52 +128,47 @@
 
     /**
      * Search against TMDb and IMDb for more informations.
-     * We don't need to get more informations if we add the item from the subpage.
-     *
-     * @param $data
-     * @return array
      */
-    public function makeDataComplete(array $data): array
+    private function makeDataComplete(int $tmdbId, MediaTypeEnum $mediaType): array
     {
-      if(
-        ! isset($data['imdb_id'])
-        || ! isset($data['credit_cast'])
-        || ! isset($data['credit_crew'])
-      ) {
-        $details = $this->tmdb->details($data['tmdb_id'], MediaTypeEnum::from($data['media_type']));
-        $title = $details->name ?? $details->title;
+      $details = $this->tmdb->details($tmdbId, $mediaType);
+      $title = $details->name ?? $details->title;
 
-        // @todo extract
-        try {
-          $release = Carbon::createFromFormat('Y-m-d',
-            isset($details->release_date) ? ($details->release_date ?: Item::FALLBACK_DATE) : ($details->first_air_date ?? Item::FALLBACK_DATE)
-          );
-        } catch (\Exception $exception) {
-          $release = Carbon::createFromFormat('Y-m-d', Item::FALLBACK_DATE);
-        }
-
-        $data['title'] = $data['title'] ?? $title;
-        // @todo facto
-        $data['original_title'] = $details->original_name ?? $details->original_title;
-        $data['imdb_id'] = $data['imdb_id'] ?? $this->parseImdbId($details);
-        $data['youtube_key'] = $data['youtube_key'] ?? $this->parseYoutubeKey($details, $data['media_type']);
-        $data['overview'] = $data['overview'] ?? $details->overview;
-        $data['tmdb_rating'] = $data['tmdb_rating'] ?? $details->vote_average;
-        $data['backdrop'] = $data['backdrop'] ?? $details->backdrop_path;
-        $data['slug'] = $data['slug'] ?? getSlug($title);
-        $data['homepage'] = $data['homepage'] ?? $details->homepage;
-        $data['credit_cast'] = $data['credit_cast'] ?? $this->personService->castFromTMDB($data['tmdb_id'], $details->credits->cast);
-        $data['credit_crew'] = $data['credit_crew'] ?? $this->personService->crewFromTMDB($data['tmdb_id'], $details->credits->crew);
-        // @todo extract
-        $data['released'] = $release->copy()->getTimestamp();
-        $data['released_datetime'] = $release;
-        $data['poster'] = $data['poster'] ?? $details->poster_path;
-        $genreIds = collect($details->genres)->pluck('id')->all();
-        $data['genre_ids'] = $data['genre_ids'] ?? $genreIds;
-        $data['genre'] = $data['genre'] ?? Genre::whereIn('id', $genreIds)->get();
-        $data['popularity'] = $data['popularity'] ?? ($details->popularity ?? 0);
+      // @todo extract
+      try {
+        $release = Carbon::createFromFormat('Y-m-d',
+          isset($details->release_date) ? ($details->release_date ?: Item::FALLBACK_DATE) : ($details->first_air_date ?? Item::FALLBACK_DATE)
+        );
+      } catch (\Exception $exception) {
+        $release = Carbon::createFromFormat('Y-m-d', Item::FALLBACK_DATE);
       }
 
+      // @TODO make a data object
+      $data = [];
+      $data['tmdb_id'] = $tmdbId;
+      $data['media_type'] = $mediaType->value;
+      $data['title'] = $title;
+      // @todo facto
+      $data['original_title'] = $details->original_name ?? $details->original_title;
+      $data['imdb_id'] = $this->parseImdbId($details);
+      $data['youtube_key'] = $this->parseYoutubeKey($details, $mediaType->value);
+      $data['overview'] = $details->overview;
+      $data['tmdb_rating'] = $details->vote_average;
+      $data['backdrop'] = $details->backdrop_path;
+      $data['slug'] = getSlug($title);
+      $data['homepage'] = $details->homepage;
+      $data['credit_cast'] = $this->personService->castFromTMDB($tmdbId, $details->credits->cast);
+      $data['credit_crew'] = $this->personService->crewFromTMDB($tmdbId, $details->credits->crew);
+      // @todo extract
+      $data['released'] = $release->copy()->getTimestamp();
+      $data['released_datetime'] = $release->toString();
+      $data['poster'] = $details->poster_path;
+      $genreIds = collect($details->genres)->pluck('id')->all();
+      $data['genre_ids'] = $genreIds;
+      $data['genre'] = Genre::whereIn('id', $genreIds)->get()->toArray();
+      $data['popularity'] = $details->popularity ?? 0;
+
+      // @TODO remove imdb_rating not working anymore because of forbidden web scrapping
       $data['imdb_rating'] = $this->parseImdbRating($data);
 
       return $data;
@@ -414,8 +410,7 @@
 
       // For empty items (from file-parser) we don't need access to details.
       if($item->tmdb_id) {
-        $item = $this->makeDataComplete((array) $item);
-        $this->storage->downloadImages($item['poster'], $item['backdrop']);
+        $this->storage->downloadImages($item->poster, $item->backdrop);
       }
 
       $item = collect($item)->except('id')->toArray();

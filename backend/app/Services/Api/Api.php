@@ -2,6 +2,7 @@
 
 namespace App\Services\Api;
 
+use App\Enums\MediaTypeEnum;
 use App\Enums\StatusEnum;
 use App\Models\Episode;
 use App\Models\EpisodeUser;
@@ -108,7 +109,7 @@ abstract class Api
   {
     $tmdbId = $this->getTmdbId();
     if(!$tmdbId) {
-      $foundFromTmdb = $this->tmdb->search($this->getTitle(), $this->getType());
+      $foundFromTmdb = $this->tmdb->search($this->getTitle(), MediaTypeEnum::from($this->getType()));
       if (!$foundFromTmdb) {
         return null;
       }
@@ -126,7 +127,7 @@ abstract class Api
         'media_type' => $this->getType()
       ];
     }
-    return $this->itemService->createItemInfoIfNotExists($firstResult);
+    return $this->itemService->createItemInfoIfNotExists($firstResult['tmdb_id'], MediaTypeEnum::from($firstResult['media_type']));
   }
 
   private function getItem(): ?Item

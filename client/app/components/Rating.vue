@@ -72,7 +72,7 @@
           //this.rated = true;
           this.setRated(true);
 
-          http.post(`${config.api}/add`, {item: this.item}).then(response => {
+          http.post(`${config.api}/add`, {tmdb_id: this.item.tmdb_id, media_type: this.item.media_type}).then(response => {
             this.setItem(response.data);
             //this.rated = false;
             this.setRated(false);

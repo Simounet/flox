@@ -47,10 +47,11 @@
       $user = Auth::user();
       abort_if(!$user, 403);
 
-      $item = Request::input('item');
-      abort_if(!$item, 403);
+      $tmdbId = Request::input('tmdb_id');
+      $mediaTypeStr = Request::input('media_type');
+      abort_if(!$tmdbId || !$mediaTypeStr, 403);
 
-      return $this->itemService->create($item, $user->id);
+      return $this->itemService->create($tmdbId, $mediaTypeStr, $user->id);
     }
 
     public function watchlist()

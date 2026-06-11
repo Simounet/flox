@@ -185,7 +185,7 @@
       }
 
       // Create a new item with TMDb specific values.
-      $created = $this->itemService->create($found, Auth::user()->id);
+      $created = $this->itemService->create($found['tmdb_id'], $found['media_type'], Auth::user()->id);
 
       // We are searching for the changed name (if available) in the next iteration.
       if($this->itemCategory == 'tv') {
@@ -242,7 +242,7 @@
       }
 
       // Otherwise create a new item from the result.
-      $created = $this->itemService->create($firstResult, Auth::user()->id);
+      $created = $this->itemService->create($firstResult['tmdb_id'], $firstResult['media_type'], Auth::user()->id);
       
       return $this->store($item, $created->tmdb_id);
     }

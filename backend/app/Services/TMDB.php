@@ -324,11 +324,11 @@
       if($mediaType === MediaTypeEnum::TV) {
         $response = $this->requestTmdb(self::BASE . '/3/tv/' . $id);
 
-        $seasons = collect(json_decode($response->json())->seasons);
+        $seasons = collect($response->json()['seasons']);
 
         return $seasons->filter(function ($season) {
           // We don't need pilots
-          return $season->season_number > 0;
+          return $season['season_number'] > 0;
         })->count();
       }
 
