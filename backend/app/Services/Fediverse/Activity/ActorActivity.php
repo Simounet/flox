@@ -14,7 +14,7 @@ class ActorActivity
     public function actorObject(Profile $profile): Person
     {
         TypeConfiguration::set('undefined_properties', 'ignore');
-        $avatarUrl = $profile->avatar_url ?? env('APP_URL') . self::DEFAULT_PROFILE_AVATAR;
+        $avatarUrl = $profile->avatar_url ?? config('APP_URL') . self::DEFAULT_PROFILE_AVATAR;
         $icon = new Image();
         $icon->set('mediaType', 'image/jpg');
         $icon->set('url', $avatarUrl);
