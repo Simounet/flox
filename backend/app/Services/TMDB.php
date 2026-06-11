@@ -400,8 +400,8 @@
       return $rateLimit ? (int) $rateLimit[0] > 1 : true;
     }
 
-    private function untilEndOfDay(): float
+    private function untilEndOfDay(): Carbon
     {
-      return now()->secondsUntilEndOfDay();
+      return Carbon::now()->endOfDay();
     }
   }
