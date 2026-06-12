@@ -74,7 +74,7 @@ final class ItemTest extends TestCase {
         $itemUser2 = $responseWithUser2->json()['data'][0];
         $this->assertEquals($reviewUser2->id, $itemUser2['user_review']['id']);
         $this->assertEquals($user2->id, $itemUser2['user_review']['user_id']);
-        $this->assertEquals('', $itemUser2['user_review']['content']);
+        $this->assertEquals('Testing content', $itemUser2['user_review']['content']);
     }
 
     #[Test]

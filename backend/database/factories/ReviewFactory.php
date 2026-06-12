@@ -22,7 +22,8 @@ class ReviewFactory extends Factory
         return [
             'user_id' => 1,
             'item_id' => 1,
-            'rating' => 1
+            'rating' => 1,
+            'content' => 'Testing content'
         ];
     }
 }
