@@ -28,7 +28,7 @@ class ReviewSendActivities implements ShouldQueue
 
     public function handle(): void
     {
-        $actor = Profile::where('username', $this->username)->first();
+        $actor = Profile::where('username', $this->username)->firstOrFail();
         $bySharedInboxUrl = [];
         foreach($actor->followers as $follower) {
             $bySharedInboxUrl[$follower->shared_inbox_url][] = $follower->inbox_url;

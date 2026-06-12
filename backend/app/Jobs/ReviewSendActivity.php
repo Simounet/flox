@@ -22,11 +22,11 @@ class ReviewSendActivity implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $activityType = '';
-    private $review;
-    private $username = '';
-    private $followersInbox = [];
-    private $sharedInboxUrl = '';
+    private string $activityType;
+    private Review $review;
+    private string $username;
+    private array $followersInbox;
+    private string $sharedInboxUrl;
 
     public function __construct(
         string $activityType,
@@ -45,7 +45,7 @@ class ReviewSendActivity implements ShouldQueue
 
     public function handle(): void
     {
-        $profile = Profile::where(['username' => $this->username])->first();
+        $profile = Profile::where(['username' => $this->username])->firstOrFail();
         $reviewActivity = (new ReviewActivity())->activity(
             $this->review,
             $profile,
@@ -66,9 +66,9 @@ class ReviewSendActivity implements ShouldQueue
             $activity->toJson()
         );
 
-        $response = Http::withHeaders($headers)
-            ->post($this->sharedInboxUrl, $activity->toArray());
-        $response->successful();
+        Http::withHeaders($headers)
+            ->post($this->sharedInboxUrl, $activity->toArray())
+            ->throw();
     }
 
     public function backoff(): array
