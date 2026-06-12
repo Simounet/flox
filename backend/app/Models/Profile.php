@@ -19,8 +19,7 @@ class Profile extends Model
     public $incrementing = false;
 
     protected $casts = [
-        'last_fetched_at' => 'datetime',
-        'last_status_at' => 'datetime'
+        'last_fetched_at' => 'datetime'
     ];
     protected $hidden = ['private_key'];
     protected $visible = ['id', 'user_id', 'username', 'name'];
