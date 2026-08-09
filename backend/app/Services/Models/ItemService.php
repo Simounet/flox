@@ -192,12 +192,8 @@
     /**
      * Refresh informations for an item.
      * Like ratings, new episodes, new poster and backdrop images.
-     *
-     * @param $itemId
-     *
-     * @return Response|false
      */
-    public function refresh($itemId)
+    public function refresh(int $itemId): bool
     {
       logInfo("Start refresh for item [$itemId]");
 
@@ -248,6 +244,7 @@
       );
 
       $this->storage->downloadImages($item->poster, $item->backdrop);
+      return true;
     }
 
     /**
