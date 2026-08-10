@@ -1,5 +1,29 @@
 # Flox Changelog
 
+## [2.7.0](https://github.com/Simounet/flox/releases/tag/2.7.0) - 2026-08-10
+
+* PHP minimum version: 8.4
+* Node minimum version: 24
+* Laravel version updated: 13
+
+### Feature
+
+* Comments on ActivityPub
+
+### Other stuff
+
+* Add missing APP_NAME example parameter (29f1e37)
+* Locales updated (thanks @Diginfotek) (ebc49a6)
+* Fix input colors on light theme (b095dab)
+* Removed code forcing dark mode on login page (0f85063)
+* Remove tick from unchecked checkboxes (c2eb5df)
+* Fix search bar styling (0721b20)
+* Fix homepage order by ratings (f8ce055)
+* TMDB data always fetched from server side (16080d1)
+* Technical chores and updates
+* Documentation updated
+
+
 ## [2.6.0](https://github.com/Simounet/flox/releases/tag/2.6.0) - 2025-03-13
 
 * Seasons navigation scroll to the top
