@@ -13,7 +13,7 @@
   "license": "MIT",
   "type": "project",
   "require": {
-    "php": "^8.3",
+    "php": "^8.4",
     "ext-json": "*",
     "kra8/laravel-snowflake": "^2.2",
     "landrok/activitypub": "^0.8.1",
