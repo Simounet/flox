@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 use Kra8\Snowflake\HasShortflakePrimary;
 
@@ -15,32 +16,49 @@ class Review extends Model
     protected $table = 'reviews';
 
     protected $fillable = [
-        'user_id',
-        'item_id',
-        'content',
+        'item_user_id',
         'rating',
-        'watchlist',
+        'content'
     ];
 
-    protected $casts = [
-      'watchlist' => 'boolean'
-    ];
-
-    protected $with = ['user'];
+    protected $with = ['user:users.id,users.username'];
 
     public function comments()
     {
         return $this->hasMany(Comment::class);
     }
 
-    public function item()
+    public function itemUser(): BelongsTo
     {
-        return $this->belongsTo(Item::class);
+        return $this->belongsTo(ItemUser::class, 'item_user_id');
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasOneThrough(
+            User::class,
+            ItemUser::class,
+            'id', // item_user primary key
+            'id', // user primary key
+            'item_user_id',
+            'user_id'
+        )->select([
+            'users.id as user_id',
+            'users.username',
+            'item_user.id as item_user_id',
+        ]);
+    }
+
+    public function item()
+    {
+        return $this->hasOneThrough(
+            Item::class,
+            ItemUser::class,
+            'item_id',
+            'id',
+            'item_user_id',
+            'item_id'
+        );
     }
 
     /**

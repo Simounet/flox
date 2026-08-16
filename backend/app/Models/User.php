@@ -3,6 +3,7 @@
   namespace App\Models;
 
   use Illuminate\Database\Eloquent\Factories\HasFactory;
+  use Illuminate\Database\Eloquent\Relations\HasManyThrough;
   use Illuminate\Foundation\Auth\User as Authenticatable;
 
   class User extends Authenticatable {
@@ -34,8 +35,37 @@
       'remember_token',
     ];
 
+    public function items(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Item::class,
+            ItemUser::class,
+            'user_id', // Foreign key on item_users pointing to users
+            'id', // Foreign key on items used by item_users.item_id
+            'id', // Local key on users
+            'item_id' // Local key on item_users pointing to items.id
+        );
+    }
+
+    public function itemUsers()
+    {
+      return $this->hasMany(ItemUser::class);
+    }
+
     public function episodes() {
       return $this->belongsToMany(Episode::class)->using(EpisodeUser::class);
+    }
+
+    public function reviews(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Review::class,
+            ItemUser::class,
+            'user_id', // Foreign key on item_users pointing to users
+            'item_user_id', // Foreign key on reviews pointing to item_users
+            'id', // Local key on users
+            'id'  // Local key on item_users
+        );
     }
 
     /**

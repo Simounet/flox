@@ -45,7 +45,7 @@
      *
      * @var array
      */
-    protected $with = ['genre', 'review', 'userReview'];
+    protected $with = ['genre', 'itemUser'];
 
     /**
      * Guard accessors from import.
@@ -153,17 +153,9 @@
       return $this->hasMany(Episode::class, 'tmdb_id', 'tmdb_id');
     }
 
-    /**
-     * Belongs to many reviews.
-     */
-    public function review()
+    public function itemUser()
     {
-      return $this->hasMany(Review::class);
-    }
-
-    public function userReview()
-    {
-      return $this->hasOne(Review::class)
+      return $this->hasOne(ItemUser::class)
         ->where('user_id', Auth::id());
     }
 
