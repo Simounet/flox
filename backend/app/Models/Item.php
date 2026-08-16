@@ -225,11 +225,11 @@
       return $query->where('tmdb_id', $tmdbId)->where('media_type', $mediaType);
     }
 
-    public function scopeFindByReviewWatchlist(Builder $query, int $watchlistValue): Builder
+    public function scopeFindByItemUserWatchlist(Builder $query, int $watchlistValue): Builder
     {
-        return $query->join('reviews', function(JoinClause $join) use ($watchlistValue) {
-          $join->on('items.id', '=', 'reviews.item_id')
-            ->where('reviews.watchlist', '=', $watchlistValue);
+        return $query->join('item_user', function(JoinClause $join) use ($watchlistValue) {
+          $join->on('items.id', '=', 'item_user.item_id')
+            ->where('item_user.watchlist', '=', $watchlistValue);
         });
     }
 

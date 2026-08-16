@@ -70,15 +70,15 @@ class FakeApiTest extends TestCase implements ApiTestInterface
   }
 
   #[Test]
-  public function it_should_updated_review_updated_at()
+  public function it_should_updated_item_user_updated_at()
   {
-    $this->apiTestBase->it_should_updated_review_updated_at('fake/episode_seen.json');
+    $this->apiTestBase->it_should_updated_item_user_updated_at('fake/episode_seen.json');
   }
 
   #[Test]
-  public function it_should_add_a_review_to_existing_item()
+  public function it_should_add_a_item_user_to_existing_item()
   {
-    $this->apiTestBase->it_should_add_a_review_to_existing_item('fake/episode_seen.json');
+    $this->apiTestBase->it_should_add_a_item_user_to_existing_item('fake/episode_seen.json');
   }
 
   #[Test]

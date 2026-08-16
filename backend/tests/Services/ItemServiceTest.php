@@ -2,6 +2,7 @@
 
   namespace Tests\Services;
 
+  use App\Models\User;
   use Illuminate\Foundation\Testing\DatabaseTransactions;
   use Illuminate\Support\Facades\DB;
   use PHPUnit\Framework\Attributes\Test;
@@ -21,6 +22,7 @@
 
     private $item;
     private $itemService;
+    private User $user;
 
     public function setUp(): void
     {
@@ -29,16 +31,17 @@
       $this->item = app(Item::class);
       $this->itemService = app(ItemService::class);
 
+      $this->user = $this->createUser();
+
       $this->createStorageDownloadsMock();
       $this->createImdbRatingMock();
     }
 
     private function createItem(array $data): Item
     {
-      $userId = 1;
       $this->createReviewServiceMock();
       $itemService = app(ItemService::class);
-      return $itemService->create($data['tmdb_id'], $data['media_type'], $userId);
+      return $itemService->create($data['tmdb_id'], $data['media_type'], $this->user->id);
     }
 
     #[Test]
@@ -127,19 +130,6 @@
 
       $this->assertNull($notFound);
       $this->assertEquals(68735, $found->tmdb_id);
-    }
-
-    #[Test]
-    public function it_should_remove_a_item()
-    {
-      $this->createMovie();
-
-      $item1 = $this->item->find(1);
-      $this->itemService->remove(1);
-      $item2 = $this->item->find(1);
-
-      $this->assertNotNull($item1);
-      $this->assertNull($item2);
     }
 
     #[Test]

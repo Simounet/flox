@@ -118,12 +118,12 @@
       $user = $this->createUser();
       $this->actingAs($user);
       $movie = $this->createMovie();
-      $this->createReview([
+      $this->createItemUser([
         'user_id' => $user->id,
         'item_id' => $movie->id
       ]);
       $tv = $this->createTv();
-      $this->createReview([
+      $this->createItemUser([
         'user_id' => $user->id,
         'item_id' => $tv['item']->id
       ]);
@@ -131,9 +131,9 @@
       $tmdb = app(TMDB::class);
       $trending = $tmdb->trending();
 
-      $this->assertArrayHasKey('rating', $trending[0]['user_review']);
-      $this->assertArrayHasKey('rating', $trending[1]['user_review']);
-      $this->assertEquals(null, $trending[2]['user_review']);
+      $this->assertArrayHasKey('rating', $trending[0]['item_user']);
+      $this->assertArrayHasKey('rating', $trending[1]['item_user']);
+      $this->assertEquals(null, $trending[2]['item_user']);
     }
 
     #[Test]
@@ -147,7 +147,7 @@
       $user = $this->createUser();
       $this->actingAs($user);
       $movie = $this->createMovie();
-      $this->createReview([
+      $this->createItemUser([
         'user_id' => $user->id,
         'item_id' => $movie->id
       ]);
@@ -155,8 +155,8 @@
       $tmdb = app(TMDB::class);
       $trending = $tmdb->upcoming();
 
-      $this->assertArrayHasKey('rating', $trending[0]['user_review']);
-      $this->assertEquals(null, $trending[1]['user_review']);
+      $this->assertArrayHasKey('rating', $trending[0]['item_user']);
+      $this->assertEquals(null, $trending[1]['item_user']);
     }
 
     #[Test]

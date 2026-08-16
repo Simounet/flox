@@ -4,6 +4,7 @@
 
   use App\Models\Episode;
   use App\Models\Item;
+  use App\Models\ItemUser;
   use App\Models\Review;
   use App\Models\Setting;
   use App\Models\User;
@@ -34,6 +35,11 @@
       ];
 
       return Item::factory()->create(array_merge($data, $custom));
+    }
+
+    public function createItemUser(array $custom = []): ItemUser
+    {
+        return ItemUser::factory()->create($custom);
     }
 
     public function createReview(array $custom = []): Review

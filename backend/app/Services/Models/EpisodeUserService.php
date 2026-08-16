@@ -4,7 +4,6 @@ namespace App\Services\Models;
 
 use App\Models\Episode;
 use App\Models\EpisodeUser;
-use App\Models\Review;
 use App\ValueObjects\EpisodeUserValueObject;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -12,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 final class EpisodeUserService {
     public function __construct(
         private Episode $episode,
-        private Review $review,
+        private ItemUserService $itemUserService,
     ) {}
 
     /**
@@ -51,7 +50,7 @@ final class EpisodeUserService {
       $episodes = $this->episode->select('episodes.id', 'episodes.tmdb_id')->findSeason($tmdbId, $season)->get();
 
       if($seen) {
-        $this->review->updateLastActivityAt($episodes[0]->tmdb_id);
+        $this->itemUserService->updateLastActivityAt($episodes[0]->tmdb_id);
 
         return $episodes->each(function($episode) use ($userId) {
           return EpisodeUser::updateOrCreate(
@@ -68,10 +67,9 @@ final class EpisodeUserService {
 
     }
 
-
     public function markEpisodeAsSeen(Episode $episode, EpisodeUserValueObject $episodeUserValueObject): bool
     {
-        $this->review->updateLastActivityAt($episode->tmdb_id);
+        $this->itemUserService->updateLastActivityAt($episode->tmdb_id);
         return EpisodeUser::firstOrCreate($episodeUserValueObject->get())->wasRecentlyCreated;
     }
 }

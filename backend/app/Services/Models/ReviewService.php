@@ -14,39 +14,10 @@ class ReviewService {
 
     public function changeRating(
         int $reviewId,
-        int $rating,
-        int $userId
-    ): Response
+        int $rating
+    ): void
     {
-      $review = Review::where([
-        'user_id' => $userId,
-        'id' => $reviewId
-      ])->first();
-
-      if(! $review) {
-        return response('Not Found', Response::HTTP_NOT_FOUND);
-      }
-
-      // Update the parent relation only if we change rating from neutral.
-      if($review->rating === 0) {
-          $updatedReview = $review->update([
-            'rating' => $rating,
-            'watchlist' => false,
-          ]);
-      } else {
-          $updatedReview = Review::withoutTimestamps(function () use($review, $rating) {
-              return $review->update([
-                'rating' => $rating,
-                'watchlist' => false,
-              ]);
-          });
-      }
-
-      if($updatedReview === false) {
-          return response('Review not updated: ' . $reviewId, Response::HTTP_INTERNAL_SERVER_ERROR);
-      }
-
-      return response('', Response::HTTP_OK);
+      // @TODO
     }
 
     public function create(

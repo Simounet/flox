@@ -30,7 +30,7 @@ class Review extends Model
 
     public function itemUser(): BelongsTo
     {
-        return $this->belongsTo(ItemUser::class, 'item_user_id');
+        return $this->belongsTo(ItemUser::class);
     }
 
     public function user()
@@ -54,7 +54,7 @@ class Review extends Model
         return $this->hasOneThrough(
             Item::class,
             ItemUser::class,
-            'item_id',
+            'id',
             'id',
             'item_user_id',
             'item_id'
@@ -66,18 +66,11 @@ class Review extends Model
      *
      * @return Review
      */
-    public function store(int $userId, int $itemId, array $reviewData)
+    public function store(int $userId, int $itemUserId, array $reviewData)
     {
         return $this->updateOrCreate(
-            ['user_id' => $userId, 'item_id' => $itemId],
+            ['user_id' => $userId, 'item_user_id' => $itemUserId],
             $reviewData
         );
-    }
-
-    public function updateLastActivityAt(int $tmdbId): int
-    {
-      // @TODO Episode Model should have a item_id column to avoid this Item pivot query
-      $itemId = DB::table('items')->select('id')->where('tmdb_id', $tmdbId)->first()->id;
-      return $this->where('item_id', $itemId)->touch();
     }
 }

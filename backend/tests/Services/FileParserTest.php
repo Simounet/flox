@@ -348,7 +348,11 @@
     public function it_should_update_empty_movie_if_found_in_tmdb()
     {
       $this->be($this->user);
-      $this->createMovie(['title' => 'NOT EXISTS MOVIE', 'tmdb_id' => null, 'fp_name' => 'NOT EXISTS MOVIE']);
+      $movie = $this->createMovie(['title' => 'NOT EXISTS MOVIE', 'tmdb_id' => null, 'fp_name' => 'NOT EXISTS MOVIE']);
+      $this->createItemUser([
+        'user_id' => $this->user->id,
+        'item_id' => $movie->id
+      ]);
 
       $empty = $this->item->first();
 
@@ -375,7 +379,11 @@
     public function it_should_update_empty_tv_and_episodes_if_found_in_tmdb()
     {
       $this->be($this->user);
-      $this->createTv(['title' => 'NOT EXISTS TV', 'tmdb_id' => null, 'fp_name' => 'NOT EXISTS TV'], false);
+      $tv = $this->createTv(['title' => 'NOT EXISTS TV', 'tmdb_id' => null, 'fp_name' => 'NOT EXISTS TV'], false);
+      $this->createItemUser([
+        'user_id' => $this->user->id,
+        'item_id' => $tv['item']->id
+      ]);
 
       $empty = $this->item->first();
 

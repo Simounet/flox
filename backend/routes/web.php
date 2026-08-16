@@ -53,6 +53,8 @@ Route::prefix('api')->group(function() {
         Route::patch('/settings', [SettingController::class, 'updateSettings']);
 
         Route::post('/add', [ItemController::class, 'add']);
+        Route::delete('/item/{id}', [ItemController::class, 'delete']);
+        Route::patch('/item/change-rating/{itemUserId}', [ItemController::class, 'changeRating']);
         Route::post('/watchlist', [ItemController::class, 'watchlist']);
         Route::patch('/update-alternative-titles/{tmdbId?}', [ItemController::class, 'updateAlternativeTitles']);
         Route::patch('/update-genre', [ItemController::class, 'updateGenre']);
@@ -63,8 +65,6 @@ Route::prefix('api')->group(function() {
         Route::get('/userdata', [UserController::class, 'getUserData']);
         Route::patch('/userdata', [UserController::class, 'changeUserData'])->middleware('csrf');
 
-        Route::patch('/review/change-rating/{reviewId}', [ReviewController::class, 'changeRating']);
-        Route::delete('/review/{id}', [ReviewController::class, 'delete'])->middleware('csrf');
         Route::post('/review', [ReviewController::class, 'store'])->middleware('csrf');
 
         Route::get('/search-tmdb', [TMDBController::class, 'search']);

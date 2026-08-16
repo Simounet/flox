@@ -6,6 +6,7 @@
   use App\Services\Models\EpisodeService;
   use App\Services\Models\EpisodeUserService;
   use App\Services\Models\ItemService;
+  use App\Services\Models\ItemUserService;
   use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\Request;
   use Symfony\Component\HttpFoundation\Response;
@@ -13,16 +14,19 @@
   class ItemController {
 
     private $itemService;
+    private $itemUserService;
     private $episodeService;
     private $episodeUserService;
 
     public function __construct(
       ItemService $itemService,
+      ItemUserService $itemUserService,
       EpisodeService $episodeService,
       EpisodeUserService $episodeUserService,
     )
     {
       $this->itemService = $itemService;
+      $this->itemUserService = $itemUserService;
       $this->episodeService = $episodeService;
       $this->episodeUserService = $episodeUserService;
     }
@@ -54,11 +58,25 @@
       return $this->itemService->create($tmdbId, $mediaTypeStr, $user->id);
     }
 
+    public function delete(int $itemId)
+    {
+        if(!Auth::check()) {
+          return response('Bad request.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $userId = Auth::id();
+        if(!$this->itemUserService->remove($itemId, $userId)) {
+          return response('Bad request.', Response::HTTP_BAD_REQUEST);
+        }
+
+        return response('Success', Response::HTTP_OK);
+    }
+
     public function watchlist()
     {
       $item = $this->add();
 
-      $item->userReview->update(['watchlist' => true]);
+      $item->itemUser->update(['watchlist' => true]);
 
       return $item;
     }
@@ -102,5 +120,17 @@
       $seen = Request::input('seen');
 
       $this->episodeUserService->toggleSeason($tmdbId, $season, $seen);
+    }
+
+    public function changeRating(int $itemUserId): Response
+    {
+      $user = Auth::user();
+      abort_if(!$user, 403);
+
+      return $this->itemUserService->changeRating(
+        $itemUserId,
+        Request::input('rating'),
+        $user->id
+      );
     }
   }

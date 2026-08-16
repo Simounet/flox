@@ -68,7 +68,7 @@
     public function calendarItem()
     {
       return $this->belongsTo(Item::class, 'tmdb_id', 'tmdb_id')
-        ->with(['userReview' => function($e) {
+        ->with(['itemUser' => function($e) {
           $e->select('item_id', 'watchlist');
         }])
         ->without(['review', 'user'])

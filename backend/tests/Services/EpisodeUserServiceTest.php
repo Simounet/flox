@@ -4,7 +4,7 @@ namespace Tests\Services;
 
 use App\Models\Episode;
 use App\Models\EpisodeUser;
-use App\Models\Review;
+use App\Models\ItemUser;
 use App\Services\Models\EpisodeUserService;
 use App\ValueObjects\EpisodeUserValueObject;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -25,7 +25,7 @@ class EpisodeUserServiceTest extends TestCase
     private Episode $episode;
     private EpisodeUser $episodeUser;
     private EpisodeUserService $episodeUserService;
-    private Review $review;
+    private ItemUser $itemUser;
 
     public function setUp(): void
     {
@@ -34,22 +34,22 @@ class EpisodeUserServiceTest extends TestCase
         $this->episode = app(Episode::class);
         $this->episodeUser = app(EpisodeUser::class);
         $this->episodeUserService = app(EpisodeUserService::class);
-        $this->review = app(Review::class);
+        $this->itemUser = app(ItemUser::class);
     }
 
     #[Test]
     public function it_should_set_a_episode_as_seen_or_unseen()
     {
-        $episodeId = 1;
         $user = $this->createUser();
         $this->actingAs($user);
         $tv = $this->createTv();
+        $episodeId = $tv['episodes'][0]->id;
         $episodeUserValueObject = new EpisodeUserValueObject($user->id, $episodeId);
 
         $isEpisodeSeen1 = $this->episodeUser->isSeen($episodeUserValueObject);
-        $this->episodeUserService->toggleSeen($tv['episodes'][0]->id);
+        $this->episodeUserService->toggleSeen($episodeId, true);
         $isEpisodeSeen2 = $this->episodeUser->isSeen($episodeUserValueObject);
-        $this->episodeUserService->toggleSeen($tv['episodes'][0]->id);
+        $this->episodeUserService->toggleSeen($episodeId, false);
         $isEpisodeSeen3 = $this->episodeUser->isSeen($episodeUserValueObject);
 
         $this->assertEquals(0, $isEpisodeSeen1);
@@ -90,37 +90,18 @@ class EpisodeUserServiceTest extends TestCase
         $user = $this->createUser();
         $this->actingAs($user);
         $tv = $this->createTv();
-        $review = $this->createReview([
+        $initialItemUser = $this->createItemUser([
             'user_id' => $user->id,
-            'item_id' => $tv['item']->id
+            'item_id' => $tv['item']->id,
+            'created_at' => now()->subDay(),
+            'updated_at' => now()->subDay()
         ]);
 
-        $review = $this->review->where(['id' => $review->id])->first();
-        sleep(1);
-        $this->episodeUserService->toggleSeen($tv['episodes'][0]->id);
-        $reviewUpdated = $this->review->where(['id' => $review->id])->first();
+        $itemUser = $this->itemUser->where(['id' => $initialItemUser->id])->first();
+        $this->episodeUserService->toggleSeen($tv['episodes'][0]->id, true);
+        $itemUserUpdated = $this->itemUser->where(['id' => $itemUser->id])->first();
 
-        $this->assertNotEquals($reviewUpdated->updated_at, $review->updated_at);
-    }
-
-    #[Test]
-    public function it_should_update_items_only_on_seen_from_one_episode()
-    {
-        $user = $this->createUser();
-        $this->actingAs($user);
-        $tv = $this->createTv();
-        $initialReview = $this->createReview([
-            'user_id' => $user->id,
-            'item_id' => $tv['item']->id
-        ]);
-
-        $this->episodeUserService->toggleSeen($tv['episodes'][0]->id);
-        $reviewWithEpisodeSeen1= $this->review->where(['id' => $initialReview->id])->first();
-        sleep(1);
-        $this->episodeUserService->toggleSeen($tv['episodes'][0]->id);
-        $reviewWithEpisodeSeen2= $this->review->where(['id' => $initialReview->id])->first();
-
-        $this->assertEquals($reviewWithEpisodeSeen1->updated_at, $reviewWithEpisodeSeen2->updated_at);
+        $this->assertNotEquals($itemUserUpdated->updated_at->timestamp, $itemUser->updated_at->timestamp);
     }
 
     #[Test]
@@ -129,17 +110,18 @@ class EpisodeUserServiceTest extends TestCase
         $user = $this->createUser();
         $this->actingAs($user);
         $tv = $this->createTv();
-        $initialReview = $this->createReview([
+        $initialItemUser = $this->createItemUser([
             'user_id' => $user->id,
-            'item_id' => $tv['item']->id
+            'item_id' => $tv['item']->id,
+            'created_at' => now()->subDay(),
+            'updated_at' => now()->subDay()
         ]);
 
-        $review = $this->review->where(['id' => $initialReview->id])->first();
-        sleep(1);
+        $itemUser = $this->itemUser->where(['id' => $initialItemUser->id])->first();
         $this->episodeUserService->toggleSeason($tv['item']->tmdb_id, $tv['episodes'][0]->season_number, true);
-        $updatedReview = $this->review->first();
+        $updatedItemUser = $this->itemUser->first();
 
-        $this->assertNotEquals($updatedReview->updated_at, $review->updated_at);
+        $this->assertNotEquals($updatedItemUser->updated_at->timestamp, $itemUser->updated_at->timestamp);
     }
 
     #[Test]
@@ -148,17 +130,18 @@ class EpisodeUserServiceTest extends TestCase
         $user = $this->createUser();
         $this->actingAs($user);
         $tv = $this->createTv();
-        $initialReview = $this->createReview([
+        $initialItemUser = $this->createItemUser([
             'user_id' => $user->id,
-            'item_id' => $tv['item']->id
+            'item_id' => $tv['item']->id,
+            'created_at' => now()->subDay(),
+            'updated_at' => now()->subDay()
         ]);
 
-        $review = $this->review->where(['id' => $initialReview->id])->first();
-        sleep(1);
+        $itemUser = $this->itemUser->where(['id' => $initialItemUser->id])->first();
         $this->episodeUserService->toggleSeason($tv['item']->tmdb_id, $tv['episodes'][0]->season_number, false);
-        $reviewWithSeasonToggled = $this->review->where(['id' => $initialReview->id])->first();
+        $itemUserWithSeasonToggled = $this->itemUser->where(['id' => $initialItemUser->id])->first();
 
-        $this->assertEquals($reviewWithSeasonToggled->updated_at, $review->updated_at);
+        $this->assertEquals($itemUserWithSeasonToggled->updated_at, $itemUser->updated_at);
     }
 
     #[Test]
@@ -167,12 +150,12 @@ class EpisodeUserServiceTest extends TestCase
         $user = $this->createUser();
         $this->actingAs($user);
         $tv = $this->createTv();
-        $this->createReview([
+        $this->createItemUser([
             'user_id' => $user->id,
             'item_id' => $tv['item']->id
         ]);
 
-        $this->episodeUserService->toggleSeen($tv['episodes'][0]->id);
+        $this->episodeUserService->toggleSeen($tv['episodes'][0]->id, false);
         $this->episodeUserService->toggleSeason($tv['item']->tmdb_id, $tv['episodes'][0]->season_number, true);
 
         $episodesSeenCount = EpisodeUser::count();

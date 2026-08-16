@@ -7,7 +7,7 @@ use App\Enums\StatusEnum;
 use App\Models\Episode;
 use App\Models\EpisodeUser;
 use App\Models\Item;
-use App\Models\Review;
+use App\Models\ItemUser;
 use App\Services\Models\ItemService;
 use App\Services\TMDB;
 use Illuminate\Support\Facades\Auth;
@@ -72,13 +72,13 @@ abstract class Api
       }
     }
 
-    $review = Review::firstOrCreate([
+    $itemUser = ItemUser::firstOrCreate([
       'user_id' => $user->id,
       'item_id' => $item->id
     ], ['rating' => 0]);
 
     if ($this->shouldRateItem()) {
-      $review
+      $itemUser
         ->update([
           'rating' => $this->getRating(),
         ]);
@@ -97,7 +97,7 @@ abstract class Api
           'episode_id' => $episode->id
         ]);
         if($episodeUser->wasRecentlyCreated === true) {
-          $review->touch();
+          $itemUser->touch();
         }
       }
     }

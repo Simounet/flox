@@ -250,7 +250,7 @@
         'credit_cast' => $data->credit_cast ?? [],
         'credit_crew' => $data->credit_crew ?? [],
         'review' => $data->review ?? [],
-        'user_review' => $data->user_review ?? null,
+        'item_user' => $data->item_user ?? null,
         'genre' => Genre::whereIn('id', $data->genre_ids)->get()->toArray(),
         'episodes' => [],
         'overview' => $data->overview,
