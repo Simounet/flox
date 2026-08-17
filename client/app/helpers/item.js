@@ -6,7 +6,7 @@ export default {
       if(this.auth) {
         this.rated = true;
 
-        http.post(`${config.api}/watchlist`, {item}).then(response => {
+        http.post(`${config.api}/watchlist`, {tmdb_id: item.tmdb_id, media_type: item.media_type}).then(response => {
           this.setItem(response.data);
           this.isLocalContent = true;
           this.rated = false;
