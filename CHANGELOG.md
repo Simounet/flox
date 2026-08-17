@@ -1,5 +1,11 @@
 # Flox Changelog
 
+## [2.7.1](https://github.com/Simounet/flox/releases/tag/2.7.1) - 2026-08-17
+
+### Fix
+
+* Fix add to watchlist action
+
 ## [2.7.0](https://github.com/Simounet/flox/releases/tag/2.7.0) - 2026-08-10
 
 * PHP minimum version: 8.4

@@ -5,7 +5,7 @@ use Illuminate\Support\ServiceProvider;
 
   return [
 
-    'version' => '2.7.0',
+    'version' => '2.7.1',
 
     'LOADING_ITEMS' => env('LOADING_ITEMS'),
     'CLIENT_URI' => env('CLIENT_URI'),
