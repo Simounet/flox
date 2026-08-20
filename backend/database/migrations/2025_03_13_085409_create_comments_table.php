@@ -24,7 +24,6 @@ return new class extends Migration
         Schema::create('comments', function (Blueprint $table) {
             $table->id()->unique();
             $table->unsignedBigInteger('profile_id');
-            $table->char('review_id');
             $table->longText('content');
             $table->string('source_url');
             $table->tinytext('language');
@@ -32,7 +31,9 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('profile_id')->references('id')->on('profiles');
-            $table->foreign('review_id')->references('id')->on('reviews');
+            $table->foreignId('review_id')
+                ->constrained('reviews')
+                ->cascadeOnDelete();
         });
     }
 
