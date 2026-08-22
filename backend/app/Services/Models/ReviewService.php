@@ -4,22 +4,12 @@ namespace App\Services\Models;
 
 use App\Models\Item;
 use App\Models\Review;
-use Symfony\Component\HttpFoundation\Response;
+use App\ValueObjects\RatingValueObject;
 
 class ReviewService {
-
     public function getRating(int $rating): string
     {
-        switch($rating) {
-            case 1:
-                return '👍';
-            case 2:
-                return '🤔';
-            case 3:
-                return '👎';
-            default:
-                return 'not rated';
-        }
+        return new RatingValueObject($rating);
     }
 
     public function changeRating(
