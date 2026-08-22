@@ -106,7 +106,12 @@
 
     public function toggleEpisode($id)
     {
-      if( ! $this->episodeUserService->toggleSeen($id)) {
+      $seen = Request::input('seen');
+      if(is_null($seen)) {
+        return response('Bad request: missing seen state', Response::HTTP_BAD_REQUEST);
+      }
+
+      if( ! $this->episodeUserService->toggleSeen($id, $seen)) {
         return response('Server Error', Response::HTTP_INTERNAL_SERVER_ERROR);
       }
 

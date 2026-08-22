@@ -17,15 +17,14 @@ final class EpisodeUserService {
     /**
      * Set an episode as seen / unseen.
      */
-    public function toggleSeen(int $id): bool
+    public function toggleSeen(int $id, bool $seen): bool
     {
       $episode = $this->episode->find($id);
 
       if($episode) {
         $episodeUserValueObject = new EpisodeUserValueObject(Auth::id(), $id);
-        $isEpisodeSeen = EpisodeUser::isSeen($episodeUserValueObject);
 
-        if(!$isEpisodeSeen) {
+        if($seen === true) {
           return $this->markEpisodeAsSeen($episode, $episodeUserValueObject);
         }
 
