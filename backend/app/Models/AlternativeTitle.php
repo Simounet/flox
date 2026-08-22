@@ -2,6 +2,7 @@
 
   namespace App\Models;
 
+  use Illuminate\Database\Eloquent\Builder;
   use Illuminate\Database\Eloquent\Model;
 
   class AlternativeTitle extends Model {
@@ -22,11 +23,8 @@
 
     /**
      * Store all alternative titles for tv shows and movies.
-     *
-     * @param $titles
-     * @param $tmdbId
      */
-    public function store($titles, $tmdbId)
+    public function store(array $titles, int $tmdbId): void
     {
       foreach($titles as $title) {
         $this->firstOrCreate([
@@ -40,7 +38,7 @@
     /*
      * Scope to find the result via tmdb_id.
      */
-    public function scopeFindByTmdbId($query, $tmdbId)
+    public function scopeFindByTmdbId(Builder $query, int $tmdbId): Builder
     {
       return $query->where('tmdb_id', $tmdbId);
     }

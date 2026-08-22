@@ -2,7 +2,10 @@
 
   namespace App\Models;
 
+  use Illuminate\Database\Eloquent\Builder;
   use Illuminate\Database\Eloquent\Factories\HasFactory;
+  use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+  use Illuminate\Database\Eloquent\Relations\HasMany;
   use Illuminate\Database\Eloquent\Relations\HasManyThrough;
   use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -47,12 +50,13 @@
         );
     }
 
-    public function itemUsers()
+    public function itemUsers(): HasMany
     {
       return $this->hasMany(ItemUser::class);
     }
 
-    public function episodes() {
+    public function episodes(): BelongsToMany
+    {
       return $this->belongsToMany(Episode::class)->using(EpisodeUser::class);
     }
 
@@ -71,12 +75,12 @@
     /**
      * Scope to find a user by an api key.
      */
-    public function scopeFindByApiKey($query, $key)
+    public function scopeFindByApiKey(Builder $query, string $key): Builder
     {
       return $query->where('api_key', $key);
     }
 
-    public function getAuthPasswordName()
+    public function getAuthPasswordName(): string
     {
       return 'password';
     }

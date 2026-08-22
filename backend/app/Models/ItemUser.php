@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ItemUser extends Model
@@ -25,12 +26,12 @@ class ItemUser extends Model
 
     protected $with = ['review'];
 
-    public function item()
+    public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
@@ -40,7 +41,7 @@ class ItemUser extends Model
         return $this->hasMany(Review::class, 'item_user_id', 'item_id');
     }
 
-    public function store(int $userId, int $itemId, array $reviewData)
+    public function store(int $userId, int $itemId, array $reviewData): self
     {
         return $this->updateOrCreate(
             ['user_id' => $userId, 'item_id' => $itemId],

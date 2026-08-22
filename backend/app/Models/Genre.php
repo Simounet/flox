@@ -2,6 +2,7 @@
 
   namespace App\Models;
 
+  use Illuminate\Database\Eloquent\Builder;
   use Illuminate\Database\Eloquent\Model;
 
   class Genre extends Model {
@@ -23,7 +24,7 @@
     /**
      * Scope to find the genre by name.
      */
-    public function scopeFindByName($query, $genre)
+    public function scopeFindByName(Builder $query, string $genre): Builder
     {
       return $query->where('name', $genre);
     }

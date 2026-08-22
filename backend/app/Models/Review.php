@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Kra8\Snowflake\HasShortflakePrimary;
 
 class Review extends Model
@@ -23,7 +24,7 @@ class Review extends Model
 
     protected $with = ['user:users.id,users.username'];
 
-    public function comments()
+    public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
@@ -33,7 +34,7 @@ class Review extends Model
         return $this->belongsTo(ItemUser::class);
     }
 
-    public function user()
+    public function user(): HasOneThrough
     {
         return $this->hasOneThrough(
             User::class,
@@ -49,7 +50,7 @@ class Review extends Model
         ]);
     }
 
-    public function item()
+    public function item(): HasOneThrough
     {
         return $this->hasOneThrough(
             Item::class,
@@ -66,7 +67,7 @@ class Review extends Model
      *
      * @return Review
      */
-    public function store(int $userId, int $itemUserId, array $reviewData)
+    public function store(int $userId, int $itemUserId, array $reviewData): self
     {
         return $this->updateOrCreate(
             ['user_id' => $userId, 'item_user_id' => $itemUserId],

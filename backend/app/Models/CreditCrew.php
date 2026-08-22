@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CreditCrew extends Model
 {
@@ -32,7 +33,7 @@ class CreditCrew extends Model
     /**
      * Belongs to one person.
      */
-    public function person()
+    public function person(): BelongsTo
     {
       return $this->belongsTo(Person::class);
     }
@@ -43,7 +44,7 @@ class CreditCrew extends Model
      * @param $data
      * @return CreditCrew
      */
-     public function store(int $tmdbId, array $crew)
+     public function store(int $tmdbId, array $crew): self
      {
        return $this->firstOrCreate(
          [
@@ -59,7 +60,8 @@ class CreditCrew extends Model
        );
      }
 
-     public function fromTMDB(int $tmdbId, object $crew)
+     // @TODO ValueObject instead of array return
+     public function fromTMDB(int $tmdbId, object $crew): array
      {
        return [
          'tmdb_id' => $tmdbId,
