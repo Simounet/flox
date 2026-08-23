@@ -22,7 +22,7 @@
   export default {
     mixins: [MiscHelper],
 
-    props: ['itemId', 'review'],
+    props: ['review'],
 
     created() {
       this.clearLogMessage = debounce(this.clearLogMessage, debounceMilliseconds);
@@ -41,7 +41,7 @@
         const content = this.review.content;
 
         if(content !== '') {
-          http.post(`${config.api}/review`, {content, itemId: parseInt(this.itemId)}).then(() => {
+          http.post(`${config.api}/review`, {content, itemId: parseInt(this.review.itemId)}).then(() => {
             this.displayLogMessage('success message');
           })
           .catch(err => {

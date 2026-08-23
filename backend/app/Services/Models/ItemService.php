@@ -167,7 +167,7 @@
       // @todo facto
       $data['original_title'] = $details->original_name ?? $details->original_title;
       $data['imdb_id'] = $this->parseImdbId($details);
-      $data['youtube_key'] = $this->parseYoutubeKey($details, $mediaType->value);
+      $data['youtube_key'] = $this->parseYoutubeKey($details, $mediaType);
       $data['overview'] = $details->overview;
       $data['tmdb_rating'] = $details->vote_average;
       $data['backdrop'] = $details->backdrop_path;
@@ -215,7 +215,7 @@
 
       $item = $this->item->findOrFail($itemId);
 
-      $details = $this->tmdb->details($item->tmdb_id, MediaTypeEnum::from($item->media_type));
+      $details = $this->tmdb->details($item->tmdb_id, $item->media_type);
 
       $title = $details->name ?? ($details->title ?? null);
 
@@ -305,14 +305,14 @@
      * @param $mediaType
      * @return string|null
      */
-    public function parseYoutubeKey($details, $mediaType)
+    public function parseYoutubeKey(object $details, MediaTypeEnum $mediaType)
     {
       if(isset($details->videos->results[0])) {
         return $details->videos->results[0]->key;
       }
 
       // Try to fetch details again with english language as fallback.
-      $videos = $this->tmdb->videos($details->id, MediaTypeEnum::from($mediaType), 'en');
+      $videos = $this->tmdb->videos($details->id, $mediaType, 'en');
 
       return $videos->results[0]->key ?? null;
     }
@@ -433,7 +433,7 @@
         case 'tmdb_id':
           return $this->item->findByTmdbId($value)->with('latestEpisode')->first();
         case 'tmdb_id_strict':
-          return $this->item->findByTmdbIdStrict($value, $mediaType)->with('creditCast', 'creditCrew', 'latestEpisode', 'itemUser')->first();
+          return $this->item->findByTmdbIdStrict($value, $mediaType)->with('creditCast', 'creditCrew', 'latestEpisode', 'itemUser', 'reviews')->first();
         case 'src':
           return $this->item->findBySrc($value)->first();
       }

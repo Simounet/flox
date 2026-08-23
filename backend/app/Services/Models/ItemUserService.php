@@ -78,14 +78,14 @@ class ItemUserService {
             'user_id' => $userId
         ])->with('user:id,username')->firstOrFail();
         // @TODO delete associated content (episodeUser)
-        $review = $itemUser->review;
+        $reviews = $itemUser->reviews;
         $username = $itemUser->user->username;
         $itemUser->delete();
 
-        if($review->count() > 0 && $review->content !== '') {
+        if($reviews->count() > 0 && $reviews->content !== '') {
             ReviewSendActivities::dispatch(
                 Verbs::DELETE,
-                $review->id,
+                $reviews->id,
                 $username
             );
         }

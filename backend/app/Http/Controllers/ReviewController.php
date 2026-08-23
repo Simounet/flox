@@ -66,7 +66,7 @@ class ReviewController extends Controller
      */
     public function show(string $id)
     {
-        $review = Review::with('itemUser', 'comments')->findOrFail($id);
+        $review = Review::with('item', 'comments')->findOrFail($id);
         $data = new ReviewResource($review);
 
         return $data;
@@ -82,7 +82,7 @@ class ReviewController extends Controller
 
     public function showObject(Request $request, string $username, string $id)
     {
-        $review = Review::findOrFail($id);
+        $review = Review::with('item')->findOrFail($id);
         $profile = Profile::where(['username' => $username])->first();
         $reviewActivity = (new ReviewActivity)->activity($review, $profile);
 

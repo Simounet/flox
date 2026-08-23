@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Item;
+use App\Models\ItemUser;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -19,8 +20,8 @@ class ReviewResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'user' => $this->getUser($this->user),
-            'item' => $this->when($this->relationLoaded('item'), $this->getItem($this->item)),
-            'comments' => $this->when($this->relationLoaded('comments'), $this->comments)
+            'item' => $this->when($this->relationLoaded('item'), fn () => $this->getItem($this->item)),
+            'comments' => $this->when($this->relationLoaded('comments'), fn () => $this->comments)
         ];
         return $data;
     }
@@ -29,7 +30,7 @@ class ReviewResource extends JsonResource
     {
         return [
             'username' => $user->username,
-            'user_id' => $user->id
+            'id' => $user->id
         ];
     }
 

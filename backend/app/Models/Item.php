@@ -2,6 +2,7 @@
 
   namespace App\Models;
 
+  use App\Enums\MediaTypeEnum;
   use App\Services\Storage;
   use Carbon\Carbon;
   use Illuminate\Database\Eloquent\Builder;
@@ -9,6 +10,7 @@
   use Illuminate\Database\Eloquent\Model;
   use Illuminate\Database\Eloquent\Relations\BelongsToMany;
   use Illuminate\Database\Eloquent\Relations\HasMany;
+  use Illuminate\Database\Eloquent\Relations\HasManyThrough;
   use Illuminate\Database\Eloquent\Relations\HasOne;
   use Illuminate\Database\Query\JoinClause;
   use Illuminate\Support\Facades\Auth;
@@ -32,6 +34,7 @@
       'refreshed_at' => 'datetime',
       'updated_at' => 'datetime',
       'released_datetime' => 'datetime',
+      'media_type' => MediaTypeEnum::class
     ];
     
     /**
@@ -161,6 +164,18 @@
     {
       return $this->hasOne(ItemUser::class)
         ->where('user_id', Auth::id());
+    }
+
+    public function reviews(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Review::class,
+            ItemUser::class,
+            'item_id', // Foreign key on item_users pointing to users
+            'item_user_id', // Foreign key on reviews pointing to item_users
+            'id', // Local key on users
+            'id' // Local key on item_users
+        );
     }
 
     /**

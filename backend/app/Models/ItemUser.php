@@ -24,7 +24,7 @@ class ItemUser extends Model
       'watchlist' => 'boolean'
     ];
 
-    protected $with = ['review'];
+    protected $with = ['reviews'];
 
     public function item(): BelongsTo
     {
@@ -36,9 +36,9 @@ class ItemUser extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function review(): HasMany
+    public function reviews(): HasMany
     {
-        return $this->hasMany(Review::class, 'item_user_id', 'item_id');
+        return $this->hasMany(Review::class);
     }
 
     public function store(int $userId, int $itemId, array $reviewData): self

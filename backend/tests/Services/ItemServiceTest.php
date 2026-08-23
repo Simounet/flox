@@ -2,9 +2,9 @@
 
   namespace Tests\Services;
 
+  use App\Enums\MediaTypeEnum;
   use App\Models\User;
   use Illuminate\Foundation\Testing\DatabaseTransactions;
-  use Illuminate\Support\Facades\DB;
   use PHPUnit\Framework\Attributes\Test;
   use Tests\TestCase;
   use App\Models\Item;
@@ -155,14 +155,14 @@
       $fixtureMovie = json_decode($this->tmdbFixtures('movie/details'));
       $fixtureTv = json_decode($this->tmdbFixtures('tv/details'));
 
-      $foundInDetailsMovie = $itemService->parseYoutubeKey($fixtureMovie, 'movie');
-      $foundInDetailsTv = $itemService->parseYoutubeKey($fixtureTv, 'tv');
+      $foundInDetailsMovie = $itemService->parseYoutubeKey($fixtureMovie, MediaTypeEnum::from('movie'));
+      $foundInDetailsTv = $itemService->parseYoutubeKey($fixtureTv, MediaTypeEnum::from('tv'));
 
       $fixtureMovie->videos->results = null;
       $fixtureTv->videos->results = null;
 
-      $fallBackMovie = $itemService->parseYoutubeKey($fixtureMovie, 'movie');
-      $fallBackTv = $itemService->parseYoutubeKey($fixtureMovie, 'tv');
+      $fallBackMovie = $itemService->parseYoutubeKey($fixtureMovie, MediaTypeEnum::from('movie'));
+      $fallBackTv = $itemService->parseYoutubeKey($fixtureMovie, MediaTypeEnum::from('tv'));
 
       $this->assertEquals('2Rxoz13Bthc', $foundInDetailsMovie);
       $this->assertEquals('BpJYNVhGf1s', $foundInDetailsTv);

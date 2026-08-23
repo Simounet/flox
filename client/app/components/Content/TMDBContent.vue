@@ -71,7 +71,7 @@
       }),
 
       filteredItems() {
-        return this.items.filter(item => item.user_review === null || (this.showWatchlistItems && item.user_review.watchlist));
+        return this.items.filter(item => item.item_user === null || (this.showWatchlistItems && item.item_user.watchlist));
       },
 
       notCurrentGenres() {
