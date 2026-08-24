@@ -286,7 +286,7 @@
      * Scope to find the result via title.
      */
     // @TODO create MediaTypeValueObject
-    public function scopeFindByTitle(Builder $query, string $title, string $mediaType = null): Builder
+    public function scopeFindByTitle(Builder $query, string $title, ?string $mediaType = null): Builder
     {
       // Only necessarily if we search from file-parser.
       if($mediaType) {

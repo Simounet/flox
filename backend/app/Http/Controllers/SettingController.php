@@ -2,9 +2,6 @@
 
   namespace App\Http\Controllers;
 
-  use App\Models\AlternativeTitle;
-  use App\Models\Episode;
-  use App\Models\Item;
   use App\Models\Setting;
   use App\Services\Models\UserService;
   use GuzzleHttp\Client;
@@ -16,18 +13,11 @@
 
   class SettingController {
 
-    private $item;
-    private $episodes;
-    private $version;
-    private $setting;
-    private $alternativeTitles;
+    private string $version;
 
-    public function __construct(Item $item, Episode $episodes, AlternativeTitle $alternativeTitles, Setting $setting)
-    {
-      $this->item = $item;
-      $this->episodes = $episodes;
-      $this->alternativeTitles = $alternativeTitles;
-      $this->setting = $setting;
+    public function __construct(
+      private Setting $setting
+    ) {
       $this->version = config('app.version');
     }
 

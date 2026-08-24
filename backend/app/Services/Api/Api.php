@@ -85,7 +85,7 @@ abstract class Api
     $tmdbId = $this->getTmdbId();
     if(!$tmdbId) {
       $foundFromTmdb = $this->tmdb->search($this->getTitle(), MediaTypeEnum::from($this->getType()));
-      if (!$foundFromTmdb) {
+      if (!$foundFromTmdb->isOk()) {
         return null;
       }
 

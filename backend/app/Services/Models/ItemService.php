@@ -103,9 +103,7 @@
 
     public function createItemInfoIfNotExists(int $tmdbId, MediaTypeEnum $mediaType): Item
     {
-      $existingItem = Item::where('tmdb_id', $tmdbId)
-        ->get()
-        ->first();
+      $existingItem = Item::where('tmdb_id', $tmdbId)->first();
 
       if($existingItem instanceof Item) {
         return $existingItem;
@@ -445,9 +443,8 @@
      * Get the correct name from the table for sort filter.
      *
      * @param $orderBy
-     * @return string
      */
-    private function getSortFilter($orderBy)
+    private function getSortFilter($orderBy): string
     {
       switch($orderBy) {
         case 'last seen':

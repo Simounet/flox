@@ -17,7 +17,7 @@ class ProfileService
         $this->profile = $profile;
     }
 
-    public function storeLocal(User $user, int $forcedId = null): Profile
+    public function storeLocal(User $user, ?int $forcedId = null): Profile
     {
         $profileExists = Profile::select('user_id')->where('user_id', $user->id)->first();
         if($profileExists) {

@@ -3,7 +3,6 @@
   namespace App\Services;
 
   use App\Enums\MediaTypeEnum;
-  use App\Models\AlternativeTitle;
   use App\Models\Item;
   use App\Services\Models\EpisodeService;
   use App\Services\Models\ItemService;
@@ -24,26 +23,14 @@
     // [field in local file => field in database]
     const SUPPORTED_FIELDS = ['src' => 'src', 'subtitles' => 'subtitles', 'name' => 'fp_name'];
 
-    private $itemService;
-    private $episodeService;
-    private $tmdb;
-    private $alternativeTitle;
     private $itemCategory;
-    private $client;
 
     public function __construct(
-      ItemService $itemService,
-      EpisodeService $episodeService,
-      TMDB $tmdb,
-      AlternativeTitle $alternativeTitle,
-      Client $client
-    ){
-      $this->itemService = $itemService;
-      $this->episodeService = $episodeService;
-      $this->tmdb = $tmdb;
-      $this->alternativeTitle = $alternativeTitle;
-      $this->client = $client;
-    }
+      private ItemService $itemService,
+      private EpisodeService $episodeService,
+      private TMDB $tmdb,
+      private Client $client
+    ) {}
 
     /**
      * Make a request to flox-file-parser and get local files data.

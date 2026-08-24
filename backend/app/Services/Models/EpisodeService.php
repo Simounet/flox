@@ -9,22 +9,14 @@
   use App\Services\TMDB;
   use App\Models\Setting;
   use Carbon\Carbon;
+  use Illuminate\Support\Collection;
 
   class EpisodeService {
 
-    private $episode;
-    private $tmdb;
-
-    /**
-     * @param Episode $episode
-     * @param TMDB  $tmdb
-     * @param Item  $item
-     */
-    public function __construct(Episode $episode, TMDB $tmdb)
-    {
-      $this->episode = $episode;
-      $this->tmdb = $tmdb;
-    }
+    public function __construct(
+      private Episode $episode,
+      private TMDB $tmdb
+    ) {}
 
     /**
      * @param $item
@@ -94,13 +86,8 @@
     /**
      * See if we can find a episode by src or tmdb_id.
      * Or we search a specific episode in our database.
-     *
-     * @param      $type
-     * @param      $value
-     * @param null $episode
-     * @return \Illuminate\Support\Collection
      */
-    public function findBy($type, $value, $episode = null)
+    public function findBy(string $type, mixed $value, ?object $episode = null): ?Episode
     {
       switch($type) {
         case 'src':

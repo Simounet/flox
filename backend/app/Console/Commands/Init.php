@@ -44,7 +44,7 @@
 
     private function setAppKey()
     {
-      if( ! env('APP_KEY')) {
+      if( ! config('app.key')) {
         $this->info('GENERATING APP KEY');
         $this->callSilent('key:generate');
       }
