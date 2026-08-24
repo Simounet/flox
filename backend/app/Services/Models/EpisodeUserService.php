@@ -68,7 +68,8 @@ final class EpisodeUserService {
 
     public function markEpisodeAsSeen(Episode $episode, EpisodeUserValueObject $episodeUserValueObject): bool
     {
+        $episodeUser = EpisodeUser::firstOrCreate($episodeUserValueObject->get());
         $this->itemUserService->updateLastActivityAt($episode->tmdb_id);
-        return EpisodeUser::firstOrCreate($episodeUserValueObject->get())->wasRecentlyCreated;
+        return $episodeUser->wasRecentlyCreated;
     }
 }
