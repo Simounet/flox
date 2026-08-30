@@ -11,7 +11,9 @@ use App\Services\Models\EpisodeUserService;
 use App\Services\Models\ItemService;
 use App\Services\TMDB;
 use App\ValueObjects\EpisodeUserValueObject;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 abstract class Api
 {
@@ -83,7 +85,27 @@ abstract class Api
   private function createItemWithTmdb(): ?Item
   {
     $tmdbId = $this->getTmdbId();
-    if(!$tmdbId) {
+    $imdbId = $this->getImdbId();
+    if($tmdbId) {
+      $firstResult = [
+        'tmdb_id' => $tmdbId,
+        'media_type' => $this->getType()
+      ];
+    } elseif($imdbId) {
+      $tmdbResponse = $this->tmdb->fetchByImdbId($imdbId)->object();
+      // @TODO $this->getType() should return MediaTypeEnum instead of string
+      $tmdbResult = match (MediaTypeEnum::from($this->getType())) {
+        MediaTypeEnum::MOVIE => new Collection($tmdbResponse->movie_results)->first(),
+        MediaTypeEnum::TV => new Collection($tmdbResponse->tv_results)->first(),
+        default => throw new \Exception('Unknown type: ' . $this->getType() . ' for imdb id: ' . $imdbId)
+      };
+      Log::debug('TMDB Api result: ' . json_encode($tmdbResponse));
+      Log::debug('Selected result: ' . json_encode($tmdbResult));
+      $firstResult = [
+        'tmdb_id' => $tmdbResult->id,
+        'media_type' => $this->getType()
+      ];
+    } else {
       $foundFromTmdb = $this->tmdb->search($this->getTitle(), MediaTypeEnum::from($this->getType()));
       if (!$foundFromTmdb->isOk()) {
         return null;
@@ -96,11 +118,6 @@ abstract class Api
       if($item) {
           return $item;
       }
-    } else {
-      $firstResult = [
-        'tmdb_id' => $tmdbId,
-        'media_type' => $this->getType()
-      ];
     }
     return $this->itemService->createItemInfoIfNotExists($firstResult['tmdb_id'], MediaTypeEnum::from($firstResult['media_type']));
   }
@@ -110,6 +127,11 @@ abstract class Api
     $foundItemByTmdbId = $this->getItemByTmdbId();
     if($foundItemByTmdbId) {
       return $foundItemByTmdbId;
+    }
+
+    $foundItemByImdb = $this->getItemByImdb();
+    if($foundItemByImdb) {
+      return $foundItemByImdb;
     }
 
     $foundByTitle = $this->getItemByTitle();
@@ -127,6 +149,15 @@ abstract class Api
       return null;
     }
     return $this->item->findByTmdbId($tmdbId)->first();
+  }
+
+  private function getItemByImdb(): ?Item
+  {
+    $imdbId = $this->getImdbId();
+    if(!$imdbId) {
+      return null;
+    }
+    return $this->item->findByImdbId($imdbId)->first();
   }
 
 
@@ -202,5 +233,7 @@ abstract class Api
    */
   abstract protected function getSeasonNumber();
 
-  abstract protected function getTmdbId(): int|false;
+  abstract protected function getTmdbId(): ?int;
+
+  abstract protected function getImdbId(): ?string;
 }

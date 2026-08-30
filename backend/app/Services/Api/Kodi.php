@@ -75,8 +75,13 @@ class Kodi extends Api
     return $this->data['seasonNumber'] ?? null;
   }
 
-  protected function getTmdbId(): int|false
+  protected function getTmdbId(): ?int
   {
-    return $this->data['ids']['tmdbId'] ?? false;
+    return $this->data['ids']['tmdbId'];
+  }
+
+  protected function getImdbId(): ?string
+  {
+    return $this->data['ids']['imdbId'];
   }
 }

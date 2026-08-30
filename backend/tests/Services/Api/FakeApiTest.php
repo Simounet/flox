@@ -5,9 +5,12 @@ namespace Tests\Services\Api;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Fixtures\FakeApi;
 use Tests\TestCase;
+use Tests\Traits\Fixtures;
 
 class FakeApiTest extends TestCase implements ApiTestInterface
 {
+  use Fixtures;
+
   private ApiTestBase $apiTestBase;
 
   public function setUp(): void
@@ -34,6 +37,14 @@ class FakeApiTest extends TestCase implements ApiTestInterface
   }
 
   #[Test]
+  public function it_should_create_a_new_movie_from_imdb_id(): void
+  {
+    $fixture = $this->apiFixtures('fake/movie.json');
+    $fixture['data']['tmdbid'] = null;
+    $this->apiTestBase->it_should_create_a_new_movie_from_imdb_id($fixture);
+  }
+
+  #[Test]
   public function it_should_not_create_a_new_movie_if_it_exists()
   {
     $this->apiTestBase->it_should_not_create_a_new_movie_if_it_exists('fake/movie.json');
@@ -43,6 +54,14 @@ class FakeApiTest extends TestCase implements ApiTestInterface
   public function it_should_create_a_new_tv_show()
   {
     $this->apiTestBase->it_should_create_a_new_tv_show('fake/tv.json');
+  }
+
+  #[Test]
+  public function it_should_create_a_new_tv_show_from_imdb_id()
+  {
+    $fixture = $this->apiFixtures('fake/tv.json');
+    $fixture['data']['tmdbid'] = null;
+    $this->apiTestBase->it_should_create_a_new_tv_show_from_imdb_id($fixture);
   }
 
   #[Test]

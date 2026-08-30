@@ -8,6 +8,7 @@
     "rating": null,
     "episode": null,
     "season": null,
-    "tmdbid": 12345
+    "tmdbid": 12345,
+    "imdbid": "tt45678"
   }
 }

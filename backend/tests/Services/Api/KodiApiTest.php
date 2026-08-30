@@ -41,6 +41,14 @@ class KodiApiTest extends TestCase implements ApiTestInterface
   }
 
   #[Test]
+  public function it_should_create_a_new_movie_from_imdb_id()
+  {
+    $fixture = $this->apiFixtures('kodi/movie.json');
+    $fixture['ids']['tmdbId'] = null;
+    $this->apiTestBase->it_should_create_a_new_movie_from_imdb_id($fixture);
+  }
+
+  #[Test]
   public function it_should_not_create_a_new_movie_if_it_exists()
   {
     $this->apiTestBase->it_should_not_create_a_new_movie_if_it_exists('kodi/movie.json');
@@ -50,6 +58,14 @@ class KodiApiTest extends TestCase implements ApiTestInterface
   public function it_should_create_a_new_tv_show()
   {
     $this->apiTestBase->it_should_create_a_new_tv_show('kodi/tv.json');
+  }
+
+  #[Test]
+  public function it_should_create_a_new_tv_show_from_imdb_id()
+  {
+    $fixture = $this->apiFixtures('kodi/tv.json');
+    $fixture['ids']['tmdbId'] = null;
+    $this->apiTestBase->it_should_create_a_new_tv_show_from_imdb_id($fixture);
   }
 
   #[Test]

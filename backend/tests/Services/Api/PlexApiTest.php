@@ -69,6 +69,16 @@ class PlexApiTest extends TestCase implements ApiTestInterface
   }
 
   #[Test]
+  public function it_should_create_a_new_movie_from_imdb_id()
+  {
+    $fixture = $this->apiFixtures('plex/movie.json');
+    $fixture['Metadata']['Guid'] = array_filter($fixture['Metadata']['Guid'], function($guid) {
+        return str_starts_with($guid['id'], 'imdb://');
+    });
+    $this->apiTestBase->it_should_create_a_new_movie_from_imdb_id($fixture);
+  }
+
+  #[Test]
   public function it_should_not_create_a_new_movie_if_it_exists()
   {
     $this->apiTestBase->it_should_not_create_a_new_movie_if_it_exists('plex/movie.json');
@@ -78,6 +88,16 @@ class PlexApiTest extends TestCase implements ApiTestInterface
   public function it_should_create_a_new_tv_show()
   {
     $this->apiTestBase->it_should_create_a_new_tv_show('plex/tv.json');
+  }
+
+  #[Test]
+  public function it_should_create_a_new_tv_show_from_imdb_id()
+  {
+    $fixture = $this->apiFixtures('plex/tv.json');
+    $fixture['Metadata']['Guid'] = array_filter($fixture['Metadata']['Guid'], function($guid) {
+        return str_starts_with($guid['id'], 'imdb://');
+    });
+    $this->apiTestBase->it_should_create_a_new_tv_show_from_imdb_id($fixture);
   }
 
   #[Test]

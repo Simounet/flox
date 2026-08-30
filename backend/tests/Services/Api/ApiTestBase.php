@@ -61,6 +61,27 @@ class ApiTestBase extends TestCase
     $this->assertCount(1, $itemsAfter);
   }
 
+  public function it_should_create_a_new_movie_from_imdb_id(array $fixture): void
+  {
+    $this->be($this->user);
+    $this->createGuzzleMock(
+      $this->tmdbFixtures('movie/find_by_id'),
+      $this->tmdbFixtures('movie/details'),
+      $this->tmdbFixtures('movie/alternative_titles')
+    );
+
+    $api = app($this->apiClass);
+
+    $itemsBefore = Item::all();
+
+    $api->handle($fixture);
+
+    $itemsAfter = Item::all();
+
+    $this->assertCount(0, $itemsBefore);
+    $this->assertCount(1, $itemsAfter);
+  }
+
   public function it_should_not_create_a_new_movie_if_it_exists($fixture)
   {
     $this->be($this->user);
@@ -93,6 +114,29 @@ class ApiTestBase extends TestCase
     $itemsBefore = Item::all();
 
     $api->handle($this->apiFixtures($fixture));
+
+    $itemsAfter = Item::all();
+
+    $this->assertCount(0, $itemsBefore);
+    $this->assertCount(1, $itemsAfter);
+  }
+
+  public function it_should_create_a_new_tv_show_from_imdb_id(array $fixture): void
+  {
+    $this->be($this->user);
+    $this->createGuzzleMock(
+      $this->tmdbFixtures('tv/find_by_id'),
+      $this->tmdbFixtures('tv/details'),
+      $this->tmdbFixtures('tv/alternative_titles')
+    );
+
+    $this->createTmdbEpisodeMock();
+
+    $api = app($this->apiClass);
+
+    $itemsBefore = Item::all();
+
+    $api->handle($fixture);
 
     $itemsAfter = Item::all();
 

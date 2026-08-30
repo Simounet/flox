@@ -373,6 +373,11 @@
       return $this->requestTmdb(self::BASE . '/3/' . $item['media_type']->value . '/' . $item['tmdb_id'] . '/alternative_titles');
     }
 
+    public function fetchByImdbId(string $imdbId): ClientResponse
+    {
+      return $this->requestTmdb(self::BASE . '/3/find/' . $imdbId, ['external_source' => 'imdb_id', 'language' => 'en-US']);
+    }
+
     /**
      * Get the lists of genres from TMDb for tv shows and movies.
      */

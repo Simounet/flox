@@ -74,8 +74,16 @@ class FakeApi extends Api
   /**
    * @inheritDoc
    */
-  protected function getTmdbId(): int|false
+  protected function getTmdbId(): ?int
   {
     return $this->data['data']['tmdbid'];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  protected function getImdbId(): ?string
+  {
+    return $this->data['data']['imdbid'];
   }
 }

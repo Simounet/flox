@@ -2,7 +2,7 @@
     "mediaType": "movie",
     "title": "Warcraft: The Beginning",
     "ids": {
-        "imdbId": 1234,
+        "imdbId": "tt6789",
         "tmdbId": 68735
     },
     "duration": 451000

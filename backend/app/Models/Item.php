@@ -228,6 +228,11 @@
       });
     }
 
+    public function scopeFindByImdbId(Builder $query, string $imdbId): Builder
+    {
+      return $query->where('imdb_id', $imdbId);
+    }
+
     /**
      * Scope to find the result via tmdb_id.
      */
