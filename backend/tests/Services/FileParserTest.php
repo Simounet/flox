@@ -2,6 +2,7 @@
 
   namespace Tests\Services;
 
+  use Carbon\Carbon;
   use Illuminate\Foundation\Testing\DatabaseTransactions;
   use Illuminate\Routing\Middleware\ThrottleRequests;
   use Illuminate\Support\Facades\Hash;
@@ -228,7 +229,7 @@
       $setting1 = Setting::where('user_id', $this->user->id)->first();
       $this->parser->updateDatabase($this->user->id, $this->fpFixtures('movie/added'));
       $setting2 = Setting::where('user_id', $this->user->id)->first();
-      sleep(1);
+      Carbon::setTestNow(Carbon::tomorrow());
       $this->parser->updateDatabase($this->user->id, $this->fpFixtures('movie/added'));
       $setting3 = Setting::where('user_id', $this->user->id)->first();
 

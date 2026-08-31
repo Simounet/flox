@@ -9,6 +9,7 @@ use App\Models\ItemUser;
 use App\Models\User;
 use App\ValueObjects\EpisodeUserValueObject;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 use Tests\Traits\Factories;
@@ -234,14 +235,13 @@ class ApiTestBase extends TestCase
 
     $updatedAt = ItemUser::where(['id' => $itemUser->id])->first()->updated_at;
 
-    // sleep for 1 second so that Carbon::now() returns a different date
-    sleep(1);
+    Carbon::setTestNow(Carbon::tomorrow());
 
     $api->handle($this->apiFixtures($fixture));
 
     $updatedAtUpdated = ItemUser::where(['id' => $itemUser->id])->first()->updated_at;
 
-    $this->assertNotEquals($updatedAt, $updatedAtUpdated);
+    $this->assertNotEquals($updatedAt->timestamp, $updatedAtUpdated->timestamp);
   }
 
   public function it_should_add_a_item_user_to_existing_item($fixture)
