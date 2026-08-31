@@ -1,23 +1,23 @@
 <?php
 
+  declare(strict_types=1);
+
   namespace App\Http\Controllers;
   
-  use App\Models\Genre;
   use App\Services\Models\GenreService;
+  use Illuminate\Http\JsonResponse;
 
   class GenreController {
     
     private $genreService;
-    private $genre;
 
-    public function __construct(GenreService $genreService, Genre $genre)
+    public function __construct(GenreService $genreService)
     {
       $this->genreService = $genreService;
-      $this->genre = $genre;
     }
     
-    public function allGenres()
+    public function allGenres(): JsonResponse
     {
-      return $this->genre->all();
+      return response()->json($this->genreService->all());
     }
   }

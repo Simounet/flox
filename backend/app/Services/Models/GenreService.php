@@ -4,6 +4,7 @@
 
   use App\Models\Genre;
   use App\Services\TMDB;
+  use Illuminate\Database\Eloquent\Collection;
   use Illuminate\Support\Facades\DB;
 
   class GenreService {
@@ -19,6 +20,11 @@
     {
       $this->genre = $genre;
       $this->tmdb = $tmdb;
+    }
+
+    public function all(): Collection
+    {
+      return $this->genre->all();
     }
 
     /**
