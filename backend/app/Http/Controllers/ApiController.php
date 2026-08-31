@@ -7,6 +7,7 @@
   use App\Services\Api\Plex;
   use Illuminate\Http\Request;
   use Illuminate\Http\Response;
+  use Illuminate\Support\Facades\Log;
 
   class ApiController {
 
@@ -19,6 +20,7 @@
     {
       $payload = $request->all();
 
+      Log::debug('API payload: ' . json_encode($payload));
       $result = $this->kodi->handle($payload);
 
       if($result === StatusEnum::NOT_FOUND) {
