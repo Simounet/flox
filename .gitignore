@@ -12,6 +12,7 @@ Homestead.yaml
 /public/assets/app.css
 /public/assets/app.js
 /public/assets/vendor.js
+/public/assets/vendors-*.js
 /public/assets/poster/*.jpg
 /public/assets/poster/subpage/*.jpg
 /public/assets/backdrop/*.jpg
