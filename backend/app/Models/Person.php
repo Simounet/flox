@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Person extends Model
@@ -25,7 +26,7 @@ class Person extends Model
     /**
      * Scope to find the person by name.
      */
-    public function scopeFindByName($query, $person)
+    public function scopeFindByName(Builder $query, string $person): Builder
     {
       return $query->where('name', $person);
     }
@@ -36,7 +37,7 @@ class Person extends Model
      * @param $data
      * @return Person
      */
-     public function store(array $person)
+     public function store(array $person): self
      {
        return $this->firstOrCreate(
          ['id' => $person['id']],
@@ -48,7 +49,9 @@ class Person extends Model
        );
      }
 
-     public function fromCredits(object $person)
+     // @TODO define ValueObject instead of $person object
+     // @TODO define ValueObject instead of array
+     public function fromCredits(object $person): array
      {
        return [
          'id' => $person->id,

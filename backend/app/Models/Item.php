@@ -2,11 +2,16 @@
 
   namespace App\Models;
 
+  use App\Enums\MediaTypeEnum;
   use App\Services\Storage;
   use Carbon\Carbon;
   use Illuminate\Database\Eloquent\Builder;
   use Illuminate\Database\Eloquent\Factories\HasFactory;
   use Illuminate\Database\Eloquent\Model;
+  use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+  use Illuminate\Database\Eloquent\Relations\HasMany;
+  use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+  use Illuminate\Database\Eloquent\Relations\HasOne;
   use Illuminate\Database\Query\JoinClause;
   use Illuminate\Support\Facades\Auth;
 
@@ -29,6 +34,7 @@
       'refreshed_at' => 'datetime',
       'updated_at' => 'datetime',
       'released_datetime' => 'datetime',
+      'media_type' => MediaTypeEnum::class
     ];
     
     /**
@@ -45,7 +51,7 @@
      *
      * @var array
      */
-    protected $with = ['genre', 'review', 'userReview'];
+    protected $with = ['genre', 'itemUser'];
 
     /**
      * Guard accessors from import.
@@ -56,11 +62,9 @@
 
     /**
      * Create the new movie / tv show.
-     *
-     * @param $data
-     * @return Item
      */
-    public function store($data)
+    // @TODO create ItemDataValueObject
+    public function store(array $data): self
     {
       return $this->firstOrCreate([
         'tmdb_id' => $data['tmdb_id'],
@@ -89,7 +93,9 @@
      * @param $mediaType
      * @return Item
      */
-    public function storeEmpty($data, $mediaType)
+    // @TODO create ItemDataValueObject
+    // @TODO create MediaTypeValueObject
+    public function storeEmpty(array $data, string $mediaType): self
     {
       return $this->create([
         'tmdb_id' => null,
@@ -114,17 +120,18 @@
     /**
      * Accessor for formatted release date.
      */
-    public function getStartDateAttribute()
+    public function getStartDateAttribute(): string|null
     {
       if($this->released) {
         return Carbon::createFromTimestamp($this->released)->format('Y-m-d');
       }
+      return null;
     }
 
     /**
      * Belongs to many genres.
      */
-    public function genre()
+    public function genre(): BelongsToMany
     {
       return $this->belongsToMany(Genre::class);
     }
@@ -132,7 +139,7 @@
     /**
      * Belongs to many creditCasts.
      */
-    public function creditCast()
+    public function creditCast(): HasMany
     {
       return $this->hasMany(CreditCast::class, 'tmdb_id', 'tmdb_id')->orderBy('order');
     }
@@ -140,7 +147,7 @@
     /**
      * Belongs to many creditCrews.
      */
-    public function creditCrew()
+    public function creditCrew(): HasMany
     {
       return $this->hasMany(CreditCrew::class, 'tmdb_id', 'tmdb_id');
     }
@@ -148,29 +155,33 @@
     /**
      * Can have many episodes.
      */
-    public function episodes()
+    public function episodes(): HasMany
     {
       return $this->hasMany(Episode::class, 'tmdb_id', 'tmdb_id');
     }
 
-    /**
-     * Belongs to many reviews.
-     */
-    public function review()
+    public function itemUser(): HasOne
     {
-      return $this->hasMany(Review::class);
+      return $this->hasOne(ItemUser::class)
+        ->where('user_id', Auth::id());
     }
 
-    public function userReview()
+    public function reviews(): HasManyThrough
     {
-      return $this->hasOne(Review::class)
-        ->where('user_id', Auth::id());
+        return $this->hasManyThrough(
+            Review::class,
+            ItemUser::class,
+            'item_id', // Foreign key on item_users pointing to users
+            'item_user_id', // Foreign key on reviews pointing to item_users
+            'id', // Local key on users
+            'id' // Local key on item_users
+        );
     }
 
     /**
      * Can have many alternative titles.
      */
-    public function alternativeTitles()
+    public function alternativeTitles(): HasMany
     {
       return $this->hasMany(AlternativeTitle::class, 'tmdb_id', 'tmdb_id');
     }
@@ -178,7 +189,7 @@
     /**
      * The latest unseen episode.
      */
-    public function latestEpisode()
+    public function latestEpisode(): HasOne
     {
       $episodeUserSeen = EpisodeUser::select('episode_id')->from('episode_user');
 
@@ -192,7 +203,7 @@
     /**
      * Can have many episodes with a src (from FP).
      */
-    public function episodesWithSrc()
+    public function episodesWithSrc(): HasMany
     {
       return $this->hasMany(Episode::class, 'tmdb_id', 'tmdb_id')->whereNotNull('src');
     }
@@ -200,7 +211,7 @@
     /**
      * Scope to find the result by a genre.
      */
-    public function scopeFindByGenreId($query, $genreId)
+    public function scopeFindByGenreId(Builder $query, int $genreId): Builder
     {
       return $query->orWhereHas('genre', function($query) use ($genreId) {
         $query->where('genre_id', $genreId);
@@ -210,7 +221,7 @@
     /**
      * Scope to find the result by a person.
      */
-    public function scopeFindByPersonId($query, $personId)
+    public function scopeFindByPersonId(Builder $query, int $personId): Builder
     {
       return $query->orWhereHas('person', function($query) use ($personId) {
         $query->where('person_id', $personId);
@@ -220,7 +231,7 @@
     /**
      * Scope to find the result via tmdb_id.
      */
-    public function scopeFindByTmdbId($query, $tmdbId)
+    public function scopeFindByTmdbId(Builder $query, int $tmdbId): Builder
     {
       return $query->where('tmdb_id', $tmdbId);
     }
@@ -228,23 +239,24 @@
     /**
      * Scope to find the result via tmdb_id and media_type.
      */
-    public function scopeFindByTmdbIdStrict($query, $tmdbId, $mediaType)
+    // @TODO create MediaTypeValueObject
+    public function scopeFindByTmdbIdStrict(Builder $query, int $tmdbId, string $mediaType): Builder
     {
       return $query->where('tmdb_id', $tmdbId)->where('media_type', $mediaType);
     }
 
-    public function scopeFindByReviewWatchlist(Builder $query, int $watchlistValue): Builder
+    public function scopeFindByItemUserWatchlist(Builder $query, int $watchlistValue): Builder
     {
-        return $query->join('reviews', function(JoinClause $join) use ($watchlistValue) {
-          $join->on('items.id', '=', 'reviews.item_id')
-            ->where('reviews.watchlist', '=', $watchlistValue);
+        return $query->join('item_user', function(JoinClause $join) use ($watchlistValue) {
+          $join->on('items.id', '=', 'item_user.item_id')
+            ->where('item_user.watchlist', '=', $watchlistValue);
         });
     }
 
     /**
      * Scope to find the result by year.
      */
-    public function scopeFindByYear($query, $year)
+    public function scopeFindByYear(Builder $query, int $year): Builder
     {
       return $query->whereYear('released_datetime', $year);
     }
@@ -252,7 +264,9 @@
     /**
      * Scope to find the result via fp_name.
      */
-    public function scopeFindByFPName($query, $item, $mediaType)
+    // @TODO $item typing
+    // @TODO create MediaTypeValueObject
+    public function scopeFindByFPName(Builder $query, object $item, string $mediaType): Builder
     {
       return $query->where('media_type', $mediaType)
         ->where(function($query) use ($item) {
@@ -263,7 +277,7 @@
     /**
      * Scope to find the result via src.
      */
-    public function scopeFindBySrc($query, $src)
+    public function scopeFindBySrc(Builder $query, string $src): Builder
     {
       return $query->where('src', $src);
     }
@@ -271,7 +285,8 @@
     /**
      * Scope to find the result via title.
      */
-    public function scopeFindByTitle($query, $title, $mediaType = null)
+    // @TODO create MediaTypeValueObject
+    public function scopeFindByTitle(Builder $query, string $title, string $mediaType = null): Builder
     {
       // Only necessarily if we search from file-parser.
       if($mediaType) {
@@ -293,7 +308,8 @@
     /**
      * Scope to find the result via title without a like query.
      */
-    public function scopeFindByTitleStrict($query, $title, $mediaType)
+    // @TODO create MediaTypeValueObject
+    public function scopeFindByTitleStrict(Builder $query, string $title, string $mediaType): Builder
     {
       return $query->where('media_type', $mediaType)
         ->where(function($query) use ($title) {

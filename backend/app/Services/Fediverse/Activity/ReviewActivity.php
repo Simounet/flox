@@ -14,12 +14,12 @@ class ReviewActivity
 
     public function activity(Review $review, Profile $profile, array $followersInbox = []): Note
     {
-        $item = Item::select(['poster', 'title'])->where('id', $review->item_id)->firstOrFail();
+        $review->load('item:items.id,poster,title');
         $created = $review->created_at->toAtomString();
         $updated = $review->updated_at->toAtomString();
         $reviewUrl = route('user.review', ['username' => $profile->username, 'id' => $review->id]);
         $content = $this->getReviewContent((int) $review->rating, $review->content);
-        $poster = $item->getPoster();
+        $poster = $review->item->getPoster();
 
         $note = new Note();
         $note->set('id', $reviewUrl);
@@ -42,11 +42,12 @@ class ReviewActivity
         return $note;
     }
 
-    private function getReviewContent(int $rating, string $content): string
+    private function getReviewContent(int $rating, ?string $content): string
     {
-        $htmlContent = preg_replace("/\r\n|\r|\n/", '<br>', $content);
+        $htmlContent = $content ?
+            preg_replace("/\r\n|\r|\n/", '<br>', $content) . '<br><br>' : '';
         $starsRating = (new ReviewService)->getRating($rating);
-        $ratingContent = '<br><br>Avis : ' . $starsRating;
+        $ratingContent = 'Avis : ' . $starsRating;
         return $htmlContent . $ratingContent;
     }
 }

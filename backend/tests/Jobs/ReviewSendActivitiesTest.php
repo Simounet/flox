@@ -8,6 +8,7 @@ use App\Jobs\ReviewSendActivities;
 use App\Jobs\ReviewSendActivity;
 use App\Models\Follower;
 use App\Models\Item;
+use App\Models\ItemUser;
 use App\Models\Profile;
 use App\Models\Review;
 use App\Models\User;
@@ -32,11 +33,11 @@ class ReviewSendActivitiesTest extends TestCase
 
         $user = User::factory()->create();
         $this->profile = (new ProfileService(new Profile()))->storeLocal($user);
-
         $item = Item::factory()->create();
+
+        $itemUser = ItemUser::factory()->create(['user_id' => $user->id, 'item_id' => $item->id]);
         $this->review = Review::factory()->create([
-            'user_id' => $user->id,
-            'item_id' => $item->id,
+            'item_user_id' => $itemUser->id,
         ]);
     }
 

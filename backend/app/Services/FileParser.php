@@ -166,7 +166,7 @@
     }
 
     /**
-     * If result was found in TMDb, remove empty item and re-create from TMDb.
+     * If result was found in TMDb, update empty item from TMDb.
      * Otherwise remove and re-create empty item.
      *
      * @param $emptyItem
@@ -176,16 +176,18 @@
     private function searchTmdbAndUpdateEmptyItem($emptyItem, $file)
     {
       $found = $this->searchTmdb($file);
+      $userId = Auth::user()->id;
 
       // We will create a new empty or a real item from TMDb.
-      $this->itemService->remove($emptyItem->id);
+      // @TODO I don't think it should ever remove anything BUT update it
+      $this->itemService->remove($emptyItem->id, $userId);
 
       if( ! $found) {
         return $this->createEmptyItem($file);
       }
 
       // Create a new item with TMDb specific values.
-      $created = $this->itemService->create($found['tmdb_id'], $found['media_type'], Auth::user()->id);
+      $created = $this->itemService->create($found['tmdb_id'], $found['media_type'], $userId);
 
       // We are searching for the changed name (if available) in the next iteration.
       if($this->itemCategory == 'tv') {

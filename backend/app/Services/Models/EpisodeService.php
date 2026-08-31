@@ -2,6 +2,7 @@
 
   namespace App\Services\Models;
 
+  use App\Enums\MediaTypeEnum;
   use App\Models\Episode;
   use App\Models\EpisodeUser;
   use App\Models\Item;
@@ -30,7 +31,7 @@
      */
     public function create($item)
     {
-      if($item->media_type == 'tv') {
+      if($item->media_type === MediaTypeEnum::TV) {
         $seasons = $this->tmdb->tvEpisodes($item->tmdb_id);
 
         foreach($seasons as $season) {

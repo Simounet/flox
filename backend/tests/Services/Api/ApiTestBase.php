@@ -5,7 +5,7 @@ namespace Tests\Services\Api;
 use App\Enums\StatusEnum;
 use App\Models\EpisodeUser;
 use App\Models\Item;
-use App\Models\Review;
+use App\Models\ItemUser;
 use App\Models\User;
 use App\ValueObjects\EpisodeUserValueObject;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -121,18 +121,18 @@ class ApiTestBase extends TestCase
   {
     $this->be($this->user);
     $movie = $this->createMovie();
-    $review = $this->createReview([
+    $itemUser = $this->createItemUser([
         'user_id' => $this->user->id,
         'item_id' => $movie->id
     ]);
 
     $api = app($this->apiClass);
 
-    $movieBefore = Review::where(['id' => $review->id])->first();
+    $movieBefore = ItemUser::where(['id' => $itemUser->id])->first();
 
     $api->handle($this->apiFixtures($fixture));
 
-    $movieAfter = Review::where(['id' => $review->id])->first();
+    $movieAfter = ItemUser::where(['id' => $itemUser->id])->first();
 
     $this->assertEquals(1, $movieBefore->rating);
     $this->assertEquals($shouldHaveRating, $movieAfter->rating);
@@ -142,18 +142,18 @@ class ApiTestBase extends TestCase
   {
     $this->be($this->user);
     $tv = $this->createTv();
-    $review = $this->createReview([
+    $itemUser = $this->createItemUser([
         'user_id' => $this->user->id,
         'item_id' => $tv['item']->id
     ]);
 
     $api = app($this->apiClass);
 
-    $tvBefore = Review::where(['id' => $review->id])->first();
+    $tvBefore = ItemUser::where(['id' => $itemUser->id])->first();
 
     $api->handle($this->apiFixtures($fixture));
 
-    $tvAfter = Review::where(['id' => $review->id])->first();
+    $tvAfter = ItemUser::where(['id' => $itemUser->id])->first();
 
     $this->assertEquals(1, $tvBefore->rating);
     $this->assertEquals($shouldHaveRating, $tvAfter->rating);
@@ -163,61 +163,60 @@ class ApiTestBase extends TestCase
   {
     $this->be($this->user);
     $this->createTv();
-    $userId = 1;
     $episodeId = 2;
 
     $api = app($this->apiClass);
 
-    $seenEpisodesBefore = EpisodeUser::isSeen(new EpisodeUserValueObject($userId, $episodeId));
+    $seenEpisodesBefore = EpisodeUser::isSeen(new EpisodeUserValueObject($this->user->id, $episodeId));
 
     $api->handle($this->apiFixtures($fixture));
 
-    $seenEpisodesAfter = EpisodeUser::isSeen(new EpisodeUserValueObject($userId, $episodeId));
+    $seenEpisodesAfter = EpisodeUser::isSeen(new EpisodeUserValueObject($this->user->id, $episodeId));
 
     $this->assertFalse($seenEpisodesBefore);
     $this->assertTrue($seenEpisodesAfter);
   }
 
-  public function it_should_updated_review_updated_at($fixture)
+  public function it_should_updated_item_user_updated_at($fixture)
   {
     $this->be($this->user);
     $tv = $this->createTv();
-    $review = $this->createReview([
+    $itemUser = $this->createItemUser([
         'user_id' => $this->user->id,
         'item_id' => $tv['item']->id
     ]);
 
     $api = app($this->apiClass);
 
-    $updatedAt = Review::where(['id' => $review->id])->first()->updated_at;
+    $updatedAt = ItemUser::where(['id' => $itemUser->id])->first()->updated_at;
 
     // sleep for 1 second so that Carbon::now() returns a different date
     sleep(1);
 
     $api->handle($this->apiFixtures($fixture));
 
-    $updatedAtUpdated = Review::where(['id' => $review->id])->first()->updated_at;
+    $updatedAtUpdated = ItemUser::where(['id' => $itemUser->id])->first()->updated_at;
 
     $this->assertNotEquals($updatedAt, $updatedAtUpdated);
   }
 
-  public function it_should_add_a_review_to_existing_item($fixture)
+  public function it_should_add_a_item_user_to_existing_item($fixture)
   {
     $this->be($this->user);
     $tv = $this->createTv();
-    $review = $this->createReview([
+    $itemUser = $this->createItemUser([
         'user_id' => $this->user->id,
         'item_id' => $tv['item']->id
     ]);
 
-    $this->assertEquals(1, Review::count());
-    $review->delete();
-    $this->assertEquals(0, Review::count());
+    $this->assertEquals(1, ItemUser::count());
+    $itemUser->delete();
+    $this->assertEquals(0, ItemUser::count());
     $this->assertEquals(1, Item::count());
 
     $api = app($this->apiClass);
     $api->handle($this->apiFixtures($fixture));
-    $this->assertEquals(1, Review::count());
+    $this->assertEquals(1, ItemUser::count());
   }
 
   public function add_a_movie_from_api(string $fixture, string $apiUri, array $data)
@@ -227,11 +226,11 @@ class ApiTestBase extends TestCase
       $this->tmdbFixtures('movie/alternative_titles')
     );
 
-    $this->assertEquals(0, Review::count());
+    $this->assertEquals(0, ItemUser::count());
 
     $response = $this->postJson($apiUri, $data);
     $response->assertStatus(200);
-    $this->assertEquals(1, Review::count());
+    $this->assertEquals(1, ItemUser::count());
   }
 
   public function mark_episode_seen_multiple_times_from_api(string $fixture, string $apiUri, array $data)
@@ -242,14 +241,14 @@ class ApiTestBase extends TestCase
     );
     $this->createTmdbEpisodeMock();
 
-    $this->assertEquals(0, Review::count());
+    $this->assertEquals(0, ItemUser::count());
 
     $response = $this->postJson($apiUri, $data);
     $response->assertStatus(200);
-    $this->assertEquals(1, Review::count());
+    $this->assertEquals(1, ItemUser::count());
 
     $response = $this->postJson($apiUri, $data);
     $response->assertStatus(200);
-    $this->assertEquals(1, Review::count());
+    $this->assertEquals(1, ItemUser::count());
   }
 }

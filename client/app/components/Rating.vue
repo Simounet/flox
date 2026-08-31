@@ -1,15 +1,15 @@
 <template>
   <div>
-    <span v-if="item.user_review && item.user_review.rating != null && ! item.user_review.watchlist" :class="'item-rating rating-' + item.user_review.rating" @click="changeRating()">
+    <span v-if="item.item_user && item.item_user.rating != null && ! item.item_user.watchlist" :class="'item-rating rating-' + item.item_user.rating" @click="changeRating()">
       <i class="icon-rating"></i>
     </span>
-    <span v-if="item.user_review === null && item.tmdb_id && auth && ! localRated" class="item-rating item-new" @click="addNewItem()">
+    <span v-if="item.item_user === null && item.tmdb_id && auth && ! localRated" class="item-rating item-new" @click="addNewItem()">
       <i class="icon-add"></i>
     </span>
-    <span v-if="item.user_review && item.user_review.watchlist" class="item-rating item-new" @click="changeRating()">
+    <span v-if="item.item_user && item.item_user.watchlist" class="item-rating item-new" @click="changeRating()">
       <i class="icon-add"></i>
     </span>
-    <span v-if="item.user_review === null && item.tmdb_id && localRated" class="item-rating item-new item-rating-loader">
+    <span v-if="item.item_user === null && item.tmdb_id && localRated" class="item-rating item-new item-rating-loader">
       <span class="loader smallsize-loader"></span>
     </span>
   </div>
@@ -45,24 +45,24 @@
     methods: {
       changeRating() {
         if(this.auth) {
-          if(this.item.user_review.watchlist) {
-            this.item.user_review.rating = 0;
+          if(this.item.item_user.watchlist) {
+            this.item.item_user.rating = 0;
           } else {
-            this.prevRating = this.item.user_review.rating;
-            this.item.user_review.rating = this.prevRating == 3
+            this.prevRating = this.item.item_user.rating;
+            this.item.item_user.rating = this.prevRating == 3
               ? 1
               : +this.prevRating + 1;
           }
           
-          this.item.user_review.watchlist = false;
+          this.item.item_user.watchlist = false;
 
           this.saveNewRating();
         }
       },
 
       saveNewRating() {
-        http.patch(`${config.api}/review/change-rating/${this.item.user_review.id}`, {rating: this.item.user_review.rating}).catch(error => {
-          this.item.user_review.rating = this.prevRating;
+        http.patch(`${config.api}/item/change-rating/${this.item.item_user.id}`, {rating: this.item.item_user.rating}).catch(error => {
+          this.item.item_user.rating = this.prevRating;
           alert('Error in saveNewRating()');
         });
       },

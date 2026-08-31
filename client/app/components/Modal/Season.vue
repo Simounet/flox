@@ -116,7 +116,7 @@
         if(this.auth) {
           episode.seen = ! episode.seen;
 
-          http.patch(`${config.api}/toggle-episode/${episode.id}`).catch(error => {
+          http.patch(`${config.api}/toggle-episode/${episode.id}`, {seen: episode.seen}).catch(error => {
             episode.seen = ! episode.seen;
           });
         }

@@ -249,8 +249,8 @@
         'genre_ids' => $data->genre_ids,
         'credit_cast' => $data->credit_cast ?? [],
         'credit_crew' => $data->credit_crew ?? [],
-        'review' => $data->review ?? [],
-        'user_review' => $data->user_review ?? null,
+        // @TODO client side should use a backend generated variable to know if it's local content or TMDB content
+        'item_user' => null,
         'genre' => Genre::whereIn('id', $data->genre_ids)->get()->toArray(),
         'episodes' => [],
         'overview' => $data->overview,
@@ -370,7 +370,7 @@
 
     public function fetchAlternativeTitles(Item $item): ClientResponse
     {
-      return $this->requestTmdb(self::BASE . '/3/' . MediaTypeEnum::from($item['media_type'])->value . '/' . $item['tmdb_id'] . '/alternative_titles');
+      return $this->requestTmdb(self::BASE . '/3/' . $item['media_type']->value . '/' . $item['tmdb_id'] . '/alternative_titles');
     }
 
     /**

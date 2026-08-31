@@ -32,7 +32,7 @@ class CalendarTest extends TestCase {
     $user = $this->createUser();
     $this->be($user);
     $tv = $this->createTv();
-    $this->createReview([
+    $this->createItemUser([
       'user_id' => $user->id,
       'item_id' => $tv['item']->id
     ]);
@@ -60,7 +60,7 @@ class CalendarTest extends TestCase {
     $user = $this->createUser();
     $this->be($user);
     $tv = $this->createTv();
-    $this->createReview([
+    $this->createItemUser([
       'user_id' => $user->id,
       'item_id' => $tv['item']->id,
       'watchlist' => true
@@ -79,7 +79,7 @@ class CalendarTest extends TestCase {
     $user = $this->createUser();
     $this->be($user);
     $movie = $this->createMovie();
-    $this->createReview([
+    $this->createItemUser([
       'user_id' => $user->id,
       'item_id' => $movie->id
     ]);
@@ -107,7 +107,7 @@ class CalendarTest extends TestCase {
     $user = $this->createUser();
     $this->be($user);
     $movie = $this->createMovie();
-    $this->createReview([
+    $this->createItemUser([
       'user_id' => $user->id,
       'item_id' => $movie->id,
       'watchlist' => true
@@ -126,13 +126,13 @@ class CalendarTest extends TestCase {
     $user = $this->createUser();
     $this->be($user);
     $tv = $this->createTv();
-    $this->createReview([
+    $this->createItemUser([
       'user_id' => $user->id,
       'item_id' => $tv['item']->id,
       'watchlist' => true
     ]);
     $movie = $this->createMovie();
-    $this->createReview([
+    $this->createItemUser([
       'user_id' => $user->id,
       'item_id' => $movie->id,
       'watchlist' => false

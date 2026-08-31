@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Kra8\Snowflake\HasShortflakePrimary;
 
 class Review extends Model
@@ -15,32 +17,49 @@ class Review extends Model
     protected $table = 'reviews';
 
     protected $fillable = [
-        'user_id',
-        'item_id',
-        'content',
+        'item_user_id',
         'rating',
-        'watchlist',
+        'content'
     ];
 
-    protected $casts = [
-      'watchlist' => 'boolean'
-    ];
+    protected $with = ['user:users.id,users.username'];
 
-    protected $with = ['user'];
-
-    public function comments()
+    public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
 
-    public function item()
+    public function itemUser(): BelongsTo
     {
-        return $this->belongsTo(Item::class);
+        return $this->belongsTo(ItemUser::class);
     }
 
-    public function user()
+    public function user(): HasOneThrough
     {
-        return $this->belongsTo(User::class);
+        return $this->hasOneThrough(
+            User::class,
+            ItemUser::class,
+            'id', // item_user primary key
+            'id', // user primary key
+            'item_user_id',
+            'user_id'
+        )->select([
+            'users.id as user_id',
+            'users.username',
+            'item_user.id as item_user_id',
+        ]);
+    }
+
+    public function item(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            Item::class,
+            ItemUser::class,
+            'id',
+            'id',
+            'item_user_id',
+            'item_id'
+        );
     }
 
     /**
@@ -48,18 +67,11 @@ class Review extends Model
      *
      * @return Review
      */
-    public function store(int $userId, int $itemId, array $reviewData)
+    public function store(int $userId, int $itemUserId, array $reviewData): self
     {
         return $this->updateOrCreate(
-            ['user_id' => $userId, 'item_id' => $itemId],
+            ['user_id' => $userId, 'item_user_id' => $itemUserId],
             $reviewData
         );
-    }
-
-    public function updateLastActivityAt(int $tmdbId): int
-    {
-      // @TODO Episode Model should have a item_id column to avoid this Item pivot query
-      $itemId = DB::table('items')->select('id')->where('tmdb_id', $tmdbId)->first()->id;
-      return $this->where('item_id', $itemId)->touch();
     }
 }

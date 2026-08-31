@@ -9,10 +9,10 @@ class ItemResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $reviews = (new ReviewCollection($this->review))->toArray($request);
+        $reviews = (new ReviewCollection($this->reviews))->toArray($request);
 
         $data = parent::toArray($request);
-        $data['review'] = $reviews;
+        $data['reviews'] = $reviews;
         return $data;
     }
 }

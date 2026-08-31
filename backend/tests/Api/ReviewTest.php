@@ -4,10 +4,12 @@ namespace Tests\Api;
 
 use App\Jobs\ReviewSendActivities;
 use App\Models\Item;
+use App\Models\ItemUser;
 use App\Models\Profile;
 use App\Models\Review;
 use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ItemService;
+use App\Services\Models\ItemUserService;
 use App\Services\Models\ProfileService;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -55,6 +57,7 @@ class ReviewTest extends TestCase {
     {
       $this->postJson('api/review', [
         'itemId' => 1,
+        'rating' => 1,
         'content' => 'Lorem ipsum.'
       ])->assertStatus(401);
     }
@@ -63,8 +66,9 @@ class ReviewTest extends TestCase {
     public function shouldFailOnPostingAReviewWithoutItemId()
     {
       $this->actingAs($this->user)->postJson('api/review', [
+        'rating' => 1,
         'content' => 'Lorem ipsum.'
-      ])->assertStatus(400);
+      ])->assertStatus(422);
     }
 
     #[Test]
@@ -73,13 +77,14 @@ class ReviewTest extends TestCase {
       Queue::fake();
       $this->addFollower();
       $movie = $this->mockItem();
-      $this->actingAs($this->user)->postJson('api/review', [
+      $response = $this->actingAs($this->user)->postJson('api/review', [
         'itemId' => $movie->id,
+        'rating' => 1,
         'content' => 'Lorem ipsum.'
       ])->assertStatus(200);
       Queue::assertPushed(ReviewSendActivities::class);
       $this->assertDatabaseHas('reviews', [
-        'item_id' => $movie->id,
+        'id' => $response->json()['reviewId'],
         'content' => 'Lorem ipsum.',
       ]);
     }
@@ -92,61 +97,66 @@ class ReviewTest extends TestCase {
       $movie = $this->mockItem();
       $this->actingAs($this->user)->postJson('api/review', [
         'itemId' => $movie->id,
+        'rating' => 1,
         'content' => 'Lorem ipsum.'
       ])->assertStatus(200);
-      $review = $this->actingAs($this->user)->postJson('api/review', [
+      $result = $this->actingAs($this->user)->postJson('api/review', [
         'itemId' => $movie->id,
+        'rating' => 1,
         'content' => 'Lorem ipsum dolor.'
       ])->assertStatus(200);
       Queue::assertPushed(ReviewSendActivities::class);
       $this->assertDatabaseHas('reviews', [
-        'user_id' => $this->user->id,
+        'id' => $result->json()['reviewId'],
+        'rating' => 1,
         'content' => 'Lorem ipsum dolor.',
       ]);
     }
 
     #[Test]
-    public function itShouldFailAtChangingOtherUserRating(): void
-    {
-      $movie = $this->createMovie();
-      $review = $this->createReview([
-        'user_id' => $this->user->id,
-        'item_id' => $movie->id
-      ]);
-      $user2 = $this->createUser();
-
-      $this->actingAs($user2)->patchJson('api/review/change-rating/' . $review->id, [
-        'rating' => 2
-      ])->assertStatus(404);
-    }
-
-    #[Test]
-    public function itShouldNotChangeRatingOnReviewPost(): void
+    public function itShouldNotChangeItemUserRatingOnReviewPost(): void
     {
       $this->actingAs($this->user);
       $item = $this->mockItem();
-      $this->postJson('api/review', [
+      $itemUserRating = 1;
+      $this->createItemUser([
+          'user_id' => $this->user->id,
+          'item_id' => $item->id,
+          'rating' => $itemUserRating
+      ]);
+
+      $reviewResponse = $this->postJson('api/review', [
         'itemId' => $item->id,
+        'rating' => 1,
         'content' => 'Lorem ipsum.'
       ]);
+      $reviewResponse->assertStatus(200);
+
       $reviews = Review::query()->get();
       $this->assertEquals(1, $reviews->count());
       $review = $reviews->first();
 
       $updatedRating = 1;
 
-      $this->patchJson('api/review/change-rating/' . $review->id, [
+      $this->patchJson('api/item/change-rating/' . $item->id, [
         'rating' => $updatedRating
       ]);
-      $changedRatingReview = Review::find($review->id);
-      $this->postJson('api/review', [
-        'itemId' => $item->id,
+
+      $itemUser = ItemUser::find($item->id);
+      $this->assertEquals($updatedRating, $itemUser->rating);
+    }
+
+    #[Test]
+    public function shouldNotBeAbleToPostAReviewBeforeItemUserAdded(): void
+    {
+      $this->actingAs($this->user);
+
+      $reviewResponse = $this->postJson('api/review', [
+        'itemId' => 1,
+        'rating' => 1,
         'content' => 'Lorem ipsum.'
       ]);
-
-      $updatedReview = Review::find($review->id);
-
-      $this->assertEquals($updatedRating, $updatedReview->rating);
+      $reviewResponse->assertStatus(500);
     }
 
     private function mockItem(): Item
@@ -159,6 +169,12 @@ class ReviewTest extends TestCase {
         );
         $itemService = app(ItemService::class);
         return $itemService->create($movieFixture['tmdb_id'], $movieFixture['media_type'], $this->user->id);
+    }
+
+    private function mockItemUser(Item $item, int $userId): ItemUser
+    {
+        $itemUserService = app(ItemUserService::class);
+        return $itemUserService->create($item, $userId);
     }
 
     private function getHeaders(string $dataStr): array

@@ -2,8 +2,9 @@
 
   namespace Tests\Services;
 
+  use App\Enums\MediaTypeEnum;
+  use App\Models\User;
   use Illuminate\Foundation\Testing\DatabaseTransactions;
-  use Illuminate\Support\Facades\DB;
   use PHPUnit\Framework\Attributes\Test;
   use Tests\TestCase;
   use App\Models\Item;
@@ -21,6 +22,7 @@
 
     private $item;
     private $itemService;
+    private User $user;
 
     public function setUp(): void
     {
@@ -29,16 +31,17 @@
       $this->item = app(Item::class);
       $this->itemService = app(ItemService::class);
 
+      $this->user = $this->createUser();
+
       $this->createStorageDownloadsMock();
       $this->createImdbRatingMock();
     }
 
     private function createItem(array $data): Item
     {
-      $userId = 1;
       $this->createReviewServiceMock();
       $itemService = app(ItemService::class);
-      return $itemService->create($data['tmdb_id'], $data['media_type'], $userId);
+      return $itemService->create($data['tmdb_id'], $data['media_type'], $this->user->id);
     }
 
     #[Test]
@@ -130,19 +133,6 @@
     }
 
     #[Test]
-    public function it_should_remove_a_item()
-    {
-      $this->createMovie();
-
-      $item1 = $this->item->find(1);
-      $this->itemService->remove(1);
-      $item2 = $this->item->find(1);
-
-      $this->assertNotNull($item1);
-      $this->assertNull($item2);
-    }
-
-    #[Test]
     public function it_should_parse_correct_imdb_id()
     {
       $idMovie = $this->itemService->parseImdbId(json_decode($this->tmdbFixtures('movie/details')));
@@ -165,14 +155,14 @@
       $fixtureMovie = json_decode($this->tmdbFixtures('movie/details'));
       $fixtureTv = json_decode($this->tmdbFixtures('tv/details'));
 
-      $foundInDetailsMovie = $itemService->parseYoutubeKey($fixtureMovie, 'movie');
-      $foundInDetailsTv = $itemService->parseYoutubeKey($fixtureTv, 'tv');
+      $foundInDetailsMovie = $itemService->parseYoutubeKey($fixtureMovie, MediaTypeEnum::from('movie'));
+      $foundInDetailsTv = $itemService->parseYoutubeKey($fixtureTv, MediaTypeEnum::from('tv'));
 
       $fixtureMovie->videos->results = null;
       $fixtureTv->videos->results = null;
 
-      $fallBackMovie = $itemService->parseYoutubeKey($fixtureMovie, 'movie');
-      $fallBackTv = $itemService->parseYoutubeKey($fixtureMovie, 'tv');
+      $fallBackMovie = $itemService->parseYoutubeKey($fixtureMovie, MediaTypeEnum::from('movie'));
+      $fallBackTv = $itemService->parseYoutubeKey($fixtureMovie, MediaTypeEnum::from('tv'));
 
       $this->assertEquals('2Rxoz13Bthc', $foundInDetailsMovie);
       $this->assertEquals('BpJYNVhGf1s', $foundInDetailsTv);

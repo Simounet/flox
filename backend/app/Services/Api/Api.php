@@ -5,13 +5,13 @@ namespace App\Services\Api;
 use App\Enums\MediaTypeEnum;
 use App\Enums\StatusEnum;
 use App\Models\Episode;
-use App\Models\EpisodeUser;
 use App\Models\Item;
-use App\Models\Review;
+use App\Models\ItemUser;
+use App\Services\Models\EpisodeUserService;
 use App\Services\Models\ItemService;
 use App\Services\TMDB;
+use App\ValueObjects\EpisodeUserValueObject;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpFoundation\Response;
 
 abstract class Api
 {
@@ -21,33 +21,13 @@ abstract class Api
    */
   protected $data = [];
 
-  /**
-   * @var Item
-   */
-  private $item;
-
-  /**
-   * @var TMDB
-   */
-  private $tmdb;
-
-  /**
-   * @var ItemService
-   */
-  private $itemService;
-
-  /**
-   * @var Episode
-   */
-  private $episode;
-
-  public function __construct(Item $item, TMDB $tmdb, ItemService $itemService, Episode $episode)
-  {
-    $this->item = $item;
-    $this->tmdb = $tmdb;
-    $this->itemService = $itemService;
-    $this->episode = $episode;
-  }
+  public function __construct(
+    private Item $item,
+    private TMDB $tmdb,
+    private ItemService $itemService,
+    private EpisodeUserService $episodeUserService,
+    private Episode $episode)
+  {}
 
   public function handle(array $data): StatusEnum
   {
@@ -72,13 +52,13 @@ abstract class Api
       }
     }
 
-    $review = Review::firstOrCreate([
+    $itemUser = ItemUser::firstOrCreate([
       'user_id' => $user->id,
       'item_id' => $item->id
     ], ['rating' => 0]);
 
     if ($this->shouldRateItem()) {
-      $review
+      $itemUser
         ->update([
           'rating' => $this->getRating(),
         ]);
@@ -92,13 +72,8 @@ abstract class Api
         ->first();
 
       if ($episode) {
-        $episodeUser = EpisodeUser::firstOrCreate([
-          'user_id' => $user->id,
-          'episode_id' => $episode->id
-        ]);
-        if($episodeUser->wasRecentlyCreated === true) {
-          $review->touch();
-        }
+        $episodeUserValueObject = new EpisodeUserValueObject(Auth::id(), $episode->id);
+        $this->episodeUserService->markEpisodeAsSeen($episode, $episodeUserValueObject);
       }
     }
 

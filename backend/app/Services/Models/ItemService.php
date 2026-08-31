@@ -5,7 +5,6 @@
   use App\Enums\MediaTypeEnum;
   use App\Models\Genre;
   use App\Models\Item;
-  use App\Models\Review;
   use App\Services\IMDB;
   use App\Services\Storage;
   use App\Services\Models\PersonService;
@@ -13,7 +12,6 @@
   use App\Jobs\UpdateItem;
   use App\Models\Setting;
   use Carbon\Carbon;
-  use Illuminate\Database\Eloquent\Builder;
   use Illuminate\Support\Facades\Auth;
   use Illuminate\Support\Facades\DB;
   use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +28,7 @@
     private $genreService;
     private $personService;
     private $reviewService;
+    private $itemUserService;
 
     /**
      * @param Item $item
@@ -41,6 +40,8 @@
      * @param IMDB $imdb
      * @param Setting $setting
      * @param PersonService $personService
+     * @param ReviewService $reviewService
+     * @param ItemUserService $itemUserService
      */
     public function __construct(
       Item $item,
@@ -52,7 +53,8 @@
       IMDB $imdb,
       Setting $setting,
       PersonService $personService,
-      ReviewService $reviewService
+      ReviewService $reviewService,
+      ItemUserService $itemUserService
     ){
       $this->item = $item;
       $this->tmdb = $tmdb;
@@ -64,6 +66,7 @@
       $this->genreService = $genreService;
       $this->personService = $personService;
       $this->reviewService = $reviewService;
+      $this->itemUserService = $itemUserService;
     }
 
     /**
@@ -79,10 +82,23 @@
       DB::beginTransaction();
       $mediaType = MediaTypeEnum::from($mediaTypeStr);
       $item = $this->createItemInfoIfNotExists($tmdbId, $mediaType);
-      $this->reviewService->create($item, $userId);
+      $this->itemUserService->create($item, $userId);
       DB::commit();
 
       return $item->fresh();
+    }
+
+    public function remove(
+        int $itemId,
+        $userId
+    ): bool
+    {
+      DB::beginTransaction();
+      $this->itemUserService->remove($itemId, $userId);
+      $item = Item::find($itemId)->delete();
+      DB::commit();
+
+      return $item;
     }
 
     public function createItemInfoIfNotExists(int $tmdbId, MediaTypeEnum $mediaType): Item
@@ -151,7 +167,7 @@
       // @todo facto
       $data['original_title'] = $details->original_name ?? $details->original_title;
       $data['imdb_id'] = $this->parseImdbId($details);
-      $data['youtube_key'] = $this->parseYoutubeKey($details, $mediaType->value);
+      $data['youtube_key'] = $this->parseYoutubeKey($details, $mediaType);
       $data['overview'] = $details->overview;
       $data['tmdb_rating'] = $details->vote_average;
       $data['backdrop'] = $details->backdrop_path;
@@ -199,7 +215,7 @@
 
       $item = $this->item->findOrFail($itemId);
 
-      $details = $this->tmdb->details($item->tmdb_id, MediaTypeEnum::from($item->media_type));
+      $details = $this->tmdb->details($item->tmdb_id, $item->media_type);
 
       $title = $details->name ?? ($details->title ?? null);
 
@@ -289,14 +305,14 @@
      * @param $mediaType
      * @return string|null
      */
-    public function parseYoutubeKey($details, $mediaType)
+    public function parseYoutubeKey(object $details, MediaTypeEnum $mediaType)
     {
       if(isset($details->videos->results[0])) {
         return $details->videos->results[0]->key;
       }
 
       // Try to fetch details again with english language as fallback.
-      $videos = $this->tmdb->videos($details->id, MediaTypeEnum::from($mediaType), 'en');
+      $videos = $this->tmdb->videos($details->id, $mediaType, 'en');
 
       return $videos->results[0]->key ?? null;
     }
@@ -320,31 +336,6 @@
     }
 
     /**
-     * Delete movie or tv show (with episodes and alternative titles).
-     * Also remove the poster image file.
-     *
-     * @param $itemId
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
-     */
-    public function remove($itemId)
-    {
-      $item = $this->item->find($itemId);
-
-      if( ! $item) {
-        return response('Not Found', Response::HTTP_NOT_FOUND);
-      }
-
-      $tmdbId = $item->tmdb_id;
-
-      $item->delete();
-
-      // Delete all related episodes, alternative titles and images.
-      $this->episodeService->remove($tmdbId);
-      $this->alternativeTitleService->remove($tmdbId);
-      $this->storage->removeImages($item->poster, $item->backdrop);
-    }
-
-    /**
      * Return all items with pagination.
      *
      * @param $type
@@ -357,15 +348,15 @@
       $filter = $this->getSortFilter($orderBy);
 
       $items = Item::orderBy($filter, $sortDirection)
-        ->with('latestEpisode', 'review', 'userReview')
+        ->with('latestEpisode', 'itemUser')
         ->withCount('episodesWithSrc')
         ->where('user_id', Auth::id())
-        ->whereHas('userReview');
+        ->whereHas('itemUser');
 
       if($type == 'watchlist') {
-        $items->findByReviewWatchlist(1);
+        $items->findByItemUserWatchlist(1);
       } elseif( ! $this->setting->first()->show_watchlist_everywhere) {
-        $items->findByReviewWatchlist(0);
+        $items->findByItemUserWatchlist(0);
       }
 
       if($type == 'tv' || $type == 'movie') {
@@ -442,7 +433,7 @@
         case 'tmdb_id':
           return $this->item->findByTmdbId($value)->with('latestEpisode')->first();
         case 'tmdb_id_strict':
-          return $this->item->findByTmdbIdStrict($value, $mediaType)->with('creditCast', 'creditCrew', 'latestEpisode', 'review', 'userReview')->first();
+          return $this->item->findByTmdbIdStrict($value, $mediaType)->with('creditCast', 'creditCrew', 'latestEpisode', 'itemUser', 'reviews')->first();
         case 'src':
           return $this->item->findBySrc($value)->first();
       }
@@ -460,9 +451,9 @@
     {
       switch($orderBy) {
         case 'last seen':
-          return 'reviews.updated_at';
+          return 'item_user.updated_at';
         case 'own rating':
-          return 'reviews.rating';
+          return 'item_user.rating';
         case 'title':
           return 'title';
         case 'release':

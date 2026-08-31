@@ -1,8 +1,8 @@
 <template>
   <div>
     <UserReview
+      :v-if="userReview"
       :review="userReview"
-      :itemId="itemId"
     />
     <ReviewList
       v-if="filteredReviews.length > 0"
@@ -19,7 +19,7 @@
   export default {
     mixins: [MiscHelper],
 
-    props: ['itemId', 'reviews'],
+    props: ['reviews'],
 
     data() {
       return {
@@ -29,7 +29,7 @@
 
     computed: {
       userReview() {
-        const userReviews = this.reviews.filter(review => review.user.user_id === this.auth);
+        const userReviews = this.reviews.filter(review => review.user.id === this.auth);
         if(userReviews.length === 1) {
             return userReviews[0];
         }
@@ -41,7 +41,7 @@
 
       filteredReviews() {
         return this.auth ?
-            this.reviews.filter(review => review.user.user_id !== this.auth) : this.reviews;
+            this.reviews.filter(review => review.user.id !== this.auth) : this.reviews;
       }
     },
 

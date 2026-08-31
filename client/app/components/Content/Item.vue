@@ -12,7 +12,7 @@
           <router-link :title="lang('suggestions')" :to="suggestionsUri(localItem)" v-if="localItem.tmdb_id" class="has-suggestion">
             <i class="icon-suggest"></i>
           </router-link>
-          <span class="is-on-watchlist" :title="lang('add to watchlist')" v-if="auth && localItem.user_review === null && ! rated" @click="addToWatchlist(localItem)">
+          <span class="is-on-watchlist" :title="lang('add to watchlist')" v-if="auth && localItem.item_user === null && ! rated" @click="addToWatchlist(localItem)">
             <i class="icon-watchlist"></i>
           </span>
           <span class="is-on-watchlist" :title="lang('remove from watchlist')" v-if="auth && localItem.watchlist && ! rated" @click="removeItem()">
@@ -84,7 +84,7 @@
       },
 
       poster() {
-        if(this.localItem.user_review !== null && this.localItem.user_review.rating) {
+        if(this.localItem.item_user !== null && this.localItem.item_user.rating) {
           return config.poster + this.localItem.poster;
         }
 
@@ -124,7 +124,7 @@
 
         http.delete(`${config.api}/remove/${this.localItem.id}`).then(response => {
           this.rated = false;
-          this.localItem.user_review = null;
+          this.localItem.item_user = null;
         }, error => {
           alert(error);
           this.rated = false;
