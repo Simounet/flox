@@ -211,6 +211,11 @@ class HttpSignature {
             $this->log('[' . self::class . '] keyId actor does not match message actor: ' . ($actor->id ?? 'null') . ' !== ' . ($message['actor'] ?? 'null'));
             return false;
         }
+
+        if(($actor->publicKey['id'] ?? null) !== $keyId) {
+            $this->log('[' . self::class . '] keyId does not belong to the resolved actor: ' . $keyId . ' !== ' . ($actor->publicKey['id'] ?? 'null'));
+            return false;
+        }
         $pkey = openssl_pkey_get_public($actor->publicKey['publicKeyPem']);
         if(!$pkey) {
             $this->log('[' . self::class . '] Wrong public key pem');

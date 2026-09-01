@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Services\Fediverse;
 
+use ActivityPhp\Type\Extended\Actor\Person;
 use App\Services\Fediverse\HttpSignature;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use ReflectionMethod;
+use Symfony\Component\HttpFoundation\HeaderBag;
 use Tests\TestCase;
 
 class HttpSignatureTest extends TestCase
@@ -103,6 +105,55 @@ class HttpSignatureTest extends TestCase
         $this->assertNotSame(1, $verified);
     }
 
+    #[Test]
+    public function it_should_verify_a_delete_request_signed_with_the_actors_own_key(): void
+    {
+        $keyPair = $this->generateKeyPair();
+        $profileUrl = 'https://93.184.216.34/users/alice';
+        $keyId = $profileUrl . '#main-key';
+
+        [$headers] = $this->signedRequest($keyPair['privateKey'], $keyId, 'post', '/users/alice/inbox');
+
+        $actor = new Person();
+        $actor->set('id', $profileUrl);
+        $actor->set('publicKey', ['id' => $keyId, 'publicKeyPem' => $keyPair['publicKeyPem']]);
+
+        $payload = json_encode([
+            'id' => $profileUrl . '#delete/1',
+            'actor' => $profileUrl,
+            'object' => $profileUrl,
+        ]);
+
+        $verified = $this->httpSignature->verifySignature('post', '/users/alice/inbox', $headers, $payload, $actor);
+
+        $this->assertTrue($verified);
+    }
+
+    #[Test]
+    public function it_should_reject_a_delete_request_signed_with_a_different_keyid_on_the_same_domain(): void
+    {
+        $keyPair = $this->generateKeyPair();
+        $profileUrl = 'https://93.184.216.34/users/alice';
+        $actorsOwnKeyId = $profileUrl . '#main-key';
+        $claimedKeyId = $profileUrl . '#other-key';
+
+        [$headers] = $this->signedRequest($keyPair['privateKey'], $claimedKeyId, 'post', '/users/alice/inbox');
+
+        $actor = new Person();
+        $actor->set('id', $profileUrl);
+        $actor->set('publicKey', ['id' => $actorsOwnKeyId, 'publicKeyPem' => $keyPair['publicKeyPem']]);
+
+        $payload = json_encode([
+            'id' => $profileUrl . '#delete/1',
+            'actor' => $profileUrl,
+            'object' => $profileUrl,
+        ]);
+
+        $verified = $this->httpSignature->verifySignature('post', '/users/alice/inbox', $headers, $payload, $actor);
+
+        $this->assertFalse($verified);
+    }
+
     private function validateUrl(string $url): string|false
     {
         $method = new ReflectionMethod(HttpSignature::class, 'validateUrl');
@@ -155,4 +206,38 @@ class HttpSignatureTest extends TestCase
 
         return [$publicKey, base64_encode($signature), $inputHeaders];
     }
+
+    /**
+     * @return array{privateKey: \OpenSSLAsymmetricKey, publicKeyPem: string}
+     */
+    private function generateKeyPair(): array
+    {
+        $keyPair = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA]);
+        $privateKey = openssl_pkey_get_private($keyPair);
+        $details = openssl_pkey_get_details($keyPair);
+
+        return ['privateKey' => $privateKey, 'publicKeyPem' => $details['key']];
+    }
+
+    private function signedRequest(
+        \OpenSSLAsymmetricKey $privateKey,
+        string $keyId,
+        string $method,
+        string $path
+    ): array {
+        $date = gmdate('D, d M Y H:i:s \G\M\T');
+        $signingString = "(request-target): {$method} {$path}\ndate: {$date}";
+        openssl_sign($signingString, $signature, $privateKey, OPENSSL_ALGO_SHA256);
+
+        $signatureHeader = 'keyId="' . $keyId . '",headers="(request-target) date",'
+            . 'algorithm="rsa-sha256",signature="' . base64_encode($signature) . '"';
+
+        $headers = new HeaderBag([
+            'signature' => $signatureHeader,
+            'date' => $date,
+        ]);
+
+        return [$headers, $date];
+    }
+
 }
