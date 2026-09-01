@@ -201,9 +201,14 @@ class HttpSignature {
             $this->log('[' . self::class . '] Missing or not equalse keyDomain: ' . $keyDomain . ' - idDomain: ' . $idDomain);
             return false;
         }
-        $actor = is_object($actor) ? $actor : (new ActivityPubFetchService())->get($message['actor']);
+        $actor = is_object($actor) ? $actor : (new ActivityPubFetchService())->get($keyId);
         if(!$actor) {
             $this->log('[' . self::class . '] Wrong actor');
+            return false;
+        }
+
+        if(($actor->id ?? null) !== ($message['actor'] ?? null)) {
+            $this->log('[' . self::class . '] keyId actor does not match message actor: ' . ($actor->id ?? 'null') . ' !== ' . ($message['actor'] ?? 'null'));
             return false;
         }
         $pkey = openssl_pkey_get_public($actor->publicKey['publicKeyPem']);
