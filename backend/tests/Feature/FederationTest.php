@@ -15,6 +15,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use App\Models\Review;
@@ -56,6 +57,29 @@ class FederationTest extends TestCase
             $this->remoteProfile->remote_url => Http::response(file_get_contents(__DIR__ . '/../_Fixtures/fediverse-fake-user/actor.json')),
             $this->remoteProfile->shared_inbox_url => Http::response('', 202)
         ]);
+    }
+
+    #[Test]
+    public function shouldNotLogRawSignatureOrDigestHeaders(): void
+    {
+        $dataStr = '{"@context":"https://www.w3.org/ns/activitystreams","id":"https://fediverse.tld/c5a8e80d-eeba-4f1f-827a-e759687881cc","type":"Follow","actor":"' . $this->remoteProfile->remote_url . '","object":"' . $this->profile->remote_url . '"}';
+        $headers = $this->getHeaders($dataStr);
+        $data = (array) json_decode($dataStr);
+
+        $loggedMessages = [];
+        Log::listen(function ($event) use (&$loggedMessages) {
+            $loggedMessages[] = $event->message . json_encode($event->context);
+        });
+
+        $this->postJson($this->profile->shared_inbox_url, $data, $headers);
+
+        $signatureValue = $headers['Signature'];
+        $digestValue = $headers['Digest'];
+
+        foreach ($loggedMessages as $loggedMessage) {
+            $this->assertStringNotContainsString($signatureValue, $loggedMessage);
+            $this->assertStringNotContainsString($digestValue, $loggedMessage);
+        }
     }
 
     #[Test]

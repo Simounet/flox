@@ -151,7 +151,7 @@ class HttpSignature {
         }
 
         $signature = $headers->get('signature', null);
-        $this->log('[' . self::class . '] signature: ' . $signature);
+        $this->log('[' . self::class . '] signature present: ' . ($signature ? 'yes' : 'no'));
         if(!$signature) {
             $this->log('[' . self::class . '] No signature provided on request');
             return false;
@@ -284,13 +284,27 @@ class HttpSignature {
             }
         }
         $signingString = self::headersToSigningString($headersToSign);
-        $this->log('[' . self::class . '] verify signatureData: ' . json_encode($signatureData, JSON_UNESCAPED_SLASHES));
-        $this->log('[' . self::class . '] verify inputHeader: ' . json_encode($inputHeaders, JSON_UNESCAPED_SLASHES));
-        $this->log('[' . self::class . '] verify signing string: ' . $signingString);
+        $this->log('[' . self::class . '] verify signatureData: ' . json_encode($this->redactSensitive($signatureData), JSON_UNESCAPED_SLASHES));
+        $this->log('[' . self::class . '] verify inputHeader: ' . json_encode($this->redactSensitive($inputHeaders), JSON_UNESCAPED_SLASHES));
 
         $verified = openssl_verify($signingString, base64_decode($signatureData['signature']), $publicKey, OPENSSL_ALGO_SHA256);
 
         return [$verified, $signingString];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function redactSensitive(array $data): array
+    {
+        foreach (['signature', 'digest'] as $sensitiveKey) {
+            if (isset($data[$sensitiveKey])) {
+                $data[$sensitiveKey] = '[redacted]';
+            }
+        }
+
+        return $data;
     }
 
     private function log(string $message): void

@@ -26,6 +26,7 @@ use App\Services\Fediverse\OutboxCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Response;
 
 class ActorController
@@ -154,7 +155,7 @@ class ActorController
     {
         $payload = $request->getContent();
         $headers = $request->headers;
-        Log::debug("[InboxRequestHeaders] " . (string) $headers);
+        Log::debug("[InboxRequestHeaders] " . json_encode($this->redactedHeaders($headers)));
         try {
             $actor = $deleteProfile !== null
                 ? (new ActorActivity())->actorObject($deleteProfile)
@@ -171,6 +172,21 @@ class ActorController
         }
 
         return null;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function redactedHeaders(HeaderBag $headers): array
+    {
+        $redacted = $headers->all();
+        foreach (['signature', 'digest'] as $sensitiveHeader) {
+            if (isset($redacted[$sensitiveHeader])) {
+                $redacted[$sensitiveHeader] = ['[redacted]'];
+            }
+        }
+
+        return $redacted;
     }
 
     private function handleCreateActivity(Create $activity, Request $request, $verifiedActor): JsonResponse
