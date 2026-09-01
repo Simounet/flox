@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Fediverse;
 
 use App\Exceptions\UrlValidationException;
-use App\Services\HelpersService;
+use App\Services\UrlService;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -133,7 +133,8 @@ class HttpSignature {
         string $path,
         HeaderBag $headers,
         string $payload,
-        $actor = false
+        $actor = false,
+        &$verifiedActor = null
     ): bool
     {
         $message = json_decode($payload, true, 8);
@@ -201,7 +202,7 @@ class HttpSignature {
             $this->log('[' . self::class . '] Missing or not equalse keyDomain: ' . $keyDomain . ' - idDomain: ' . $idDomain);
             return false;
         }
-        $actor = is_object($actor) ? $actor : (new ActivityPubFetchService())->get($keyId);
+        $actor = is_object($actor) ? $actor : (new ActivityPubFetchService())->get(strtok($keyId, '#'));
         if(!$actor) {
             $this->log('[' . self::class . '] Wrong actor');
             return false;
@@ -223,6 +224,9 @@ class HttpSignature {
         }
         list($verified, $headers) = $this->verify($pkey, $signatureData, $headers->all(), $method, $path, $payload);
         $this->log('[' . self::class . '] verified: ' . ($verified ? 'yes' : 'no' ));
+        if($verified === 1) {
+            $verifiedActor = $actor;
+        }
         return $verified === 1;
     }
 
@@ -238,7 +242,7 @@ class HttpSignature {
             }
 
             try {
-                (new HelpersService())->urlValidate($url);
+                (new UrlService())->validate($url);
             } catch(UrlValidationException $e) {
                 $this->log('[' . self::class . '] ' . $e->getMessage());
                 return false;

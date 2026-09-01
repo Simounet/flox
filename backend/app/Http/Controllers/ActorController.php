@@ -98,13 +98,14 @@ class ActorController
             }
         }
 
-        $signatureError = $this->verifyInboxSignature($request, $activity, $deleteProfile);
+        $verifiedActor = null;
+        $signatureError = $this->verifyInboxSignature($request, $activity, $deleteProfile, $verifiedActor);
         if ($signatureError instanceof JsonResponse) {
             return $signatureError;
         }
 
         return match ($activity::class) {
-            Create::class => $this->handleCreateActivity($activity, $request),
+            Create::class => $this->handleCreateActivity($activity, $request, $verifiedActor),
             Delete::class => $this->handleDeleteActivity($activity, $deleteProfile),
             Follow::class => $this->handleFollowActivity($activity),
             Undo::class => $this->handleUndoActivity($activity),
@@ -149,7 +150,7 @@ class ActorController
         return $profiles->first();
     }
 
-    private function verifyInboxSignature(Request $request, AbstractObject $activity, ?Profile $deleteProfile): ?JsonResponse
+    private function verifyInboxSignature(Request $request, AbstractObject $activity, ?Profile $deleteProfile, &$verifiedActor = null): ?JsonResponse
     {
         $payload = $request->getContent();
         $headers = $request->headers;
@@ -158,7 +159,7 @@ class ActorController
             $actor = $deleteProfile !== null
                 ? (new ActorActivity())->actorObject($deleteProfile)
                 : false;
-            $verifiedSignature = (new HttpSignature())->verifySignature($request->getMethod(), $request->getPathInfo(), $headers, $payload, $actor);
+            $verifiedSignature = (new HttpSignature())->verifySignature($request->getMethod(), $request->getPathInfo(), $headers, $payload, $actor, $verifiedActor);
         } catch(\Exception $e) {
             Log::error('[InboxActivity] Error: ' . $e->getMessage());
             return $this->httpFediverseResponse->get(Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -172,11 +173,11 @@ class ActorController
         return null;
     }
 
-    private function handleCreateActivity(Create $activity, Request $request): JsonResponse
+    private function handleCreateActivity(Create $activity, Request $request, $verifiedActor): JsonResponse
     {
         try {
             $createActivity = new CreateActivity();
-            $createActivity->activity($activity);
+            $createActivity->activity($activity, $verifiedActor);
             $this->logInvalidState("[InboxCreateResponse] Create activity: " . $activity::class, $request);
         } catch(\Exception $e) {
             switch($e->getMessage()) {

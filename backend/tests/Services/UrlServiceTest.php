@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace Tests\Services;
 
 use App\Exceptions\UrlValidationException;
-use App\Services\HelpersService;
+use App\Services\UrlService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class HelpersServiceTest extends TestCase
+class UrlServiceTest extends TestCase
 {
-    private HelpersService $helpersService;
+    private UrlService $urlService;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->helpersService = app(HelpersService::class);
+        $this->urlService = app(UrlService::class);
     }
 
     #[Test]
@@ -26,7 +26,7 @@ class HelpersServiceTest extends TestCase
     public function it_should_accept_valid_public_urls(string $url): void
     {
         $this->expectNotToPerformAssertions();
-        $this->helpersService->urlValidate($url);
+        $this->urlService->validate($url);
     }
 
     public static function validUrlProvider(): array
@@ -42,7 +42,7 @@ class HelpersServiceTest extends TestCase
     public function it_should_reject_invalid_or_unsafe_urls(string $url): void
     {
         $this->expectException(UrlValidationException::class);
-        $this->helpersService->urlValidate($url);
+        $this->urlService->validate($url);
     }
 
     public static function invalidUrlProvider(): array

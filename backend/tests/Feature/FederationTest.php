@@ -8,6 +8,7 @@ use App\Models\Comment;
 use App\Models\Follower;
 use App\Models\Item;
 use App\Models\Profile;
+use App\Services\IpService;
 use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ProfileService;
 use App\Models\User;
@@ -36,6 +37,13 @@ class FederationTest extends TestCase
         $this->withoutMiddleware(
             ThrottleRequests::class
         );
+
+        $this->app->bind(IpService::class, fn () => new class extends IpService {
+            public function hostToIps(string $host): array
+            {
+                return ['93.184.216.34'];
+            }
+        });
 
         $this->host = parse_url(env('APP_URL'))['host'];
         $this->withHeader('Host', $this->host);
