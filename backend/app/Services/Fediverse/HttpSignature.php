@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Fediverse;
 
+use App\Exceptions\UrlValidationException;
+use App\Services\HelpersService;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -220,30 +222,15 @@ class HttpSignature {
         $key = "helpers:url:valid:sha256-{$hash}";
 
         $valid = Cache::remember($key, 900, function() use($url) {
-            if(strtolower(mb_substr($url, 0, 8)) !== 'https://') {
+            if (!str_starts_with(strtolower($url), 'https://')) {
+                $this->log('[' . self::class . '] URL validation: wrong protocol ' . $url);
                 return false;
             }
 
-            if(substr_count($url, '://') !== 1) {
-                return false;
-            }
-
-            if(mb_substr($url, 0, 8) !== 'https://') {
-                $url = 'https://' . substr($url, 8);
-            }
-
-            $valid = filter_var($url, FILTER_VALIDATE_URL);
-
-            if(!$valid) {
-                return false;
-            }
-
-            $localhosts = [
-                '127.0.0.1', 'localhost', '::1'
-            ];
-            $host = parse_url($valid, PHP_URL_HOST);
-
-            if(in_array($host, $localhosts)) {
+            try {
+                (new HelpersService())->urlValidate($url);
+            } catch(UrlValidationException $e) {
+                $this->log('[' . self::class . '] ' . $e->getMessage());
                 return false;
             }
 
