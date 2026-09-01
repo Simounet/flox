@@ -11,21 +11,21 @@ class WebFingerService
 
     public function webFingerObject(array $resource): object
     {
-        $data = '{
-            "subject": "' . self::RESOURCE_PREFIX . $resource['username'] . '@' . $resource['domain'] . '",
-            "aliases": [' .
-                '"' . route('federation.user', ['username' => $resource['username']]) . '"' .
-            '],
-            "links": [
-                {
-                    "rel": "self",
-                    "type": "application/activity+json",
-                    "href": "' . route('federation.user', ['username' => $resource['username']]) . '"
-                }
-            ]
-        }';
+        $profileUrl = route('federation.user', ['username' => $resource['username']]);
 
-        return json_decode($data);
+        $data = [
+            'subject' => self::RESOURCE_PREFIX . $resource['username'] . '@' . $resource['domain'],
+            'aliases' => [$profileUrl],
+            'links' => [
+                [
+                    'rel' => 'self',
+                    'type' => 'application/activity+json',
+                    'href' => $profileUrl,
+                ],
+            ],
+        ];
+
+        return json_decode(json_encode($data));
     }
 
     public function resourceFromProfileUrl(string $url): array
