@@ -102,6 +102,12 @@ class HttpSignature {
             }
         }
 
+        if(!isset($signatureData['algorithm'])) {
+            return [
+                'error' => 'No algorithm was found in the signature header. Found: '.implode(', ', array_keys($signatureData))
+            ];
+        }
+
         if(!in_array(strtolower($signatureData['algorithm']), self::AUTHORIZED_ALGORITHMS)) {
             return [
                 'error' => 'Unsupported signature algorithm (only ' . implode(',', self::AUTHORIZED_ALGORITHMS) . ' are supported). Found: ' . $signatureData['algorithm']

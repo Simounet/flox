@@ -106,6 +106,26 @@ class HttpSignatureTest extends TestCase
     }
 
     #[Test]
+    public function it_should_error_cleanly_when_algorithm_is_missing(): void
+    {
+        $result = $this->httpSignature->parseSignatureHeader(
+            'keyId="https://example.com/users/alice#main-key",headers="(request-target) date",signature="abc123"'
+        );
+
+        $this->assertArrayHasKey('error', $result);
+    }
+
+    #[Test]
+    public function it_should_error_cleanly_when_algorithm_is_unsupported(): void
+    {
+        $result = $this->httpSignature->parseSignatureHeader(
+            'keyId="https://example.com/users/alice#main-key",algorithm="hs2019",headers="(request-target) date",signature="abc123"'
+        );
+
+        $this->assertArrayHasKey('error', $result);
+    }
+
+    #[Test]
     public function it_should_verify_a_delete_request_signed_with_the_actors_own_key(): void
     {
         $keyPair = $this->generateKeyPair();
