@@ -21,6 +21,7 @@ use App\Services\Fediverse\FollowingCollection;
 use App\Services\Fediverse\FollowersCollection;
 use App\Services\Fediverse\HttpFediverseResponse;
 use App\Services\Fediverse\HttpSignature;
+use App\Services\Fediverse\OutboxCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -211,10 +212,21 @@ class ActorController
 
     }
 
-    public function outbox(): JsonResponse
-    {
-        return $this->httpFediverseResponse->get(Response::HTTP_NOT_IMPLEMENTED);
-    }
+     public function outbox(string $username): JsonResponse
+     {
+         abort_if(config('flox.federation.enabled') === false, 404);
+
+         $profileBuilder = Profile::where('username', $username);
+         switch($profileBuilder->count()) {
+             case 0:
+                 return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
+             case 1:
+                 $outbox = (new OutboxCollection())->get($profileBuilder->first());
+                 return $this->httpFediverseResponse->get(Response::HTTP_OK, $outbox->toArray());
+             default:
+                 return $this->httpFediverseResponse->get(Response::HTTP_INTERNAL_SERVER_ERROR);
+         }
+     }
 
     public function sharedInbox(Request $request): JsonResponse
     {
