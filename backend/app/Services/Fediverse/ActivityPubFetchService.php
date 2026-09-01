@@ -28,7 +28,7 @@ class ActivityPubFetchService
                 ->timeout(30)
                 ->connectTimeout(5)
                 ->retry(3, 500, function (\Exception $exception) {
-                    if($exception->response->status() === 410) {
+                    if($exception instanceof RequestException && $exception->response->status() === 410) {
                         return false;
                     }
                     return $exception instanceof ConnectionException;
