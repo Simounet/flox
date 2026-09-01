@@ -263,6 +263,9 @@ class HttpSignature {
                 $headersToSign[$h] = $digest;
             } elseif(isset($inputHeaders[$h][0])) {
                 $headersToSign[$h] = $inputHeaders[$h][0];
+            } else {
+                $this->log('[' . self::class . '] Header listed in signature but missing from request: ' . $h);
+                return [false, ''];
             }
         }
         $signingString = self::headersToSigningString($headersToSign);

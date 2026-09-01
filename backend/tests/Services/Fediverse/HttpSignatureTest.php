@@ -73,6 +73,36 @@ class HttpSignatureTest extends TestCase
         $this->assertSame($url, $this->validateUrl($url));
     }
 
+    #[Test]
+    public function it_should_verify_when_all_claimed_headers_are_present(): void
+    {
+        [$publicKey, $signature, $inputHeaders] = $this->makeSignedRequestKeyPair();
+
+        $signatureData = [
+            'headers' => '(request-target) date',
+            'signature' => $signature,
+        ];
+
+        [$verified] = $this->verify($publicKey, $signatureData, $inputHeaders, 'post', '/inbox', '');
+
+        $this->assertSame(1, $verified);
+    }
+
+    #[Test]
+    public function it_should_fail_closed_when_a_claimed_header_is_missing_from_the_request(): void
+    {
+        [$publicKey, $signature, $inputHeaders] = $this->makeSignedRequestKeyPair();
+
+        $signatureData = [
+            'headers' => '(request-target) date x-custom',
+            'signature' => $signature,
+        ];
+
+        [$verified] = $this->verify($publicKey, $signatureData, $inputHeaders, 'post', '/inbox', '');
+
+        $this->assertNotSame(1, $verified);
+    }
+
     private function validateUrl(string $url): string|false
     {
         $method = new ReflectionMethod(HttpSignature::class, 'validateUrl');
@@ -81,4 +111,48 @@ class HttpSignatureTest extends TestCase
         return $method->invoke($this->httpSignature, $url);
     }
 
+    /**
+     * @return array{0: mixed, 1: string}
+     */
+    private function verify(
+        \OpenSSLAsymmetricKey $publicKey,
+        array $signatureData,
+        array $inputHeaders,
+        string $requestMethod,
+        string $path,
+        string $body
+    ): array {
+        $reflectionMethod = new ReflectionMethod(HttpSignature::class, 'verify');
+        $reflectionMethod->setAccessible(true);
+
+        return $reflectionMethod->invoke(
+            $this->httpSignature,
+            $publicKey,
+            $signatureData,
+            $inputHeaders,
+            $requestMethod,
+            $path,
+            $body
+        );
+    }
+
+    /**
+     * @return array{0: mixed, 1: string, 2: array<string, array<int, string>>}
+     */
+    private function makeSignedRequestKeyPair(): array
+    {
+        $keyPair = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA]);
+        $privateKey = openssl_pkey_get_private($keyPair);
+        $publicKeyDetails = openssl_pkey_get_details($keyPair);
+        $publicKey = openssl_pkey_get_public($publicKeyDetails['key']);
+
+        $signingString = "(request-target): post /inbox\ndate: Mon, 01 Sep 2026 00:00:00 GMT";
+        openssl_sign($signingString, $signature, $privateKey, OPENSSL_ALGO_SHA256);
+
+        $inputHeaders = [
+            'date' => ['Mon, 01 Sep 2026 00:00:00 GMT'],
+        ];
+
+        return [$publicKey, base64_encode($signature), $inputHeaders];
+    }
 }
