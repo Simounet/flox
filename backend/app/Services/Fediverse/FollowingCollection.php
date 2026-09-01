@@ -14,7 +14,6 @@ class FollowingCollection
         $following->set('@context', 'https://www.w3.org/ns/activitystreams');
         $following->set('id', $profile->following_url);
         $following->set('totalItems', $profile->following()->count());
-        echo '<pre>' . print_r( $following, true ) . '</pre>'; exit;
         return $following;
     }
 }

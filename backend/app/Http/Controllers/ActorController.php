@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use ActivityPhp\Type;
@@ -17,61 +19,67 @@ use App\Services\Fediverse\Activity\UndoActivity;
 use App\Services\Fediverse\Activity\FollowActivity;
 use App\Services\Fediverse\FollowingCollection;
 use App\Services\Fediverse\FollowersCollection;
+use App\Services\Fediverse\HttpFediverseResponse;
 use App\Services\Fediverse\HttpSignature;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class ActorController
 {
-    public function actor(string $username)
+    public function __construct(
+        private HttpFediverseResponse $httpFediverseResponse
+    ) {}
+
+    public function actor(string $username): JsonResponse
     {
         abort_if(config('flox.federation.enabled') === false, 404);
 
         $profile = (new Profile())->whereLocalProfile($username);
+        Log::debug('[ActorRequest] profile: ' . json_encode($profile));
         if($profile === null) {
-            return response('', 404);
+            return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
         }
-        $person = (new ActorActivity())->actorObject($profile);
+        $person = (new ActorActivity())->actorObject($profile)->toArray();
+        Log::debug('[ActorRequest] person: ' . json_encode($person));
 
-        return response()->json($person->toArray(), 200, [], JSON_UNESCAPED_SLASHES)
-            ->header('Access-Control-Allow-Origin', '*');
+        return $this->httpFediverseResponse->get(Response::HTTP_OK, $person);
     }
 
-    public function followers(string $username)
+    public function followers(string $username): JsonResponse
     {
         abort_if(config('flox.federation.enabled') === false, 404);
 
         $profileBuilder = Profile::where('username', $username);
         switch($profileBuilder->count()) {
             case 0:
-                return response('', 404);
+                return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
             case 1:
                 $followers = (new FollowersCollection())->get($profileBuilder->first());
-                return response()->json($followers->toArray(), 200, [], JSON_UNESCAPED_SLASHES)
-                    ->header('Access-Control-Allow-Origin', '*');
+                return $this->httpFediverseResponse->get(Response::HTTP_OK, $followers->toArray());
             default:
-                return response('', 500);
+                return $this->httpFediverseResponse->get(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function following(string $username)
+    public function following(string $username): JsonResponse
     {
         abort_if(config('flox.federation.enabled') === false, 404);
 
         $profileBuilder = Profile::where('username', $username);
         switch($profileBuilder->count()) {
             case 0:
-                return response('', 404);
+                return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
             case 1:
                 $followings = (new FollowingCollection())->get($profileBuilder->first());
-                return response()->json($followings->toArray(), 200, [], JSON_UNESCAPED_SLASHES)
-                    ->header('Access-Control-Allow-Origin', '*');
+                return $this->httpFediverseResponse->get(Response::HTTP_OK, $followings->toArray());
             default:
-                return response('', 500);
+                return $this->httpFediverseResponse->get(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function inbox(Request $request, string $username)
+    public function inbox(Request $request, string $username): JsonResponse
     {
         abort_if(config('flox.federation.enabled') === false, 404);
 
@@ -81,7 +89,7 @@ class ActorController
             TypeConfiguration::set('undefined_properties', 'ignore');
             $activity = Type::fromJson($payload);
         } catch(\Exception $e) {
-            return response('', 400);
+            return $this->httpFediverseResponse->get(Response::HTTP_BAD_REQUEST);
         }
         Log::debug("[InboxActivity] " . $activity::class . ': ' . $activity->toJson(JSON_UNESCAPED_SLASHES));
         $activityService = new ActivityService();
@@ -91,18 +99,17 @@ class ActorController
         try {
             $actor = false;
             if(Delete::class === $activity::class) {
-                if(!$activity->object || ($activity->object !== $activity->actor && $activity->object && !$this->isTombstone($activity))) {
+                $objectActivity = $activity->get('object');
+                if(!$objectActivity || ($objectActivity !== $activity->get('actor') && $objectActivity && !$this->isTombstone($activity))) {
                     $this->logInvalidState("[InboxActivity] " . $activity::class . ' invalid state', $request);
-                    return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
-                        ->header('Access-Control-Allow-Origin', '*');
+                    return $this->httpFediverseResponse->get(Response::HTTP_OK);
                 }
-                $remoteUrl = is_string($activity->object) ?
-                    $activity->object : $activity->actor;
+                $remoteUrl = is_string($objectActivity) ?
+                    $objectActivity : $activity->get('actor');
                 $profiles = Profile::where(['remote_url' => $remoteUrl]);
                 if(0 === $profiles->count()) {
                     Log::debug("[InboxActivity] " . $activity::class . ' unknown profile: ' . $remoteUrl);
-                    return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
-                        ->header('Access-Control-Allow-Origin', '*');
+                    return $this->httpFediverseResponse->get(Response::HTTP_OK);
                 } else {
                     $profile = $profiles->first();
                     $actor = (new ActorActivity())->actorObject($profile);
@@ -111,12 +118,12 @@ class ActorController
             $verifiedSignature = (new HttpSignature())->verifySignature($request->getMethod(),  $request->getPathInfo(), $headers, $payload, $actor);
         } catch(\Exception $e) {
             Log::error('[InboxActivity] Error: ' . $e->getMessage());
-            return response('', 500);
+            return $this->httpFediverseResponse->get(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         if(!$verifiedSignature) {
             Log::debug("[InboxActivity] Wrong signature");
-            return response('', 401);
+            return $this->httpFediverseResponse->get(Response::HTTP_UNAUTHORIZED);
         }
 
         switch($activity::class) {
@@ -129,34 +136,31 @@ class ActorController
                     switch($e->getMessage()) {
                         case $createActivity::ACTIVITY_MISSING_IN_REPLY_TO:
                             Log::debug("[InboxCreateResponse] Missing inReplyTo");
-                            return response()->json('', 400, [], JSON_UNESCAPED_SLASHES)
-                                ->header('Access-Control-Allow-Origin', '*');
+                            return $this->httpFediverseResponse->get(Response::HTTP_BAD_REQUEST);
                         case $createActivity::ACTIVITY_UNKNOWN_PROFILE:
                             Log::debug("[InboxCreateResponse] Unknown local profile");
-                            return response()->json('', 404, [], JSON_UNESCAPED_SLASHES)
-                                ->header('Access-Control-Allow-Origin', '*');
+                            return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
                         case $createActivity::ACTIVITY_UNKNOWN_REVIEW:
                             Log::debug("[InboxCreateResponse] Unknown review");
-                            return response()->json('', 404, [], JSON_UNESCAPED_SLASHES)
-                                ->header('Access-Control-Allow-Origin', '*');
+                            return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
                         default:
                             throw new \Exception($e);
                     }
                 }
-                return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
-                    ->header('Access-Control-Allow-Origin', '*');
+                return $this->httpFediverseResponse->get(Response::HTTP_OK);
 
             case Delete::class:
                 try {
+                    $objectActivity = $activity->get('object');
                     if($this->isTombstone($activity)) {
-                        Log::debug("[InboxDeleteResponseBefore] Deleted: " . json_encode($activity->get('object')));
+                        Log::debug("[InboxDeleteResponseBefore] Deleted: " . json_encode($objectActivity));
                         $deletedComment = Comment::where([
                             'profile_id' => $profile->id,
-                            'source_url' => $activity->object->id
+                            'source_url' => $objectActivity->id
                         ])->delete();
                         Log::debug("[InboxDeleteResponseAfter] Deleted: " . json_encode($deletedComment));
                     } else {
-                        Profile::where(['remote_url' => $activity->get('object')])->delete();
+                        Profile::where(['remote_url' => $objectActivity])->delete();
                     }
                 } catch(\Exception $e) {
                     switch($e->getMessage()) {
@@ -164,9 +168,8 @@ class ActorController
                             throw new \Exception($e);
                     }
                 }
-                Log::debug("[InboxDeleteResponse] Deleted: " . json_encode($activity->get('object')));
-                return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
-                    ->header('Access-Control-Allow-Origin', '*');
+                Log::debug("[InboxDeleteResponse] Deleted: " . json_encode($objectActivity));
+                return $this->httpFediverseResponse->get(Response::HTTP_OK);
             case Follow::class:
                 try {
                     $followActivity = new FollowActivity();
@@ -175,13 +178,12 @@ class ActorController
                     switch($e->getMessage()) {
                         case $activityService::ACTIVITY_WRONG_TARGET:
                             Log::debug("[InboxFollowResponse] Wrong target");
-                            return response('', 404);
+                            return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
                         default:
                             throw new \Exception($e);
                     }
                 }
-                return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
-                    ->header('Access-Control-Allow-Origin', '*');
+                return $this->httpFediverseResponse->get(Response::HTTP_OK);
             case Undo::class:
                 try {
                     $undoActivity = new UndoActivity();
@@ -190,33 +192,31 @@ class ActorController
                     switch($e->getMessage()) {
                         case $activityService::ACTIVITY_WRONG_TARGET:
                             Log::debug("[InboxUndoResponse] Wrong target");
-                            return response('', 404);
+                            return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
                         case $undoActivity::ACTIVITY_WRONG_OBJECT:
                             Log::debug("[InboxUndoResponse] Wrong object");
-                            return response('', 400);
+                            return $this->httpFediverseResponse->get(Response::HTTP_BAD_REQUEST);
                         case $undoActivity::ACTIVITY_UNKNOWN_FOLLOWER:
                             Log::debug("[InboxUndoResponse] Unknown follower");
-                            return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
-                                ->header('Access-Control-Allow-Origin', '*');
+                            return $this->httpFediverseResponse->get(Response::HTTP_OK);
                         default:
                             throw new \Exception($e);
                     }
                 }
-                return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
-                    ->header('Access-Control-Allow-Origin', '*');
+                return $this->httpFediverseResponse->get(Response::HTTP_OK);
             default:
                 $this->logInvalidState("[InboxDefaultResponse] Unknown activity: " . $activity::class, $request);
-                return response('', 501);
+                return $this->httpFediverseResponse->get(Response::HTTP_NOT_IMPLEMENTED);
         }
 
     }
 
-    public function outbox()
+    public function outbox(): JsonResponse
     {
-        return response('', 501);
+        return $this->httpFediverseResponse->get(Response::HTTP_NOT_IMPLEMENTED);
     }
 
-    public function sharedInbox(Request $request)
+    public function sharedInbox(Request $request): JsonResponse
     {
         abort_if(config('flox.federation.enabled') === false, 404);
 
@@ -231,6 +231,7 @@ class ActorController
 
     private function isTombstone(Delete $activity): bool
     {
-        return is_object($activity->object) && $activity->object->type === 'Tombstone';
+        $objectActivity = $activity->get('object');
+        return is_object($objectActivity) && $objectActivity->type === 'Tombstone';
     }
 }
