@@ -446,19 +446,14 @@
      */
     private function getSortFilter($orderBy): string
     {
-      switch($orderBy) {
-        case 'last seen':
-          return 'item_user.updated_at';
-        case 'own rating':
-          return 'item_user.rating';
-        case 'title':
-          return 'title';
-        case 'release':
-          return 'released';
-        case 'tmdb rating':
-          return 'tmdb_rating';
-        case 'imdb rating':
-          return 'imdb_rating';
-      }
+      return match($orderBy) {
+        'last seen' => 'item_user.updated_at',
+        'own rating' => 'item_user.rating',
+        'title' => 'title',
+        'release' => 'released',
+        'tmdb rating' => 'tmdb_rating',
+        'imdb rating' => 'imdb_rating',
+        default => '',
+      };
     }
   }
