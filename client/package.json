@@ -30,7 +30,7 @@
     "file-loader": "^6.2.0",
     "lost": "^9.0.1",
     "mini-css-extract-plugin": "^2.7.6",
-    "mjml": "^4.14.1",
+    "mjml": "^5.0.0",
     "postcss-loader": "^8.0.0",
     "sass": "^1.90.0",
     "sass-loader": "^16.0.5",
