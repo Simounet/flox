@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Fediverse;
 
+use App\Exceptions\UrlValidationException;
+use App\Services\UrlService;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -100,6 +102,12 @@ class HttpSignature {
             }
         }
 
+        if(!isset($signatureData['algorithm'])) {
+            return [
+                'error' => 'No algorithm was found in the signature header. Found: '.implode(', ', array_keys($signatureData))
+            ];
+        }
+
         if(!in_array(strtolower($signatureData['algorithm']), self::AUTHORIZED_ALGORITHMS)) {
             return [
                 'error' => 'Unsupported signature algorithm (only ' . implode(',', self::AUTHORIZED_ALGORITHMS) . ' are supported). Found: ' . $signatureData['algorithm']
@@ -131,7 +139,8 @@ class HttpSignature {
         string $path,
         HeaderBag $headers,
         string $payload,
-        $actor = false
+        $actor = false,
+        &$verifiedActor = null
     ): bool
     {
         $message = json_decode($payload, true, 8);
@@ -142,7 +151,7 @@ class HttpSignature {
         }
 
         $signature = $headers->get('signature', null);
-        $this->log('[' . self::class . '] signature: ' . $signature);
+        $this->log('[' . self::class . '] signature present: ' . ($signature ? 'yes' : 'no'));
         if(!$signature) {
             $this->log('[' . self::class . '] No signature provided on request');
             return false;
@@ -199,9 +208,19 @@ class HttpSignature {
             $this->log('[' . self::class . '] Missing or not equalse keyDomain: ' . $keyDomain . ' - idDomain: ' . $idDomain);
             return false;
         }
-        $actor = is_object($actor) ? $actor : (new ActivityPubFetchService())->get($message['actor']);
+        $actor = is_object($actor) ? $actor : (new ActivityPubFetchService())->get(strtok($keyId, '#'));
         if(!$actor) {
             $this->log('[' . self::class . '] Wrong actor');
+            return false;
+        }
+
+        if(($actor->id ?? null) !== ($message['actor'] ?? null)) {
+            $this->log('[' . self::class . '] keyId actor does not match message actor: ' . ($actor->id ?? 'null') . ' !== ' . ($message['actor'] ?? 'null'));
+            return false;
+        }
+
+        if(($actor->publicKey['id'] ?? null) !== $keyId) {
+            $this->log('[' . self::class . '] keyId does not belong to the resolved actor: ' . $keyId . ' !== ' . ($actor->publicKey['id'] ?? 'null'));
             return false;
         }
         $pkey = openssl_pkey_get_public($actor->publicKey['publicKeyPem']);
@@ -211,6 +230,9 @@ class HttpSignature {
         }
         list($verified, $headers) = $this->verify($pkey, $signatureData, $headers->all(), $method, $path, $payload);
         $this->log('[' . self::class . '] verified: ' . ($verified ? 'yes' : 'no' ));
+        if($verified === 1) {
+            $verifiedActor = $actor;
+        }
         return $verified === 1;
     }
 
@@ -220,30 +242,15 @@ class HttpSignature {
         $key = "helpers:url:valid:sha256-{$hash}";
 
         $valid = Cache::remember($key, 900, function() use($url) {
-            if(strtolower(mb_substr($url, 0, 8)) !== 'https://') {
+            if (!str_starts_with(strtolower($url), 'https://')) {
+                $this->log('[' . self::class . '] URL validation: wrong protocol ' . $url);
                 return false;
             }
 
-            if(substr_count($url, '://') !== 1) {
-                return false;
-            }
-
-            if(mb_substr($url, 0, 8) !== 'https://') {
-                $url = 'https://' . substr($url, 8);
-            }
-
-            $valid = filter_var($url, FILTER_VALIDATE_URL);
-
-            if(!$valid) {
-                return false;
-            }
-
-            $localhosts = [
-                '127.0.0.1', 'localhost', '::1'
-            ];
-            $host = parse_url($valid, PHP_URL_HOST);
-
-            if(in_array($host, $localhosts)) {
+            try {
+                (new UrlService())->validate($url);
+            } catch(UrlValidationException $e) {
+                $this->log('[' . self::class . '] ' . $e->getMessage());
                 return false;
             }
 
@@ -271,16 +278,33 @@ class HttpSignature {
                 $headersToSign[$h] = $digest;
             } elseif(isset($inputHeaders[$h][0])) {
                 $headersToSign[$h] = $inputHeaders[$h][0];
+            } else {
+                $this->log('[' . self::class . '] Header listed in signature but missing from request: ' . $h);
+                return [false, ''];
             }
         }
         $signingString = self::headersToSigningString($headersToSign);
-        $this->log('[' . self::class . '] verify signatureData: ' . json_encode($signatureData, JSON_UNESCAPED_SLASHES));
-        $this->log('[' . self::class . '] verify inputHeader: ' . json_encode($inputHeaders, JSON_UNESCAPED_SLASHES));
-        $this->log('[' . self::class . '] verify signing string: ' . $signingString);
+        $this->log('[' . self::class . '] verify signatureData: ' . json_encode($this->redactSensitive($signatureData), JSON_UNESCAPED_SLASHES));
+        $this->log('[' . self::class . '] verify inputHeader: ' . json_encode($this->redactSensitive($inputHeaders), JSON_UNESCAPED_SLASHES));
 
         $verified = openssl_verify($signingString, base64_decode($signatureData['signature']), $publicKey, OPENSSL_ALGO_SHA256);
 
         return [$verified, $signingString];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function redactSensitive(array $data): array
+    {
+        foreach (['signature', 'digest'] as $sensitiveKey) {
+            if (isset($data[$sensitiveKey])) {
+                $data[$sensitiveKey] = '[redacted]';
+            }
+        }
+
+        return $data;
     }
 
     private function log(string $message): void

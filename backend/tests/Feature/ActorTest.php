@@ -36,7 +36,7 @@ class ActorTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonFragment([
                 'type' => 'Person',
-                '@context' => 'https://www.w3.org/ns/activitystreams',
+                '@context' => ['https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1'],
                 'id' => $this->profile->remote_url,
                 'outbox' => $this->profile->outbox_url,
                 'following' => $this->profile->following_url,

@@ -7,6 +7,7 @@ use App\Models\Item;
 use App\Models\ItemUser;
 use App\Models\Profile;
 use App\Models\Review;
+use App\Services\IpService;
 use App\Services\Fediverse\HttpSignature;
 use App\Services\Models\ItemService;
 use App\Services\Models\ItemUserService;
@@ -45,6 +46,13 @@ class ReviewTest extends TestCase {
       $this->createStorageDownloadsMock();
       $this->profile = $profileService->storeLocal($this->user);
       $this->remoteProfile = json_decode(file_get_contents(__DIR__ . '/../_Fixtures/fediverse-fake-user/profile.json'));
+
+      $this->app->bind(IpService::class, fn () => new class extends IpService {
+          public function hostToIps(string $host): array
+          {
+              return ['93.184.216.34'];
+          }
+      });
 
       Http::fake([
           $this->remoteProfile->remote_url => Http::response(file_get_contents(__DIR__ . '/../_Fixtures/fediverse-fake-user/actor.json')),

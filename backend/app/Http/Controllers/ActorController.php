@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use ActivityPhp\Type;
+use ActivityPhp\Type\AbstractObject;
 use ActivityPhp\Type\Extended\Activity\Delete;
 use ActivityPhp\Type\Extended\Activity\Follow;
 use ActivityPhp\Type\Extended\Activity\Undo;
@@ -17,206 +20,284 @@ use App\Services\Fediverse\Activity\UndoActivity;
 use App\Services\Fediverse\Activity\FollowActivity;
 use App\Services\Fediverse\FollowingCollection;
 use App\Services\Fediverse\FollowersCollection;
+use App\Services\Fediverse\HttpFediverseResponse;
 use App\Services\Fediverse\HttpSignature;
+use App\Services\Fediverse\OutboxCollection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\Response;
 
 class ActorController
 {
-    public function actor(string $username)
+    public function __construct(
+        private HttpFediverseResponse $httpFediverseResponse
+    ) {}
+
+    public function actor(string $username): JsonResponse
     {
         abort_if(config('flox.federation.enabled') === false, 404);
 
         $profile = (new Profile())->whereLocalProfile($username);
+        Log::debug('[ActorRequest] profile: ' . json_encode($profile));
         if($profile === null) {
-            return response('', 404);
+            return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
         }
-        $person = (new ActorActivity())->actorObject($profile);
+        $person = (new ActorActivity())->actorObject($profile)->toArray();
+        Log::debug('[ActorRequest] person: ' . json_encode($person));
 
-        return response()->json($person->toArray(), 200, [], JSON_UNESCAPED_SLASHES)
-            ->header('Access-Control-Allow-Origin', '*');
+        return $this->httpFediverseResponse->get(Response::HTTP_OK, $person);
     }
 
-    public function followers(string $username)
+    public function followers(string $username): JsonResponse
     {
         abort_if(config('flox.federation.enabled') === false, 404);
 
         $profileBuilder = Profile::where('username', $username);
         switch($profileBuilder->count()) {
             case 0:
-                return response('', 404);
+                return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
             case 1:
                 $followers = (new FollowersCollection())->get($profileBuilder->first());
-                return response()->json($followers->toArray(), 200, [], JSON_UNESCAPED_SLASHES)
-                    ->header('Access-Control-Allow-Origin', '*');
+                return $this->httpFediverseResponse->get(Response::HTTP_OK, $followers->toArray());
             default:
-                return response('', 500);
+                return $this->httpFediverseResponse->get(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function following(string $username)
+    public function following(string $username): JsonResponse
     {
         abort_if(config('flox.federation.enabled') === false, 404);
 
         $profileBuilder = Profile::where('username', $username);
         switch($profileBuilder->count()) {
             case 0:
-                return response('', 404);
+                return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
             case 1:
                 $followings = (new FollowingCollection())->get($profileBuilder->first());
-                return response()->json($followings->toArray(), 200, [], JSON_UNESCAPED_SLASHES)
-                    ->header('Access-Control-Allow-Origin', '*');
+                return $this->httpFediverseResponse->get(Response::HTTP_OK, $followings->toArray());
             default:
-                return response('', 500);
+                return $this->httpFediverseResponse->get(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function inbox(Request $request, string $username)
+    public function inbox(Request $request, string $username): JsonResponse
     {
         abort_if(config('flox.federation.enabled') === false, 404);
 
+        $activity = $this->parseInboxActivity($request);
+        if ($activity instanceof JsonResponse) {
+            return $activity;
+        }
+
+        $deleteProfile = null;
+        if (Delete::class === $activity::class) {
+            $deleteProfile = $this->resolveDeleteProfile($activity, $request);
+            if ($deleteProfile instanceof JsonResponse) {
+                return $deleteProfile;
+            }
+        }
+
+        $verifiedActor = null;
+        $signatureError = $this->verifyInboxSignature($request, $activity, $deleteProfile, $verifiedActor);
+        if ($signatureError instanceof JsonResponse) {
+            return $signatureError;
+        }
+
+        return match ($activity::class) {
+            Create::class => $this->handleCreateActivity($activity, $request, $verifiedActor),
+            Delete::class => $this->handleDeleteActivity($activity, $deleteProfile),
+            Follow::class => $this->handleFollowActivity($activity),
+            Undo::class => $this->handleUndoActivity($activity),
+            default => $this->handleUnknownActivity($activity, $request),
+        };
+    }
+
+    private function parseInboxActivity(Request $request): JsonResponse|AbstractObject
+    {
         $payload = $request->getContent();
         Log::debug("[InboxRequest]", $request->all());
         try {
             TypeConfiguration::set('undefined_properties', 'ignore');
             $activity = Type::fromJson($payload);
         } catch(\Exception $e) {
-            return response('', 400);
+            return $this->httpFediverseResponse->get(Response::HTTP_BAD_REQUEST);
         }
         Log::debug("[InboxActivity] " . $activity::class . ': ' . $activity->toJson(JSON_UNESCAPED_SLASHES));
-        $activityService = new ActivityService();
 
+        return $activity;
+    }
+
+    /**
+     * Resolves the local profile targeted by a Delete activity, needed both
+     * to verify the request signature and to perform the delete itself.
+     */
+    private function resolveDeleteProfile(Delete $activity, Request $request): JsonResponse|Profile
+    {
+        $objectActivity = $activity->get('object');
+        if(!$objectActivity || ($objectActivity !== $activity->get('actor') && $objectActivity && !$this->isTombstone($activity))) {
+            $this->logInvalidState("[InboxActivity] " . $activity::class . ' invalid state', $request);
+            return $this->httpFediverseResponse->get(Response::HTTP_OK);
+        }
+        $remoteUrl = is_string($objectActivity) ?
+            $objectActivity : $activity->get('actor');
+        $profiles = Profile::where(['remote_url' => $remoteUrl]);
+        if(0 === $profiles->count()) {
+            Log::debug("[InboxActivity] " . $activity::class . ' unknown profile: ' . $remoteUrl);
+            return $this->httpFediverseResponse->get(Response::HTTP_OK);
+        }
+
+        return $profiles->first();
+    }
+
+    private function verifyInboxSignature(Request $request, AbstractObject $activity, ?Profile $deleteProfile, &$verifiedActor = null): ?JsonResponse
+    {
+        $payload = $request->getContent();
         $headers = $request->headers;
-        Log::debug("[InboxRequestHeaders] " . (string) $headers);
+        Log::debug("[InboxRequestHeaders] " . json_encode($this->redactedHeaders($headers)));
         try {
-            $actor = false;
-            if(Delete::class === $activity::class) {
-                if(!$activity->object || ($activity->object !== $activity->actor && $activity->object && !$this->isTombstone($activity))) {
-                    $this->logInvalidState("[InboxActivity] " . $activity::class . ' invalid state', $request);
-                    return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
-                        ->header('Access-Control-Allow-Origin', '*');
-                }
-                $remoteUrl = is_string($activity->object) ?
-                    $activity->object : $activity->actor;
-                $profiles = Profile::where(['remote_url' => $remoteUrl]);
-                if(0 === $profiles->count()) {
-                    Log::debug("[InboxActivity] " . $activity::class . ' unknown profile: ' . $remoteUrl);
-                    return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
-                        ->header('Access-Control-Allow-Origin', '*');
-                } else {
-                    $profile = $profiles->first();
-                    $actor = (new ActorActivity())->actorObject($profile);
-                }
-            }
-            $verifiedSignature = (new HttpSignature())->verifySignature($request->getMethod(),  $request->getPathInfo(), $headers, $payload, $actor);
+            $actor = $deleteProfile !== null
+                ? (new ActorActivity())->actorObject($deleteProfile)
+                : false;
+            $verifiedSignature = (new HttpSignature())->verifySignature($request->getMethod(), $request->getPathInfo(), $headers, $payload, $actor, $verifiedActor);
         } catch(\Exception $e) {
             Log::error('[InboxActivity] Error: ' . $e->getMessage());
-            return response('', 500);
+            return $this->httpFediverseResponse->get(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         if(!$verifiedSignature) {
             Log::debug("[InboxActivity] Wrong signature");
-            return response('', 401);
+            return $this->httpFediverseResponse->get(Response::HTTP_UNAUTHORIZED);
         }
 
-        switch($activity::class) {
-            case Create::class:
-                try {
-                    $createActivity = new CreateActivity();
-                    $createActivity->activity($activity);
-                    $this->logInvalidState("[InboxCreateResponse] Create activity: " . $activity::class, $request);
-                } catch(\Exception $e) {
-                    switch($e->getMessage()) {
-                        case $createActivity::ACTIVITY_MISSING_IN_REPLY_TO:
-                            Log::debug("[InboxCreateResponse] Missing inReplyTo");
-                            return response()->json('', 400, [], JSON_UNESCAPED_SLASHES)
-                                ->header('Access-Control-Allow-Origin', '*');
-                        case $createActivity::ACTIVITY_UNKNOWN_PROFILE:
-                            Log::debug("[InboxCreateResponse] Unknown local profile");
-                            return response()->json('', 404, [], JSON_UNESCAPED_SLASHES)
-                                ->header('Access-Control-Allow-Origin', '*');
-                        case $createActivity::ACTIVITY_UNKNOWN_REVIEW:
-                            Log::debug("[InboxCreateResponse] Unknown review");
-                            return response()->json('', 404, [], JSON_UNESCAPED_SLASHES)
-                                ->header('Access-Control-Allow-Origin', '*');
-                        default:
-                            throw new \Exception($e);
-                    }
-                }
-                return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
-                    ->header('Access-Control-Allow-Origin', '*');
-
-            case Delete::class:
-                try {
-                    if($this->isTombstone($activity)) {
-                        Log::debug("[InboxDeleteResponseBefore] Deleted: " . json_encode($activity->get('object')));
-                        $deletedComment = Comment::where([
-                            'profile_id' => $profile->id,
-                            'source_url' => $activity->object->id
-                        ])->delete();
-                        Log::debug("[InboxDeleteResponseAfter] Deleted: " . json_encode($deletedComment));
-                    } else {
-                        Profile::where(['remote_url' => $activity->get('object')])->delete();
-                    }
-                } catch(\Exception $e) {
-                    switch($e->getMessage()) {
-                        default:
-                            throw new \Exception($e);
-                    }
-                }
-                Log::debug("[InboxDeleteResponse] Deleted: " . json_encode($activity->get('object')));
-                return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
-                    ->header('Access-Control-Allow-Origin', '*');
-            case Follow::class:
-                try {
-                    $followActivity = new FollowActivity();
-                    $followActivity->activity($activity);
-                } catch(\Exception $e) {
-                    switch($e->getMessage()) {
-                        case $activityService::ACTIVITY_WRONG_TARGET:
-                            Log::debug("[InboxFollowResponse] Wrong target");
-                            return response('', 404);
-                        default:
-                            throw new \Exception($e);
-                    }
-                }
-                return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
-                    ->header('Access-Control-Allow-Origin', '*');
-            case Undo::class:
-                try {
-                    $undoActivity = new UndoActivity();
-                    $undoActivity->activity($activity);
-                } catch(\Exception $e) {
-                    switch($e->getMessage()) {
-                        case $activityService::ACTIVITY_WRONG_TARGET:
-                            Log::debug("[InboxUndoResponse] Wrong target");
-                            return response('', 404);
-                        case $undoActivity::ACTIVITY_WRONG_OBJECT:
-                            Log::debug("[InboxUndoResponse] Wrong object");
-                            return response('', 400);
-                        case $undoActivity::ACTIVITY_UNKNOWN_FOLLOWER:
-                            Log::debug("[InboxUndoResponse] Unknown follower");
-                            return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
-                                ->header('Access-Control-Allow-Origin', '*');
-                        default:
-                            throw new \Exception($e);
-                    }
-                }
-                return response()->json('', 200, [], JSON_UNESCAPED_SLASHES)
-                    ->header('Access-Control-Allow-Origin', '*');
-            default:
-                $this->logInvalidState("[InboxDefaultResponse] Unknown activity: " . $activity::class, $request);
-                return response('', 501);
-        }
-
+        return null;
     }
 
-    public function outbox()
+    /**
+     * @return array<string, mixed>
+     */
+    private function redactedHeaders(HeaderBag $headers): array
     {
-        return response('', 501);
+        $redacted = $headers->all();
+        foreach (['signature', 'digest'] as $sensitiveHeader) {
+            if (isset($redacted[$sensitiveHeader])) {
+                $redacted[$sensitiveHeader] = ['[redacted]'];
+            }
+        }
+
+        return $redacted;
     }
 
-    public function sharedInbox(Request $request)
+    private function handleCreateActivity(Create $activity, Request $request, $verifiedActor): JsonResponse
+    {
+        try {
+            $createActivity = new CreateActivity();
+            $createActivity->activity($activity, $verifiedActor);
+            $this->logInvalidState("[InboxCreateResponse] Create activity: " . $activity::class, $request);
+        } catch(\Exception $e) {
+            switch($e->getMessage()) {
+                case $createActivity::ACTIVITY_MISSING_IN_REPLY_TO:
+                    Log::debug("[InboxCreateResponse] Missing inReplyTo");
+                    return $this->httpFediverseResponse->get(Response::HTTP_BAD_REQUEST);
+                case $createActivity::ACTIVITY_UNKNOWN_PROFILE:
+                    Log::debug("[InboxCreateResponse] Unknown local profile");
+                    return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
+                case $createActivity::ACTIVITY_UNKNOWN_REVIEW:
+                    Log::debug("[InboxCreateResponse] Unknown review");
+                    return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
+                default:
+                    throw new \Exception($e);
+            }
+        }
+
+        return $this->httpFediverseResponse->get(Response::HTTP_OK);
+    }
+
+    private function handleDeleteActivity(Delete $activity, Profile $profile): JsonResponse
+    {
+        $objectActivity = $activity->get('object');
+        if($this->isTombstone($activity)) {
+            Log::debug("[InboxDeleteResponseBefore] Deleted: " . json_encode($objectActivity));
+            $deletedComment = Comment::where([
+                'profile_id' => $profile->id,
+                'source_url' => $objectActivity->id
+            ])->delete();
+            Log::debug("[InboxDeleteResponseAfter] Deleted: " . json_encode($deletedComment));
+        } else {
+            Profile::where(['remote_url' => $objectActivity])->delete();
+        }
+        Log::debug("[InboxDeleteResponse] Deleted: " . json_encode($objectActivity));
+
+        return $this->httpFediverseResponse->get(Response::HTTP_OK);
+    }
+
+    private function handleFollowActivity(Follow $activity): JsonResponse
+    {
+        try {
+            $followActivity = new FollowActivity();
+            $followActivity->activity($activity);
+        } catch(\Exception $e) {
+            switch($e->getMessage()) {
+                case ActivityService::ACTIVITY_WRONG_TARGET:
+                    Log::debug("[InboxFollowResponse] Wrong target");
+                    return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
+                default:
+                    throw new \Exception($e);
+            }
+        }
+
+        return $this->httpFediverseResponse->get(Response::HTTP_OK);
+    }
+
+    private function handleUndoActivity(Undo $activity): JsonResponse
+    {
+        try {
+            $undoActivity = new UndoActivity();
+            $undoActivity->activity($activity);
+        } catch(\Exception $e) {
+            switch($e->getMessage()) {
+                case ActivityService::ACTIVITY_WRONG_TARGET:
+                    Log::debug("[InboxUndoResponse] Wrong target");
+                    return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
+                case $undoActivity::ACTIVITY_WRONG_OBJECT:
+                    Log::debug("[InboxUndoResponse] Wrong object");
+                    return $this->httpFediverseResponse->get(Response::HTTP_BAD_REQUEST);
+                case $undoActivity::ACTIVITY_UNKNOWN_FOLLOWER:
+                    Log::debug("[InboxUndoResponse] Unknown follower");
+                    return $this->httpFediverseResponse->get(Response::HTTP_OK);
+                default:
+                    throw new \Exception($e);
+            }
+        }
+
+        return $this->httpFediverseResponse->get(Response::HTTP_OK);
+    }
+
+    private function handleUnknownActivity(AbstractObject $activity, Request $request): JsonResponse
+    {
+        $this->logInvalidState("[InboxDefaultResponse] Unknown activity: " . $activity::class, $request);
+
+        return $this->httpFediverseResponse->get(Response::HTTP_NOT_IMPLEMENTED);
+    }
+
+     public function outbox(string $username): JsonResponse
+     {
+         abort_if(config('flox.federation.enabled') === false, 404);
+
+         $profileBuilder = Profile::where('username', $username);
+         switch($profileBuilder->count()) {
+             case 0:
+                 return $this->httpFediverseResponse->get(Response::HTTP_NOT_FOUND);
+             case 1:
+                 $outbox = (new OutboxCollection())->get($profileBuilder->first());
+                 return $this->httpFediverseResponse->get(Response::HTTP_OK, $outbox->toArray());
+             default:
+                 return $this->httpFediverseResponse->get(Response::HTTP_INTERNAL_SERVER_ERROR);
+         }
+     }
+
+    public function sharedInbox(Request $request): JsonResponse
     {
         abort_if(config('flox.federation.enabled') === false, 404);
 
@@ -231,6 +312,7 @@ class ActorController
 
     private function isTombstone(Delete $activity): bool
     {
-        return is_object($activity->object) && $activity->object->type === 'Tombstone';
+        $objectActivity = $activity->get('object');
+        return is_object($objectActivity) && $objectActivity->type === 'Tombstone';
     }
 }

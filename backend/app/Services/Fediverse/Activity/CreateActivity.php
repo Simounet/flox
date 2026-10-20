@@ -9,7 +9,6 @@ use App\Models\Comment;
 use App\Models\Profile;
 use App\Models\Review;
 use App\Services\Models\ProfileService;
-use App\Services\Fediverse\ActivityPubFetchService;
 
 class CreateActivity
 {
@@ -17,7 +16,7 @@ class CreateActivity
     public const ACTIVITY_UNKNOWN_REVIEW = 'activity-unknown-review';
     public const ACTIVITY_UNKNOWN_PROFILE = 'activity-unknown-profile';
 
-    public function activity(Create $createActivity): void
+    public function activity(Create $createActivity, $verifiedActor): void
     {
         $inReplyTo = $createActivity->object->inReplyTo ?? '';
         if ($inReplyTo === '') {
@@ -39,12 +38,11 @@ class CreateActivity
             throw new \Exception(self::ACTIVITY_UNKNOWN_PROFILE);
         }
 
-        $this->storeComment($localProfile, $createActivity, $reviewId);
+        $this->storeComment($localProfile, $createActivity, $reviewId, $verifiedActor);
     }
 
-    private function storeComment(Profile $localProfile, Create $createActivity, int $reviewId): void
+    private function storeComment(Profile $localProfile, Create $createActivity, int $reviewId, $actorComment): void
     {
-        $actorComment = (new ActivityPubFetchService())->get($createActivity->get('actor'));
         $profileService = new ProfileService(new Profile());
         $profileComment = $profileService->updateOrCreate($actorComment);
         $commentModel = new Comment();

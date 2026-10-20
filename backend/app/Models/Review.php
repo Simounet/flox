@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -74,4 +75,12 @@ class Review extends Model
             $reviewData
         );
     }
+
+    public function scopeFindByUser(Builder $query, int $userId): Builder
+    {
+        return $query->whereHas('itemUser', function (Builder $itemUserQuery) use ($userId) {
+            $itemUserQuery->where('user_id', $userId);
+        });
+    }
+
 }

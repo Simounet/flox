@@ -10,7 +10,7 @@ use ActivityPhp\Type\Ontology;
 use ActivityPhp\Type\TypeConfiguration;
 use App\Models\Profile;
 use App\Services\Fediverse\HttpSignature;
-use App\Services\HelpersService;
+use App\Services\UrlService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
@@ -28,7 +28,7 @@ class ActivityPubFetchService
                 ->timeout(30)
                 ->connectTimeout(5)
                 ->retry(3, 500, function (\Exception $exception) {
-                    if($exception->response->status() === 410) {
+                    if($exception instanceof RequestException && $exception->response->status() === 410) {
                         return false;
                     }
                     return $exception instanceof ConnectionException;
@@ -64,7 +64,7 @@ class ActivityPubFetchService
 
     private function urlValidation(string $url): void
     {
-        if((new HelpersService())->urlValidate($url) === false) {
+        if((new UrlService())->validate($url) === false) {
             throw new \Exception('Wrong URL');
         }
     }

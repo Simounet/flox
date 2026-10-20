@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Fediverse\Activity;
 
 use ActivityPhp\Type\Extended\Actor\Person;
@@ -14,16 +16,19 @@ class ActorActivity
     public function actorObject(Profile $profile): Person
     {
         TypeConfiguration::set('undefined_properties', 'ignore');
-        $avatarUrl = $profile->avatar_url ?? config('APP_URL') . self::DEFAULT_PROFILE_AVATAR;
+        // @TODO avatar handling on Flox side ($profile->avatar_url already available on ActivityPub side)
+        $avatarUrl = config('app.url') . '/' . ($profile->avatar_url ?? self::DEFAULT_PROFILE_AVATAR);
         $icon = new Image();
-        $icon->set('mediaType', 'image/jpg');
+        // @TODO $profile->avatar_url should change the mimetype
+        $icon->set('mediaType', 'image/png');
         $icon->set('url', $avatarUrl);
 
         $person = new Person();
-        $person->set('@context', 'https://www.w3.org/ns/activitystreams');
+        $person->set('@context', ['https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1']);
         $person->set('id', $profile->remote_url);
         $person->set('url', $profile->remote_url);
         $person->set('name', $profile->name);
+        $person->set('published', $profile->created_at->toIso8601ZuluString());
         $person->set('preferredUsername', $profile->username);
         $person->set('inbox', $profile->inbox_url);
         $person->set('outbox', $profile->outbox_url);
