@@ -56,7 +56,15 @@ module.exports = {
       },
     ],
   },
-  plugins: [new VueLoaderPlugin(), new MiniCssExtractPlugin()].concat(
+  plugins: [
+    new VueLoaderPlugin(),
+    new MiniCssExtractPlugin(),
+    new webpack.DefinePlugin({
+      __VUE_OPTIONS_API__: JSON.stringify(true),
+      __VUE_PROD_DEVTOOLS__: JSON.stringify(false),
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false)
+    })
+  ].concat(
     withReport ? [new BundleAnalyzerPlugin({ analyzerMode: "static" })] : []
   ),
   optimization: {
